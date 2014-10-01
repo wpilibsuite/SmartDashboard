@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<layout name="standard">
+	<widget field="Claw" class="edu.wpi.first.smartdashboard.gui.elements.Subsystem">
+		<location x="0" y="0"/>
+	</widget>
+	<widget field="Wings" class="edu.wpi.first.smartdashboard.gui.elements.Subsystem">
+		<location x="0" y="29"/>
+	</widget>
+	<widget field="Elevator" class="edu.wpi.first.smartdashboard.gui.elements.Subsystem">
+		<location x="151" y="0"/>
+	</widget>
+	<widget field="Driveline" class="edu.wpi.first.smartdashboard.gui.elements.Subsystem">
+		<location x="0" y="58"/>
+	</widget>
+	<widget field="Collect" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="158" y="29"/>
+	</widget>
+	<widget field="Wrist" class="edu.wpi.first.smartdashboard.gui.elements.Subsystem">
+		<location x="318" y="0"/>
+	</widget>
+	<widget field="Stop Collect" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="294" y="371"/>
+	</widget>
+	<widget field="Shine Camera Light" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="171" y="58"/>
+	</widget>
+	<widget field="Jog Up" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="225" y="29"/>
+	</widget>
+	<widget field="Deployment" class="edu.wpi.first.smartdashboard.gui.elements.Subsystem">
+		<location x="318" y="29"/>
+	</widget>
+	<widget field="Jog Down" class="edu.wpi.first.smartdashboard.gui.elements.Button">
+		<location x="469" y="0"/>
+	</widget>
+</layout>

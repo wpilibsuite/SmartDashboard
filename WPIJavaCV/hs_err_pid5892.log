@@ -1,0 +1,30 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_STACK_OVERFLOW (0xc00000fd) at pc=0x62884f2a, pid=5892, tid=4092
+#
+# JRE version: 6.0_23-b05
+# Java VM: Java HotSpot(TM) Client VM (19.0-b09 mixed mode, sharing windows-x86 )
+# Problematic frame:
+# C  [opencv_core220.dll+0x54f2a]
+#
+# If you would like to submit a bug report, please visit:
+#   http://java.sun.com/webapps/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000d9000):  JavaThread "main" [_thread_in_native, id=4092, stack(0x000e0000,0x00130000)]
+
+siginfo: ExceptionCode=0xc00000fd, ExceptionInformation=0x00000001 0x000e0ffc 
+
+Registers:
+EAX=0x00000000, EBX=0x00000000, ECX=0x000e1014, EDX=0x00000000
+ESP=0x000e1000, EBP=0x000e1108, ESI=0x04547c30, EDI=0x04547c30
+EIP=0x62884f2a, EFLAGS=0x00010206
+
+Register to memory mapping:
+
+EAX=0x00000000
