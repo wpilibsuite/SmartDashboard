@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.wpi.first.wpilib</groupId>
+  <artifactId>SmartDashboard</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>WPILib Maven Repository</id>
+      <url>http://first.wpi.edu/FRC/roborio/maven/</url>
+    </repository>
+  </repositories>
+  
+  <distributionManagement>
+    <repository>
+      <id>filesystem.repo</id>
+      <name>Temporary Staging Repository</name>
+      <url>file://${user.home}/releases/maven</url>
+    </repository>
+  </distributionManagement>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <artifactItems>
+            <artifactItem>
+              <groupId>edu.wpi.first.wpilib.networktables.java</groupId>
+              <artifactId>NetworkTables</artifactId>
+              <version>0.1.0-SNAPSHOT</version>
+              <type>jar</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>lib</outputDirectory>
+              <!-- <destFileName>[ filename ]</destFileName> -->
+            </artifactItem>
+          </artifactItems>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.9.1</version>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>dist/tools/SmartDashboard.jar</file>
+                  <type>jar</type>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

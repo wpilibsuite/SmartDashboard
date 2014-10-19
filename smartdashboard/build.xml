@@ -18,12 +18,16 @@
     <target name="clean">
         <delete dir="${build.dir}" />
         <delete dir="${dist.dir}" />
+        <delete dir="target" />
+        <delete dir="${lib.dir}" includes="NetworkTables-*.jar" />
     </target>
 
-
     <target name="compile">
+        <exec executable="mvn"><arg value="dependency:copy" /></exec>
         <mkdir dir="${classes.dir}" />
-        <javac srcdir="${src.dir}" 
+        <javac source="1.6"
+               target="1.6"
+               srcdir="${src.dir}" 
                destdir="${classes.dir}" 
                classpathref="classpath"
                includeantruntime="false"
@@ -51,6 +55,10 @@
             </manifest>
 			<zipgroupfileset dir="lib/" includes="*.jar" /> 
         </jar>
+    </target>
+    
+    <target name="deploy" depends="jar">
+      <exec executable="mvn"><arg value="deploy" /></exec>
     </target>
     
     <target name="run" depends="jar">

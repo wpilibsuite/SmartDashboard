@@ -1,0 +1,5 @@
+*~
+smartdashboard/lib/NetworkTables*
+dist/
+build/
+target/
