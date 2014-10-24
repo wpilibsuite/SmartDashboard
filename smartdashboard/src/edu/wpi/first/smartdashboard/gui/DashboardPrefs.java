@@ -25,6 +25,7 @@ public class DashboardPrefs implements PropertyHolder {
 
 	private Map<String, Property> properties = new LinkedHashMap<String, Property>();
 	public final IntegerProperty team = new IntegerProperty(this, "Team Number", 0);
+	public final BooleanProperty usemDNS = new BooleanProperty(this, "Use mDNS (supported on roboRIO)", true);
 	public final BooleanProperty hideMenu = new BooleanProperty(this, "Hide Menu", false);
 	public final BooleanProperty autoShowWidgets = new BooleanProperty(this, "Automatically Show Widgets", true);
 	public final IntegerListProperty grid_widths = new IntegerListProperty(this, "Grid Cell Width(s)", new int[] { 16 });
@@ -104,6 +105,8 @@ public class DashboardPrefs implements PropertyHolder {
 		} else if (property == team) {
 			Robot.setTeam(team.getValue());
 			frame.setTitle("SmartDashboard - " + team.getValue());
+		} else if (property == usemDNS) {
+			Robot.setUseMDNS(usemDNS.getValue());
 		} else if (property == hideMenu) {
 			frame.setShouldHideMenu(hideMenu.getValue());
 		} else if (property == logToCSV) {

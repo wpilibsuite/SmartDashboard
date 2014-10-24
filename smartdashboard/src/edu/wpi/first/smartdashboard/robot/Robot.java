@@ -17,10 +17,11 @@ public class Robot {
 	public static final String TABLE_NAME = "SmartDashboard";
     public static final String LIVE_WINDOW_NAME = "LiveWindow";
 	public static final String PREFERENCES_NAME = "Preferences";
-
 	
 	private static volatile String _host = null;
 	private static volatile int _port = NetworkTable.DEFAULT_PORT;
+	private static int _team;
+	private static boolean _usemDNS = true;
 	private static final IOStreamFactory configurableFactory = new IOStreamFactory() {
 		@Override
 		public IOStream createStream() throws IOException {
@@ -36,13 +37,38 @@ public class Robot {
         }
 
 	public static void setTeam(int team) {
-		setHost("10." + (team / 100) + "." + (team % 100) + ".2");
+		_team = team;
+		setHost();
 	}
-	public static void setHost(String host){
+	
+	/**
+	 * Switch between using MDNS and a static IP to resolve the robot's
+	 * hostname (mDNS is only supported on the roboRIO)
+	 * @param useMDNS
+	 */
+	public static void setUseMDNS(boolean usemDNS) {
+		_usemDNS = usemDNS;
+		setHost();
+	}
+	
+	public static void setHost(){
+		String host;
+		
+		if(_usemDNS) {
+			host = "roboRIO-" + _team + ".local";
+		} else {
+			host = "10." + (_team / 100) + "." + (_team % 100) + ".2";
+		}
+		
 		_host = host;
 		System.out.println("Host: "+host);
 		client.close();
 	}
+	
+	public static String getHost() {
+		return _host;
+	}
+	
 	public static void setPort(int port){
 		_port = port;
 		client.close();

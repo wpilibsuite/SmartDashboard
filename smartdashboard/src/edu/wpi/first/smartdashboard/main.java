@@ -63,15 +63,6 @@ public class main {
         // Search the filesystem for extensions (49%)
         FileSniffer.findExtensions(monitor, 0, 490);
         
-        
-        
-        ArgParser argParser = new ArgParser(args, true, true, new String[] { "ip" });
-        inCompetition = argParser.hasFlag("competition");
-        
-        
-        
-        
-        
         // Initialize GUI
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -82,38 +73,24 @@ public class main {
             ex.printStackTrace();
             System.exit(2);
         }
-        
-        
-        
-        
+                
         IntegerProperty teamProp = frame.getPrefs().team;
-        if (argParser.hasValue("ip")) {
-            monitor.setProgress(650);
-            monitor.setNote("Connecting to robot at: "+argParser.getValue("ip"));
-            Robot.setHost(argParser.getValue("ip"));
+        monitor.setProgress(600);
+        monitor.setNote("Getting Team Number");
+        int teamNumber = teamProp.getValue();
+        teamNumberLoop: while (teamNumber <= 0) {
+            try{
+				String input = JOptionPane.showInputDialog("Input Team Number");
+				if(input==null){
+					teamNumber = 0;
+					break teamNumberLoop;
+				}
+                teamNumber = Integer.parseInt(input);
+            } catch(Exception e){}
         }
-        else{
-            monitor.setProgress(600);
-            monitor.setNote("Getting Team Number");
-            int teamNumber = teamProp.getValue();
-            teamNumberLoop: while (teamNumber <= 0) {
-                try{
-					String input = JOptionPane.showInputDialog("Input Team Number");
-					if(input==null){
-						teamNumber = 0;
-						break teamNumberLoop;
-					}
-                    teamNumber = Integer.parseInt(input);
-                } catch(Exception e){}
-            }
-            monitor.setProgress(650);
-            monitor.setNote("Connecting to robot of team: "+teamNumber);
-            teamProp.setValue(teamNumber);
-        }
-        
-        
-        
-        
+        monitor.setProgress(650);
+        monitor.setNote("Connecting to robot of team: "+teamNumber);
+        teamProp.setValue(teamNumber);
         
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
