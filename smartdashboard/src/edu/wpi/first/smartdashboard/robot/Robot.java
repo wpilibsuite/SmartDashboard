@@ -38,7 +38,7 @@ public class Robot {
 
 	public static void setTeam(int team) {
 		_team = team;
-		setHost();
+		setHost("");
 	}
 	
 	/**
@@ -48,13 +48,13 @@ public class Robot {
 	 */
 	public static void setUseMDNS(boolean usemDNS) {
 		_usemDNS = usemDNS;
-		setHost();
+		setHost("");
 	}
-	
-	public static void setHost(){
-		String host;
-		
-		if(_usemDNS) {
+
+    public static void setHost(String host) {
+        if (host != "") {
+            // Use the given host
+		} else if (_usemDNS) {
 			host = "roboRIO-" + _team + ".local";
 		} else {
 			host = "10." + (_team / 100) + "." + (_team % 100) + ".2";
