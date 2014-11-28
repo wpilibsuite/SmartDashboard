@@ -1,10 +1,15 @@
 package edu.wpi.first.smartdashboard.extensions;
 
 import java.io.*;
+import java.lang.String;
+import java.lang.System;
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.jar.JarFile;
+import java.util.jar.JarEntry;
+import java.util.Enumeration;
 import java.net.*;
-import java.util.*;
-import java.util.jar.*;
 
 import javax.swing.*;
 
@@ -13,20 +18,26 @@ import edu.wpi.first.smartdashboard.gui.elements.*;
 import edu.wpi.first.smartdashboard.types.*;
 
 /**
- * This class searches through the ./lib and ./lib/extensions folders and adds
- * to the class path all of the jars it finds.  Then it searches the ./extensions folder
+ * This class searches through the ./lib, ~/wpilib/tools/sd_extensions,
+ * and ~/wpilib/tools/sd_extensions/lib folders and adds to the class path all
+ * of the jars it finds.  Then it searches the ~/wpilib/tools/sd_extensions folder
  * for any jars, adding them to the class path and then searching through them to find any
  * internal {@link StaticWidget StaticWidgets} or {@link Widget Widgets}.
+ *
  * @author Joe Grinstead
  */
 public class FileSniffer {
-    public static final String EXTENSIONS_FOLDER = "./extensions";
+    private static final File EXTENSION_DIR =
+            new File(getUserHomeDir(), "wpilib/tools/sd_extensions");
+
+    private static final File[] LIBRARY_DIRS = {
+            new File("./lib"),
+            new File(EXTENSION_DIR, "lib"),
+            EXTENSION_DIR
+    };
 
     public static void findExtensions(ProgressMonitor monitor, int min, int max) {
         monitor.setNote("Loading Extensions");
-        File extensions = new File(EXTENSIONS_FOLDER);
-        File lib1 = new File("./lib");
-        File lib2 = new File("./extensions/lib");
 
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<?> sysclass = URLClassLoader.class;
@@ -41,15 +52,15 @@ public class FileSniffer {
             return;
         }
 
-        for (File lib : new File[]{lib1, lib2, extensions}) {
-            if (!lib.exists()) {
+        for (File libDir : LIBRARY_DIRS) {
+            if (!libDir.exists()) {
                 monitor.setProgress(min + (max - min) / 5);
                 continue;
             }
-            System.out.println("Searching Folder:" + lib);
-            monitor.setNote("Searching Folder:" + lib);
+            System.out.println("Searching for library jars in: " + libDir);
+            monitor.setNote("Searching for library jars in: " + libDir);
 
-            File[] files = lib.listFiles(new FilenameFilter() {
+            File[] files = libDir.listFiles(new FilenameFilter() {
 
                 public boolean accept(File dir, String name) {
                     return name.endsWith(".jar");
@@ -61,7 +72,7 @@ public class FileSniffer {
             }
 
             for (File file : files) {
-                System.out.println("Adding Jar:" + file);
+                System.out.println("Adding Jar: " + file);
 
                 try {
                     method.invoke(sysloader, new Object[]{file.toURI().toURL()});
@@ -73,13 +84,13 @@ public class FileSniffer {
             monitor.setProgress(min + (max - min) / 5);
         }
 
-        if (!extensions.exists()) {
+        if (!EXTENSION_DIR.exists()) {
             System.out.println("No Extension Folder");
             monitor.setProgress(max);
             return;
         }
 
-        File[] files = extensions.listFiles(new FilenameFilter() {
+        File[] files = EXTENSION_DIR.listFiles(new FilenameFilter() {
 
             public boolean accept(File dir, String name) {
                 return name.endsWith(".jar");
@@ -88,9 +99,9 @@ public class FileSniffer {
 
         double fileCount = 0;
         for (File file : files) {
-            System.out.println("Searching Jar:" + file);
+            System.out.println("Searching for extensions in: " + file);
             monitor.setProgress((int) ((min + max) / 2.0 * (1.0 + fileCount++ / files.length)));
-            monitor.setNote("Searching Jar:" + file);
+            monitor.setNote("Searching for extensions in: " + file);
 
             try {
                 JarFile jar = new JarFile(file);
@@ -113,13 +124,13 @@ public class FileSniffer {
                             Class<? extends Widget> element = clazz.asSubclass(Widget.class);
                             DisplayElementRegistry.registerWidget(element);
 
-                            System.out.println("Custom Widget:" + clazz.getSimpleName());
+                            System.out.println("Custom Widget: " + clazz.getSimpleName());
                         } catch (ClassCastException ex) {
                             try {
                                 Class<? extends StaticWidget> element = clazz.asSubclass(StaticWidget.class);
                                 DisplayElementRegistry.registerStaticWidget(element);
 
-                                System.out.println("Custom Static Widget:" + clazz.getSimpleName());
+                                System.out.println("Custom Static Widget: " + clazz.getSimpleName());
                             } catch (ClassCastException ex2) {
                             }
                         } catch (ClassNotFoundException ex) {
@@ -134,5 +145,20 @@ public class FileSniffer {
         }
 
         monitor.setProgress(max);
+    }
+
+    private static File getUserHomeDir() {
+        final String homeDirPath;
+        if (isWindows()) {
+            homeDirPath = System.getenv("USERPROFILE");
+        } else {
+            homeDirPath = System.getProperty("user.home");
+        }
+
+        return new File(homeDirPath);
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").matches("(?i)Windows.*");
     }
 }
