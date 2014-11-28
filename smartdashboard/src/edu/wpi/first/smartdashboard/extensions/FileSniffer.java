@@ -18,18 +18,16 @@ import edu.wpi.first.smartdashboard.gui.elements.*;
 import edu.wpi.first.smartdashboard.types.*;
 
 /**
- * This class searches through the ./lib, ~/wpilib/tools/sd_extensions,
- * and ~/wpilib/tools/sd_extensions/lib folders and adds to the class path all
- * of the jars it finds.  Then it searches the ~/wpilib/tools/sd_extensions folder
- * for any jars, adding them to the class path and then searching through them to find any
- * internal {@link StaticWidget StaticWidgets} or {@link Widget Widgets}.
+ * This class searches for library and extension jars and adds them
+ * to the system class loader. It then searches within extension jars for
+ * {@link StaticWidget StaticWidget}s or {@link Widget Widget}s, and registers
+ * them in the dashboard.
  *
  * @author Joe Grinstead
  */
 public class FileSniffer {
     private static final File EXTENSION_DIR =
-            new File(getUserHomeDir(), "wpilib/tools/sd_extensions");
-
+            new File(getUserHomeDir(), "SmartDashboard/extensions");
     private static final File[] LIBRARY_DIRS = {
             new File("./lib"),
             new File(EXTENSION_DIR, "lib"),
