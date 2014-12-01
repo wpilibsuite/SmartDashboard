@@ -237,38 +237,35 @@ public class Chooser extends AbstractTableWidget implements ITableListener
 
 			combo = new JComboBox();
 
-			synchronized (table)
-			{
-				boolean hasSelection = false;
+			boolean hasSelection = false;
 
-				for (int i = 0; i < choices.size(); i++)
-				{
+			for (int i = 0; i < choices.size(); i++)
+			{
 					String choice = choices.get(i);
 					hasSelection |= choice.equals(selection);
 					combo.addItem(choice);
-				}
+			}
 
-				if (!hasSelection)
-				{
+			if (!hasSelection)
+			{
 					selection = null;
-				}
+			}
 
-				if (table.containsKey(SELECTED))
-				{
+			if (table != null && table.containsKey(SELECTED))
+			{
 					selection = table.getString(SELECTED);
-				}
+			}
 
-				if (selection != null)
-				{
+			if (table != null && selection != null)
+			{
 					combo.setSelectedItem(selection);
 					table.putString(SELECTED, selection);
-				} else
-				{
-					if (table.containsKey(DEFAULT))
+			} else
+			{
+					if (table != null && table.containsKey(DEFAULT))
 					{
-						combo.setSelectedItem(table.getString(DEFAULT));
+							combo.setSelectedItem(table.getString(DEFAULT));
 					}
-				}
 			}
 
 			panel.add(combo);
