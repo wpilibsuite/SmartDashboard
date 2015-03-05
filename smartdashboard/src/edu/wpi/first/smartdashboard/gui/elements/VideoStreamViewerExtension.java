@@ -30,11 +30,11 @@ import javax.imageio.stream.ImageInputStream;
 public class VideoStreamViewerExtension extends StaticWidget {
 
     public static final String NAME = "Simple Camera Viewer";
-    
+
 
     private static final int[] START_BYTES = new int[]{0xFF, 0xD8};
     private static final int[] END_BYTES = new int[]{0xFF, 0xD9};
-    
+
     private boolean ipChanged = true;
     private String ipString = null;
     private long lastFPSCheck = 0;
@@ -62,14 +62,14 @@ public class VideoStreamViewerExtension extends StaticWidget {
                     connection = url.openConnection();
                     connection.setReadTimeout(250);
                     stream = connection.getInputStream();
-                    
+
                     while(!destroyed && !ipChanged){
                         while(System.currentTimeMillis()-lastRepaint<10){
                             stream.skip(stream.available());
                             Thread.sleep(1);
                         }
                         stream.skip(stream.available());
-                        
+
                         imageBuffer.reset();
                         for(int i = 0; i<START_BYTES.length;){
                             int b = stream.read();
@@ -80,7 +80,7 @@ public class VideoStreamViewerExtension extends StaticWidget {
                         }
                         for(int i = 0; i<START_BYTES.length;++i)
                             imageBuffer.write(START_BYTES[i]);
-                        
+
                         for(int i = 0; i<END_BYTES.length;){
                             int b = stream.read();
                             imageBuffer.write(b);
@@ -89,27 +89,27 @@ public class VideoStreamViewerExtension extends StaticWidget {
                             else
                                 i = 0;
                         }
-                        
+
                         fpsCounter++;
                         if(System.currentTimeMillis()-lastFPSCheck>500){
                             lastFPSCheck = System.currentTimeMillis();
                             lastFPS = fpsCounter*2;
                             fpsCounter = 0;
                         }
-                        
+
                         lastRepaint = System.currentTimeMillis();
                         ByteArrayInputStream tmpStream = new ByteArrayInputStream(imageBuffer.toByteArray());
                         imageToDraw = ImageIO.read(tmpStream);
                         System.out.println(System.currentTimeMillis()-lastRepaint);
                         repaint();
                     }
-                
+
                 } catch(Exception e){
                     imageToDraw = null;
                     repaint();
                     e.printStackTrace();
                 }
-                
+
                 if(!ipChanged){
                     try {
                         Thread.sleep(500);
@@ -127,7 +127,7 @@ public class VideoStreamViewerExtension extends StaticWidget {
     private BufferedImage imageToDraw;
     private BGThread bgThread = new BGThread();
     private final int team = DashboardPrefs.getInstance().team.getValue();
-    public final IPAddressProperty ipProperty = new IPAddressProperty(this, "Camera IP Address", new int[]{10, (DashboardPrefs.getInstance().team.getValue() / 100), (DashboardPrefs.getInstance().team.getValue() % 100), 11});
+    public final StringProperty ipProperty = new StringProperty(this, "Camera IP Address or mDNS name", "axis-camera.local");
 
     @Override
     public void init() {
