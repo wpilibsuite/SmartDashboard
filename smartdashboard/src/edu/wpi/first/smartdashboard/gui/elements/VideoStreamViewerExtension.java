@@ -2,26 +2,23 @@ package edu.wpi.first.smartdashboard.gui.elements;
 
 import edu.wpi.first.smartdashboard.gui.DashboardPrefs;
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
-import edu.wpi.first.smartdashboard.properties.IPAddressProperty;
+import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 /**
  *
@@ -37,6 +34,7 @@ public class VideoStreamViewerExtension extends StaticWidget {
 
     private boolean ipChanged = true;
     private String ipString = null;
+    private double rotateAngleRad = 0;
     private long lastFPSCheck = 0;
     private int lastFPS = 0;
     private int fpsCounter = 0;
@@ -126,13 +124,14 @@ public class VideoStreamViewerExtension extends StaticWidget {
     }
     private BufferedImage imageToDraw;
     private BGThread bgThread = new BGThread();
-    private final int team = DashboardPrefs.getInstance().team.getValue();
     public final StringProperty ipProperty = new StringProperty(this, "Camera IP Address or mDNS name", "axis-camera.local");
-
+    public final IntegerProperty rotateProperty = new IntegerProperty(this, "Degrees Rotation", 0);
+    
     @Override
     public void init() {
         setPreferredSize(new Dimension(100, 100));
         ipString = ipProperty.getSaveValue();
+        rotateAngleRad = Math.toRadians(rotateProperty.getValue());
         bgThread.start();
         revalidate();
         repaint();
@@ -143,6 +142,9 @@ public class VideoStreamViewerExtension extends StaticWidget {
         if (property == ipProperty) {
             ipString = ipProperty.getSaveValue();
             ipChanged = true;
+        }
+        if (property == rotateProperty) {
+            rotateAngleRad = Math.toRadians(rotateProperty.getValue());
         }
 
     }
@@ -155,14 +157,48 @@ public class VideoStreamViewerExtension extends StaticWidget {
 
     @Override
     protected void paintComponent(Graphics g) {
-        BufferedImage drawnImage = imageToDraw;
+        BufferedImage drawnImage = imageToDraw; 
+        
         if (drawnImage != null) {
-            int width = getBounds().width;
-            int height = getBounds().height;
-            double scale = Math.min((double) width / (double) drawnImage.getWidth(), (double) height / (double) drawnImage.getHeight());
-            g.drawImage(drawnImage, (int) (width - (scale * drawnImage.getWidth())) / 2, (int) (height - (scale * drawnImage.getHeight())) / 2,
-                    (int) ((width + scale * drawnImage.getWidth()) / 2), (int) (height + scale * drawnImage.getHeight()) / 2,
-                    0, 0, drawnImage.getWidth(), drawnImage.getHeight(), null);
+        	// cast the Graphics context into a Graphics2D
+            Graphics2D g2d = (Graphics2D)g;
+            
+            // get the existing Graphics transform and copy it so that we can perform scaling and rotation
+            AffineTransform origXform = g2d.getTransform();
+            AffineTransform newXform = (AffineTransform)(origXform.clone());
+            
+            // find the center of the original image
+            int origImageWidth = drawnImage.getWidth();
+            int origImageHeight = drawnImage.getHeight();
+            int imageCenterX = origImageWidth/2;
+            int imageCenterY = origImageHeight/2;
+            
+            // perform the desired scaling
+            double panelWidth = getBounds().width;
+            double panelHeight = getBounds().height;
+            double panelCenterX = panelWidth/2.0;
+            double panelCenterY = panelHeight/2.0;
+            double rotatedImageWidth = origImageWidth * Math.abs(Math.cos(rotateAngleRad)) + origImageHeight * Math.abs(Math.sin(rotateAngleRad));
+            double rotatedImageHeight = origImageWidth * Math.abs(Math.sin(rotateAngleRad)) + origImageHeight * Math.abs(Math.cos(rotateAngleRad));         
+            		
+            // compute scaling needed
+            double scale = Math.min(panelWidth / rotatedImageWidth, panelHeight / rotatedImageHeight);
+                      
+            // set the transform before drawing the image
+            // 1 - translate the origin to the center of the panel
+            // 2 - perform the desired rotation (rotation will be about origin)
+            // 3 - perform the desired scaling (will scale centered about origin)
+            newXform.translate(panelCenterX,  panelCenterY);
+            newXform.rotate(rotateAngleRad);
+            newXform.scale(scale, scale);
+            g2d.setTransform(newXform);
+
+            // draw image so that the center of the image is at the "origin"; the transform will take care of the rotation and scaling
+            g2d.drawImage(drawnImage, -imageCenterX, -imageCenterY, null);
+            
+            // restore the original transform
+            g2d.setTransform(origXform);
+            
             g.setColor(Color.PINK);
             g.drawString("FPS: "+lastFPS, 10, 10);
         } else {
