@@ -7,6 +7,7 @@ import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.wpilibj.tables.*;
 import java.awt.Point;
 import java.util.*;
+import javax.swing.JComboBox;
 
 /**
  * An abstraction for creating a widget that wraps a network table
@@ -54,12 +55,12 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
         if(value != null) {
             element.setValue(value);
         }
-        subsystem.add(element);
+        subsystem.addWidget(element);
     }
 
-	private Map<String, BooleanBindable> booleanFields = new HashMap<String, BooleanBindable>();
-	private Map<String, NumberBindable> numberFields = new HashMap<String, NumberBindable>();
-	private Map<String, StringBindable> stringFields = new HashMap<String, StringBindable>();
+	private Map<String, List<BooleanBindable>> booleanFields = new HashMap<>();
+	private Map<String, List<NumberBindable>> numberFields = new HashMap<>();
+	private Map<String, List<StringBindable>> stringFields = new HashMap<>();
 	@Override
 	public void valueChanged(ITable source, String key, Object value, boolean isNew) {
 		if(value instanceof Boolean)
@@ -74,19 +75,19 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
 
 
 	public void booleanChanged(ITable source, String key, boolean value, boolean isNew) {
-		BooleanBindable field = booleanFields.get(key);
-		if(field!=null)
-			field.setBindableValue(value);
+                if(!booleanFields.containsKey(key)) booleanFields.put(key, new ArrayList<>());
+		List<BooleanBindable> field = booleanFields.get(key);
+                field.stream().forEach(bindable -> bindable.setBindableValue(value));
 	}
 	public void doubleChanged(ITable source, String key, double value, boolean isNew) {
-		NumberBindable field = numberFields.get(key);
-		if(field!=null)
-			field.setBindableValue(value);
+                if(!numberFields.containsKey(key)) numberFields.put(key, new ArrayList<>());
+		List<NumberBindable> field = numberFields.get(key);
+                field.stream().forEach(bindable -> bindable.setBindableValue(value));
 	}
 	public void stringChanged(ITable source, String key, String value, boolean isNew) {
-		StringBindable field = stringFields.get(key);
-		if(field!=null)
-			field.setBindableValue(value);
+                if(!stringFields.containsKey(key)) stringFields.put(key, new ArrayList<>());
+		List<StringBindable> field = stringFields.get(key);
+                field.stream().forEach(bindable -> bindable.setBindableValue(value));
 	}
 	public void tableChanged(ITable source, String key, ITable value, boolean isNew) {
 	}
@@ -114,20 +115,17 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
 
 
 	protected void setBooleanBinding(String key, BooleanBindable displayer){
-		if(booleanFields.containsKey(key))//TODO maybe remove and just let them overwrite???
-			throw new RuntimeException("Cannot have multiple boolean fields for the same key: "+key);
-		booleanFields.put(key, displayer);
+                if(!booleanFields.containsKey(key)) booleanFields.put(key, new ArrayList<>());
+		booleanFields.get(key).add(displayer);
 	}
 	protected void setNumberBinding(String key, NumberBindable displayer){
-		if(numberFields.containsKey(key))
-			throw new RuntimeException("Cannot have multiple number fields for the same key: "+key);
-		numberFields.put(key, displayer);
+                if(!numberFields.containsKey(key)) numberFields.put(key, new ArrayList<>());
+		numberFields.get(key).add(displayer);
 	}
 	protected void setStringBinding(String key, StringBindable displayer, String defaultValue){
-		if(stringFields.containsKey(key))
-			throw new RuntimeException("Cannot have multiple string fields for the same key: "+key);
                 displayer.setBindableValue(defaultValue);
-		stringFields.put(key, displayer);
+                if(!stringFields.containsKey(key)) stringFields.put(key, new ArrayList<>());
+		stringFields.get(key).add(displayer);
 	}
 
 
@@ -157,4 +155,29 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
 			setStringBinding(key, this, "");
 		}
 	}
+        public class StringTableComboBox extends JComboBox<String> implements StringBindable {
+                public StringTableComboBox(final String key, String... items) {
+                    super(items);
+                    getTableEntryBindable(key);
+                    setStringBinding(key, this, "");
+                    addActionListener(e -> table.putString(key, (String) getSelectedItem()));
+                }
+                @Override
+                public void setBindableValue(String value) {
+                    setSelectedItem(value);
+                }
+        }
+        public class NumberTableComboBox<E> extends JComboBox<E> implements NumberBindable {
+                public NumberTableComboBox(final String key, E... items) {
+                    super(items);
+                    getTableEntryBindable(key);
+                    setNumberBinding(key, this);
+                    addActionListener(e -> table.putNumber(key, getSelectedIndex()));
+                }
+                @Override
+                public void setBindableValue(double value) {
+                    if((int) value == value && value >= 0 && value < getItemCount())
+                    setSelectedIndex((int) value);
+                }
+        }
 }

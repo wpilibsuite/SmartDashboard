@@ -90,5 +90,10 @@ public class SpeedController extends AbstractTableWidget implements Controller {
     public void propertyChanged(Property property) {
         
     }
+
+    public void setRange(double min, double max) {
+        controller.setMin(min);
+        controller.setMax(max);
+    }
     
 }

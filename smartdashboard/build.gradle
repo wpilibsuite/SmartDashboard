@@ -1,24 +1,27 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
+apply plugin: 'application'
+
+mainClassName = "edu.wpi.first.smartdashboard.main"
 
 sourceSets {
-  main {
-    java.srcDir "src/"
-  }
+    main {
+        java.srcDir "src/"
+    }
 }
 
 dependencies {
-  compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:0.1.0-SNAPSHOT'
-  compile 'junit:junit:4.12'
-  compile 'jcommon:jcommon:0.9.5'
-  compile 'jfreechart:jfreechart:1.0.0'
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:0.1.0-SNAPSHOT'
+    compile 'junit:junit:4.12'
+    compile 'jcommon:jcommon:0.9.5'
+    compile 'jfreechart:jfreechart:1.0.0'
 }
 
 repositories {
-  maven {
-    url "http://first.wpi.edu/FRC/roborio/maven/"
-  }
-  mavenCentral()
+    maven {
+        url "http://first.wpi.edu/FRC/roborio/maven/"
+    }
+    mavenCentral()
 }
 
 publishing {
@@ -27,7 +30,7 @@ publishing {
             from components.java
 
             artifact (jar) {
-              classifier = 'jar'
+                classifier = 'jar'
             }
 
             groupId 'edu.wpi.first.wpilib'
@@ -43,8 +46,8 @@ publishing {
 }
 
 jar {
-  manifest {
-    attributes 'Main-Class': 'edu.wpi.first.smartdashboard.main'
-  }
-  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes 'Main-Class': 'edu.wpi.first.smartdashboard.main'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

@@ -20,13 +20,13 @@ public class LiveWindowFakeRobot {
                                 wPotentiometer  = createTable(wrist, "Potentiometer", "Analog Input"),
                                 wVictor         = createTable(wrist, "Victor", "Speed Controller"), 
 
-                                elevator        = createTable(liveWindow, "Elevator", "LW Subsystem"), 
+                                elevator        = createTable(liveWindow, "Elevator", "PIDSubsystem"), 
                                 ePotentiometer  = createTable(elevator, "Potentiometer", "Analog Input"), 
                                 eVictor         = createTable(elevator, "Victor", "Speed Controller"),
             
                                 testSys         = createTable(liveWindow, "TestSystem", "LW Subsystem"), 
                                 tComp           = createTable(testSys, "Compressor", "Compressor"), 
-                                tGearTooth      = createTable(testSys, "Gear Tooth Sensor", "Gear Tooth Sensor"), 
+                                tGearTooth      = createTable(testSys, "Gear Tooth Sensor", "Gear Tooth"), 
                                 tVictor         = createTable(testSys, "Victor", "Speed Controller"), 
                                 tPotentiometer  = createTable(testSys, "Potentiometer", "Analog Input"), 
                                 tRelay          = createTable(testSys, "Spike", "Relay"), 
@@ -38,17 +38,31 @@ public class LiveWindowFakeRobot {
                                 tEncoder1       = createTable(testSys, "Encoder 1", "Encoder"), 
                                 tUltra          = createTable(testSys, "Ultrasonic", "Ultrasonic"), 
                                 tCompass        = createTable(testSys, "Compass", "Compass"), 
-                                tSwitch         = createTable(testSys, "Limit Switch", "Digital Input");
+                                tSwitch         = createTable(testSys, "Limit Switch", "Digital Input"),
+            
+                                canSystem       = createTable(liveWindow, "CAN Subsystem", "LW Subsystem"),
+                                canJag          = createTable(canSystem, "CAN Jaguar", "CANSpeedController"),
+                                canTalon        = createTable(canSystem, "CAN Talon", "CANSpeedController");
     
     public static void main(String[] args) {
         
         System.out.println();
         
-        STATUS.putBoolean("LW Enabled", false);
+        STATUS.putBoolean("LW Enabled", true);
         STATUS.putString("Robot", "Testing");
         wPotentiometer.putNumber("Value", 2.6);
         ePotentiometer.putNumber("Value", -11.6872);
         tSwitch.putString("Value", "Off");
+        
+        elevator.putNumber("p", 0.5);
+        elevator.putNumber("i", 0.5);
+        elevator.putNumber("d", 0.5);
+        elevator.putNumber("f", 0.5);
+        elevator.putNumber("setpoint", 0.5);
+        elevator.putBoolean("enabled", false);
+        
+        canJag.putString("Type", "CANJaguar");
+        canTalon.putString("Type", "CANTalon");
         
         
         (new Timer()).schedule(

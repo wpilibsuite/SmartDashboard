@@ -16,10 +16,10 @@ import edu.wpi.first.smartdashboard.robot.*;
  * @author pmalmsten
  */
 public class main {
-    
+
     /** Variable used in the {@link main#inCompetition() inCompetition()} method */
     private static boolean inCompetition = false;
-    
+
     /**
      * Returns whether or not this is in "competition" mode. Competition mode
      * should be used on the netbook provided for teams to use the dashboard. If
@@ -33,7 +33,7 @@ public class main {
     public static boolean inCompetition() {
         return inCompetition;
     }
-    
+
     
     private static DashboardFrame frame;
     /**
@@ -56,17 +56,17 @@ public class main {
             ex.printStackTrace();
             System.exit(2);
         }
-        
+
         // Present a loading bar (it will only show up if this is going slowly)
         final ProgressMonitor monitor = new ProgressMonitor(null, "Loading SmartDashboard", "Initializing internal code...", 0, 1000);
-        
+
         // Search the filesystem for extensions (49%)
         FileSniffer.findExtensions(monitor, 0, 490);
 
         // Parse arguments
         ArgParser argParser = new ArgParser(args, true, true, new String[] { "ip" });
         inCompetition = argParser.hasFlag("competition");
-        
+
         // Initialize GUI
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -77,7 +77,7 @@ public class main {
             ex.printStackTrace();
             System.exit(2);
         }
-                
+
         if (argParser.hasValue("ip")) {
             monitor.setProgress(650);
             monitor.setNote("Connecting to robot at: "+argParser.getValue("ip"));
@@ -98,35 +98,37 @@ public class main {
                     }
                     teamNumber = Integer.parseInt(input);
                 } catch(Exception e){}
-            }
-            
+                }
+
             monitor.setProgress(650);
             monitor.setNote("Connecting to robot of team: "+teamNumber);
             teamProp.setValue(teamNumber);
+            Robot.setUseMDNS(DashboardPrefs.getInstance().usemDNS.getValue());
+            Robot.setTeam(teamNumber);
         }
-        
+
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
-                
+
                 public void run() {
                     try {
                         frame.pack();
                         frame.setVisible(true);
-                        
+
                         monitor.setProgress(750);
                         monitor.setNote("Loading From Save");
-                        
+
                         // Load
                         File file = new File(frame.getPrefs().saveFile.getValue());
                         if (file.exists()) {
                             frame.load(file.getPath());
                         }
-                        
+
                         monitor.setProgress(1000);
-                        
+
                     } catch (Exception e) {
                         e.printStackTrace();
-                        
+
                         System.exit(1);
                     }
                 }

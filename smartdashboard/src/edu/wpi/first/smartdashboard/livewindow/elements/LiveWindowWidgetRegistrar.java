@@ -13,6 +13,7 @@ public class LiveWindowWidgetRegistrar {
      */
     public static void init() {
         DisplayElementRegistry.registerWidget(LWSubsystem.class);
+        DisplayElementRegistry.registerWidget(PIDSubsystem.class);
         DisplayElementRegistry.registerWidget(SpeedController.class);
         DisplayElementRegistry.registerWidget(RelayController.class);
         DisplayElementRegistry.registerWidget(DigitalOutputController.class);
@@ -23,6 +24,7 @@ public class LiveWindowWidgetRegistrar {
         DisplayElementRegistry.registerWidget(ServoController.class);
         DisplayElementRegistry.registerWidget(PowerDistributionPanel.class);
         DisplayElementRegistry.registerWidget(ThreeAxisAccelerometer.class);
+        DisplayElementRegistry.registerWidget(CANSpeedController.class);
     }
     
 }

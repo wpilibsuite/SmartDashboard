@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.types.named;
 
+import edu.wpi.first.smartdashboard.livewindow.elements.PIDSubsystem;
 import edu.wpi.first.smartdashboard.types.NamedDataType;
 
 /**
@@ -11,7 +12,7 @@ public class PIDSubsystemType extends NamedDataType {
     public static final String LABEL = "PIDSubsystem";
 
     private PIDSubsystemType() {
-        super(LABEL, SubsystemType.get(), PIDType.get());
+        super(LABEL, PIDSubsystem.class, SubsystemType.get(), PIDType.get());
     }
 
     public static NamedDataType get() {

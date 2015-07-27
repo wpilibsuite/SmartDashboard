@@ -4,3 +4,4 @@ dist/
 build/
 target/
 .gradle/
+/FakeRobot/nbproject/
