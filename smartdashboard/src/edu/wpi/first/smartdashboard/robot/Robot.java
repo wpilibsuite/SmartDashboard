@@ -55,7 +55,7 @@ public class Robot {
         if (host != "") {
             // Use the given host
 		} else if (_usemDNS) {
-			host = "roboRIO-" + _team + ".local";
+			host = "roboRIO-" + _team + "-frc.local";
 		} else {
 			host = "10." + (_team / 100) + "." + (_team % 100) + ".2";
 		}
