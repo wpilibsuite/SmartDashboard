@@ -23,7 +23,6 @@ public class ConnectionIndicator extends StaticWidget implements IRemoteConnecti
     public final ColorProperty positive = new ColorProperty(this, "Connection Color", Color.GREEN);
     public final ColorProperty negative = new ColorProperty(this, "No Connection Color", Color.RED);
     public final MultiProperty display = new MultiProperty(this, "Graphics");
-    private boolean firstRun = true;
     private boolean connected = false;
     private Runnable repainter = new Runnable() {
 
@@ -91,23 +90,19 @@ public class ConnectionIndicator extends StaticWidget implements IRemoteConnecti
 
 	@Override
 	public void connected(IRemote remote) {
+	    System.out.println("ConnectionIndicator CONNECTED");
         if (!connected) {
             connected = true;
-            if (!firstRun) {
-                SwingUtilities.invokeLater(repainter);
-            }
+            SwingUtilities.invokeLater(repainter);
         }
-        firstRun = false;
 	}
 
 	@Override
 	public void disconnected(IRemote remote) {
+	    System.out.println("ConnectionIndicator DISCONNECTED");
         if (connected) {
             connected = false;
-            if (!firstRun) {
-                SwingUtilities.invokeLater(repainter);
-            }
+            SwingUtilities.invokeLater(repainter);
         }
-        firstRun = false;
 	}
 }

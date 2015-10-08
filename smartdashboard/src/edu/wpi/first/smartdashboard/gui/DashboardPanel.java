@@ -69,8 +69,8 @@ public class DashboardPanel extends JPanel {
 
         setEditable(editable);
 
-        table.addTableListener(listener, true);
-        table.addSubTableListener(listener);
+        table.addTableListenerEx(listener, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
+        table.addSubTableListener(listener, true);
     }
 
     public ITable getTable() {
@@ -179,8 +179,8 @@ public class DashboardPanel extends JPanel {
 
 
         table.removeTableListener(listener);
-        table.addTableListener(listener, true);
-        table.addSubTableListener(listener);
+        table.addTableListenerEx(listener, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
+        table.addSubTableListener(listener, true);
 
         repaint();
     }
@@ -514,7 +514,7 @@ public class DashboardPanel extends JPanel {
                 if (!hiddenFields.contains(key)) {
                     if (value instanceof ITable) {
                         final ITable table = (ITable) value;
-                        table.addTableListener("~TYPE~", new ITableListener() {
+                        table.addTableListenerEx("~TYPE~", new ITableListener() {
                             public void valueChanged(final ITable typeSource, final String typeKey, final Object typeValue, final boolean typeIsNew) {
                                 table.removeTableListener(this);
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -523,7 +523,7 @@ public class DashboardPanel extends JPanel {
                                     }
                                 });
                             }
-                        }, true);
+                        }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
                     } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {

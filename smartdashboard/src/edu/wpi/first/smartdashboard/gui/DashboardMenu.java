@@ -150,7 +150,7 @@ public class DashboardMenu extends JMenuBar {
             }
         });
         resetLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
-        Robot.getLiveWindow().getSubTable("~STATUS~").addTableListener("LW Enabled", new ITableListener() {
+        Robot.getLiveWindow().getSubTable("~STATUS~").addTableListenerEx("LW Enabled", new ITableListener() {
             public void valueChanged(ITable itable, String string, Object o, boolean bln) {
                 final boolean isInLW = Robot.getLiveWindow().getSubTable("~STATUS~").getBoolean("LW Enabled", false);
 
@@ -170,7 +170,7 @@ public class DashboardMenu extends JMenuBar {
                     }
                 });
             }
-        }, true);
+        }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
         viewMenu.add(resetLW);
 
         JMenu addMenu = new JMenu("Add...");

@@ -41,9 +41,9 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
 
 			this.table = table;
 			if(table!=null){
-				table.addTableListener(this, true);
+				table.addTableListenerEx(this, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
 				if(listenSubtables)
-					table.addSubTableListener(this);
+					table.addSubTableListener(this, true);
 			}
 		}
 	}

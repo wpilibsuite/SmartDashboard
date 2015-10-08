@@ -1,53 +1,59 @@
 apply plugin: 'java'
-apply plugin: 'maven-publish'
 apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven-publish'
+
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+    }
+}
+
+if (!hasProperty('repo')) {
+    ext.repo = 'development'
+}
 
 mainClassName = "edu.wpi.first.smartdashboard.main"
-
-sourceSets {
-    main {
-        java.srcDir "src/"
-    }
-}
-
-dependencies {
-    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:0.1.0-SNAPSHOT'
-    compile 'junit:junit:4.12'
-    compile 'jcommon:jcommon:0.9.5'
-    compile 'jfreechart:jfreechart:1.0.0'
-}
-
-repositories {
-    maven {
-        url "http://first.wpi.edu/FRC/roborio/maven/"
-    }
-    mavenCentral()
-}
 
 publishing {
     publications {
         maven(MavenPublication) {
-            from components.java
-
-            artifact (jar) {
-                classifier = 'jar'
+            artifact(shadowJar) {
+                classifier null
             }
-
             groupId 'edu.wpi.first.wpilib'
             artifactId 'SmartDashboard'
             version '1.0.0-SNAPSHOT'
         }
     }
-    repositories {
-        maven {
-            url "file://${System.properties['user.home']}/releases/maven"
+    repositories.maven {
+        url = "${System.getProperty('user.home')}/releases/maven/$repo"
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src"]
         }
     }
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'edu.wpi.first.smartdashboard.main'
+repositories {
+    mavenCentral()
+    maven {
+        url = "${System.getProperty('user.home')}/releases/maven/$repo"
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    mavenLocal()
+    maven {
+        url = "http://first.wpi.edu/FRC/roborio/maven/$repo"
+    }
+}
+
+dependencies {
+    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:desktop"
+    compile 'junit:junit:4.12'
+    compile 'jcommon:jcommon:0.9.5'
+    compile 'jfreechart:jfreechart:1.0.0'
 }

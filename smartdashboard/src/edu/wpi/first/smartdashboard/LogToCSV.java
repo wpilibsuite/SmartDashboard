@@ -38,7 +38,7 @@ public class LogToCSV implements ITableListener {
 				m_fw = new FileWriter(path);
 				m_fw.write("Time (ms),Name,Value" + s_lineSeparator);
 				m_fw.flush();
-				Robot.getTable().addTableListener(this, true);
+				Robot.getTable().addTableListenerEx(this, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
 			} catch (IOException ex) {
 				ex.printStackTrace();
 				JOptionPane.showMessageDialog(null, "An error occurred when attempting to " + "open the output CSV file for writing. "

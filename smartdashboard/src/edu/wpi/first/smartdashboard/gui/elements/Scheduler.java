@@ -112,7 +112,7 @@ public class Scheduler extends Widget {
             table.removeTableListener(listener);
         }
         table = (ITable) value;
-        table.addTableListener(listener, true);
+        table.addTableListenerEx(listener, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
 
         revalidate();
         repaint();

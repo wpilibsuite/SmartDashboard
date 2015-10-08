@@ -119,7 +119,7 @@ public class LWSubsystem extends AbstractTableWidget {
         }
 
         if (!alreadyHasWidget) {
-            table.addTableListener("~TYPE~", new ITableListener() {
+            table.addTableListenerEx("~TYPE~", new ITableListener() {
                 public void valueChanged(final ITable typeSource, final String typeKey, final Object typeValue, final boolean typeIsNew) {
                     table.removeTableListener(this);
                     SwingUtilities.invokeLater(new Runnable() {
@@ -128,7 +128,7 @@ public class LWSubsystem extends AbstractTableWidget {
                         }
                     });
                 }
-            }, true);
+            }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
         }
     }
 
