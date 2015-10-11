@@ -3,3 +3,4 @@ smartdashboard/lib/NetworkTables*
 dist/
 build/
 target/
+.gradle/

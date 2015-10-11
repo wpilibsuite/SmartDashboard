@@ -7,8 +7,6 @@ sourceSets {
   }
 }
 
-libsDirName = "../dist/tools"
-
 dependencies {
   compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:0.1.0-SNAPSHOT'
   compile 'junit:junit:4.12'
