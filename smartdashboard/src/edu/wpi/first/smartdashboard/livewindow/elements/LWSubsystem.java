@@ -76,6 +76,11 @@ public class LWSubsystem extends AbstractTableWidget {
     }
 
     private void addSubsystemElement(String key, ITable value) {
+        // don't add duplicate widgets
+        for (Widget widget : widgets) {
+            if (widget != null && widget.getFieldName().equals(key))
+                return;
+        }
         try {
             System.out.println("\nSubsystem \"" + getFieldName() + "\" does not contain widget \"" + key + "\"");
             System.out.println("Table: " + value);
