@@ -61,8 +61,12 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
      * Control panel containing the PID editor / speed controller editor.
      */
     private JPanel controlPanel;
+    private JPanel disabledControlPanel;
     private PIDEditor pidControlPanel;
     private SpeedController normalControlPanel;
+    private static final String DISABLED_PANEL = "Disabled";
+    private static final String PID_PANEL = "PID";
+    private static final String NORMAL_PANEL = "Normal";
 
     private ActionListener modeSelection = e -> {
         int m = modeBox.getSelectedIndex();
@@ -80,10 +84,13 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
     public void init() {
         nameTag = new NameTag(getFieldName());
         headerPanel = new JPanel();
-        controlPanel = new JPanel();
+        controlPanel = new JPanel(new CardLayout());
+        disabledControlPanel = new JPanel();
         createPIDControlPanel();
         createNormalControlPanel();
-        controlPanel.add(normalControlPanel);
+        controlPanel.add(disabledControlPanel, DISABLED_PANEL);
+        controlPanel.add(normalControlPanel, NORMAL_PANEL);
+        controlPanel.add(pidControlPanel, PID_PANEL);
 
         headerPanel.setLayout(new GridBagLayout());
         GridBagConstraints headerConstraints = new GridBagConstraints();
@@ -192,23 +199,18 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
             // empty (follower or disabled)
             normalControlPanel.reset();
             pidControlPanel.reset();
-            controlPanel.removeAll();
-            controlPanel.setSize(0, 0);
+            ((CardLayout)controlPanel.getLayout()).show(controlPanel, DISABLED_PANEL);
         } else if (isPID()) {
-            if (pidControlPanel.getParent() != controlPanel) {
-                // set control to PID and resize
+            if (!pidControlPanel.isVisible()) {
+                // set control to PID
                 normalControlPanel.reset();
-                controlPanel.removeAll();
-                controlPanel.add(pidControlPanel);
-                controlPanel.setSize(pidControlPanel.getSize());
+                ((CardLayout)controlPanel.getLayout()).show(controlPanel, PID_PANEL);
             }
         } else {
-            if (normalControlPanel.getParent() != controlPanel) {
-                // set control to normal and resize
+            if (!normalControlPanel.isVisible()) {
+                // set control to normal
                 pidControlPanel.reset();
-                controlPanel.removeAll();
-                controlPanel.add(normalControlPanel);
-                controlPanel.setSize(normalControlPanel.getSize());
+                ((CardLayout)controlPanel.getLayout()).show(controlPanel, NORMAL_PANEL);
             }
             // set the range on the slider depending on the mode
             switch(mode) {
