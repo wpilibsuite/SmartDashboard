@@ -23,8 +23,10 @@ public class CheckBox extends AbstractValueWidget {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
+        JLabel nameLabel = new JLabel(getFieldName());
         valueField = new EditableBooleanValueCheckBox(getFieldName());
 
+        add(nameLabel);
         add(valueField);
     }
 
