@@ -22,26 +22,26 @@ public class TextBox extends AbstractValueWidget {
     private JTextField valueField;
 
     public void init() {
-    	setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-    	JLabel nameLabel = new JLabel(getFieldName());
+        JLabel nameLabel = new JLabel(getFieldName());
 
-    	if (getType().isChildOf(DataType.BOOLEAN))
-    		valueField = new EditableBooleanValueField(getFieldName());
-    	else if (getType().isChildOf(DataType.NUMBER))
-    		valueField = new EditableNumberValueField(getFieldName());
-    	else if (getType().isChildOf(DataType.STRING))
-    		valueField = new EditableStringValueField(getFieldName());
-    	else{
-    		valueField = new JTextField();
-    		valueField.setText("Unupported basic data type: "+getType());
-    		valueField.setEditable(false);
-    	}
+        if (getType().isChildOf(DataType.BOOLEAN))
+            valueField = new EditableBooleanValueField(getFieldName());
+        else if (getType().isChildOf(DataType.NUMBER))
+            valueField = new EditableNumberValueField(getFieldName());
+        else if (getType().isChildOf(DataType.STRING))
+            valueField = new EditableStringValueField(getFieldName());
+        else{
+            valueField = new JTextField();
+            valueField.setText("Unsupported basic data type: "+getType());
+            valueField.setEditable(false);
+        }
 
-    	update(background, valueField.getBackground());
+        update(background, valueField.getBackground());
 
-    	valueField.setEditable(editable.getValue());
-    	valueField.setColumns(10);
+        valueField.setEditable(editable.getValue());
+        valueField.setColumns(10);
 
         add(nameLabel);
         add(valueField);
