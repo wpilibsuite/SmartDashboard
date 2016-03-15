@@ -52,7 +52,7 @@ public class WebcamViewerExtension extends StaticWidget implements Runnable {
         sizeProperty.add("640x480", SIZE_640x480);
         sizeProperty.add("320x240", SIZE_320x240);
         sizeProperty.add("160x120", SIZE_160x120);
-        sizeProperty.setDefault("640x480");
+        sizeProperty.setDefault("320x240");
     }
     
     /** {@inheritDoc} */
