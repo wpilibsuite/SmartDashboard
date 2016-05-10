@@ -1,5 +1,7 @@
 # Smart Dashboard Project
 
+[![Build Status](https://travis-ci.org/wpilibsuite/SmartDashboard.svg?branch=master)](https://travis-ci.org/wpilibsuite/SmartDashboard)
+
 Welcome to the WPILib project. This repository contains the Smart Dashboard project.
 
 - [WPILib Mission](#wpilib-mission)
