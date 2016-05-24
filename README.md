@@ -5,9 +5,9 @@
 Welcome to the WPILib project. This repository contains the Smart Dashboard project.
 
 - [WPILib Mission](#wpilib-mission)
-- [Building Robot Builder](#building-smart-dashboard)
+- [Building Smart Dashboard](#building-smart-dashboard)
     - [Requirements](#requirements)
-    - [Running Robot Builder](#running)
+    - [Running Smart Dashboard](#running)
 - [Contributing to WPILib](#contributing-to-wpilib)
 
 ## WPILib Mission
