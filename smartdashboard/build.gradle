@@ -1,14 +1,14 @@
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
-
-buildscript {
-    repositories { jcenter() }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
-    }
-}
 
 if (!hasProperty('repo')) {
     ext.repo = 'development'
@@ -57,3 +57,7 @@ dependencies {
     compile 'jfree:jcommon:1.0.16'
     compile 'jfree:jfreechart:1.0.13'
 }
+
+// type wrapper(type: Wrapper) {
+//     gradleVersion = '2.14.1'
+// }
