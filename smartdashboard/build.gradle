@@ -6,7 +6,7 @@ apply plugin: 'maven-publish'
 buildscript {
     repositories { jcenter() }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
 
@@ -56,4 +56,8 @@ dependencies {
     compile 'junit:junit:4.12'
     compile 'jfree:jcommon:1.0.16'
     compile 'jfree:jfreechart:1.0.13'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
 }
