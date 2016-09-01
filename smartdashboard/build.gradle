@@ -9,6 +9,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
+apply plugin: 'idea'
 
 if (!hasProperty('repo')) {
     ext.repo = 'development'
