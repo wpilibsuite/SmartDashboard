@@ -1,18 +1,10 @@
-buildscript {
-    repositories { jcenter() }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'maven-publish'
-apply plugin: 'idea'
-
-if (!hasProperty('repo')) {
-    ext.repo = 'development'
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'maven-publish'
+    id 'idea'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.1'
 }
 
 mainClassName = "edu.wpi.first.smartdashboard.main"
@@ -25,11 +17,8 @@ publishing {
             }
             groupId 'edu.wpi.first.wpilib'
             artifactId 'SmartDashboard'
-            version '1.0.0-SNAPSHOT'
+            version WPILibVersion.version
         }
-    }
-    repositories.maven {
-        url = "${System.getProperty('user.home')}/releases/maven/$repo"
     }
 }
 
@@ -43,17 +32,10 @@ sourceSets {
 
 repositories {
     mavenCentral()
-    maven {
-        url = "${System.getProperty('user.home')}/releases/maven/$repo"
-    }
-    mavenLocal()
-    maven {
-        url = "http://first.wpi.edu/FRC/roborio/maven/$repo"
-    }
 }
 
 dependencies {
-    compile "edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:desktop"
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:desktop'
     compile 'junit:junit:4.12'
     compile 'jfree:jcommon:1.0.16'
     compile 'jfree:jfreechart:1.0.13'
