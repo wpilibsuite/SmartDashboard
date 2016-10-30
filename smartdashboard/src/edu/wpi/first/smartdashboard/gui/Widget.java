@@ -4,6 +4,7 @@ import edu.wpi.first.smartdashboard.gui.elements.bindings.StringBindable;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.NumberBindable;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.BooleanBindable;
 import java.awt.event.*;
+import java.math.BigDecimal;
 import java.text.*;
 import java.util.*;
 
@@ -323,7 +324,6 @@ public abstract class Widget extends DisplayElement {
     public static abstract class NumberField extends EditorTextField implements NumberBindable {
 
         private double value = Double.NaN;
-        private DecimalFormat formatter = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.US));
 
         protected void textChanged(String text) {
             try {
@@ -351,11 +351,7 @@ public abstract class Widget extends DisplayElement {
         @Override
         public void setBindableValue(double value) {
             this.value = value;
-            setText(formatter.format(value));
-        }
-
-        public void setFormatter(DecimalFormat formatter) {
-            this.formatter = formatter;
+            setText(Double.toString((new BigDecimal(value)).stripTrailingZeros().doubleValue()));
         }
 
         protected abstract boolean setValue(double value);
