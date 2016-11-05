@@ -19,15 +19,16 @@ public class Robot {
 	
 	private static volatile String _host = "";
 	private static volatile int _port = NetworkTable.DEFAULT_PORT;
-	private static int _team;
 	private static boolean _usemDNS = true;
         static{
-            NetworkTable.setClientMode();
+		NetworkTable.setClientMode();
+		NetworkTable.setNetworkIdentity(identity);
+		NetworkTable.initialize();
         }
 
 	public static void setTeam(int team) {
-		_team = team;
-		setHost("");
+		_host = "roboRIO-" + team + "-FRC.local";
+		NetworkTable.setTeam(team);
 	}
 	
 	/**
@@ -37,27 +38,12 @@ public class Robot {
 	 */
 	public static void setUseMDNS(boolean usemDNS) {
 		_usemDNS = usemDNS;
-		setHost("");
 	}
 
-    public static void setHost(String host) {
-        if (host != "") {
-            // Use the given host
-		} else if (_usemDNS) {
-			host = "roboRIO-" + _team + "-frc.local";
-		} else {
-			host = "10." + (_team / 100) + "." + (_team % 100) + ".2";
-		}
-		if (_host.equals(host)) return;
+	public static void setHost(String host) {
 		_host = host;
 		System.out.println("Host: "+host);
-		try {
-			NetworkTable.shutdown();
-		} catch (IllegalStateException ex) {
-		}
 		NetworkTable.setIPAddress(host);
-		NetworkTable.setNetworkIdentity(identity);
-		NetworkTable.initialize();
 	}
 	
 	public static String getHost() {
