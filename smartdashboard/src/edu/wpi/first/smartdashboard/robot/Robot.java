@@ -19,7 +19,6 @@ public class Robot {
 	
 	private static volatile String _host = "";
 	private static volatile int _port = NetworkTable.DEFAULT_PORT;
-	private static boolean _usemDNS = true;
         static{
 		NetworkTable.setClientMode();
 		NetworkTable.setNetworkIdentity(identity);
@@ -31,15 +30,6 @@ public class Robot {
 		NetworkTable.setTeam(team);
 	}
 	
-	/**
-	 * Switch between using MDNS and a static IP to resolve the robot's
-	 * hostname (mDNS is only supported on the roboRIO)
-	 * @param useMDNS
-	 */
-	public static void setUseMDNS(boolean usemDNS) {
-		_usemDNS = usemDNS;
-	}
-
 	public static void setHost(String host) {
 		_host = host;
 		System.out.println("Host: "+host);
