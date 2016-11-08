@@ -4,7 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     id 'maven-publish'
     id 'idea'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.1'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.4'
 }
 
 mainClassName = "edu.wpi.first.smartdashboard.main"
