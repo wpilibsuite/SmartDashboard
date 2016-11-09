@@ -103,7 +103,6 @@ public class main {
             monitor.setProgress(650);
             monitor.setNote("Connecting to robot of team: "+teamNumber);
             teamProp.setValue(teamNumber);
-            Robot.setUseMDNS(DashboardPrefs.getInstance().usemDNS.getValue());
             Robot.setTeam(teamNumber);
         }
 
