@@ -31,6 +31,7 @@ public class DefaultDisplayElementRegistrar {
         DisplayElementRegistry.registerStaticWidget(RobotPreferences.class);
         DisplayElementRegistry.registerStaticWidget(VideoStreamViewerExtension.class);
         DisplayElementRegistry.registerStaticWidget(WebcamViewerExtension.class);
+        DisplayElementRegistry.registerStaticWidget(MJPGStreamerViewerExtension.class);
     }
 
 }
