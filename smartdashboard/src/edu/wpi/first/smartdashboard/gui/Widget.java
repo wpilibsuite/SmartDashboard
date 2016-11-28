@@ -217,10 +217,9 @@ public abstract class Widget extends DisplayElement {
         }
 
         public void setText(final String text) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    ThreadSafeTextField.super.setText(text);
-                }
+            SwingUtilities.invokeLater(() -> {
+                super.setText(text);
+                setCaretPosition(0);
             });
         }
     }
