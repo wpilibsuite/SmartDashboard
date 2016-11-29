@@ -22,14 +22,6 @@ publishing {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ["src"]
-        }
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -42,5 +34,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '3.2.1'
 }
