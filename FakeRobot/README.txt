@@ -1,1 +1,0 @@
-This is for testing the LiveWindow funcitonality in the SmartDashboard.
