@@ -1,10 +1,10 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
-import edu.wpi.first.smartdashboard.gui.DashboardPrefs;
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
+import edu.wpi.first.smartdashboard.robot.Robot;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -123,8 +123,8 @@ public class MJPGStreamerViewerExtension extends StaticWidget {
     }
     private BufferedImage imageToDraw;
     private BGThread bgThread = new BGThread();
-    public final StringProperty ipProperty = new StringProperty(this, "Robot IP Address or mDNS name", "roborio-330-frc.local");
-    public final IntegerProperty portProperty = new IntegerProperty(this, "port", 5800);
+    public final StringProperty ipProperty = new StringProperty(this, "Robot IP Address or mDNS name", Robot.getHost());
+    public final IntegerProperty portProperty = new IntegerProperty(this, "port", 1181);
     public final IntegerProperty rotateProperty = new IntegerProperty(this, "Degrees Rotation", 0);
 
     @Override
