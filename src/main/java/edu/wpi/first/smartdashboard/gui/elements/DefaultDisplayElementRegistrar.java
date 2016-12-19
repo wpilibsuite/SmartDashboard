@@ -24,13 +24,11 @@ public class DefaultDisplayElementRegistrar {
         DisplayElementRegistry.registerWidget(Subsystem.class);
         DisplayElementRegistry.registerWidget(Command.class);
         DisplayElementRegistry.registerWidget(Scheduler.class);
-        
+
         DisplayElementRegistry.registerStaticWidget(Image.class);
         DisplayElementRegistry.registerStaticWidget(ConnectionIndicator.class);
         DisplayElementRegistry.registerStaticWidget(Label.class);
         DisplayElementRegistry.registerStaticWidget(RobotPreferences.class);
-        DisplayElementRegistry.registerStaticWidget(VideoStreamViewerExtension.class);
-        DisplayElementRegistry.registerStaticWidget(WebcamViewerExtension.class);
         DisplayElementRegistry.registerStaticWidget(MJPGStreamerViewerExtension.class);
     }
 
