@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'maven-publish'
     id 'idea'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.5.1'
