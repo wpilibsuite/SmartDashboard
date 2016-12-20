@@ -11,6 +11,18 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
+before_deploy: "./gradlew shadowJar"
+
+deploy:
+  provider: releases
+  api_key:
+    secure:
+  file: "build/libs/SmartDashboard-all.jar"
+  skip_cleanup: true
+  on:
+    repo: wpilibsuite/SmartDashboard
+    tags: true
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
