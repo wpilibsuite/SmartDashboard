@@ -192,7 +192,9 @@ public class DashboardMenu extends JMenuBar {
             StaticWidget element = option.newInstance();
             mainPanel.getPanel("SmartDashboard").addElement(element, null);
           } catch (InstantiationException ex) {
+            // TODO
           } catch (IllegalAccessException ex) {
+            // TODO
           }
         }
       });

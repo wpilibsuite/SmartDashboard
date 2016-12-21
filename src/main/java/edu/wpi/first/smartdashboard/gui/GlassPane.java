@@ -326,8 +326,10 @@ public class GlassPane extends JPanel {
           lastDH = lastDW = lastDX = lastDY = 0;
         }
 
-        int dx, dy, dw, dh;
-        dx = dy = dw = dh = 0;
+        int dx = 0;
+        int dy = 0;
+        int dw = 0;
+        int dh = 0;
 
         switch (dragType) {
           case SwingConstants.NORTH:
@@ -423,7 +425,7 @@ public class GlassPane extends JPanel {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-      if (dragging == true) {
+      if (dragging) {
         dragging = false;
         defineBounds();
         mouseMoved(e);
@@ -520,7 +522,8 @@ public class GlassPane extends JPanel {
           Object value = panel.getTable().getValue(oldElement.getFieldName());
           panel.setField(oldElement.getFieldName(), elementClass, value, oldElement.getLocation());
         } else {
-          panel.setField(oldElement.getFieldName(), elementClass, oldElement.getType(), null, oldElement.getLocation());
+          panel.setField(oldElement.getFieldName(), elementClass, oldElement.getType(), null,
+              oldElement.getLocation());
         }
       }
     }

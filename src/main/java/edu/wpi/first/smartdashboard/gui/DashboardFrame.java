@@ -30,7 +30,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 
 /**
- * This class defines the main window for the FRC program. It contains almost no
+ * This class defines the SmartDashboard window for the FRC program. It contains almost no
  * logic except for the {@link DashboardFrame#load(java.lang.String) load(...)}
  * and {@link DashboardFrame#save(java.lang.String) save(...)} method.
  *
@@ -186,9 +186,9 @@ public class DashboardFrame extends JFrame {
       }
     });
 
-    INSTANCE
-        = this;//will only be instanciated once so make this a singleton so plugins can get it
-    // for compatability
+    // will only be instantiated once so make this a singleton so plugins can get it
+    // for comparability
+    INSTANCE = this;
   }
 
   /**
@@ -399,8 +399,10 @@ public class DashboardFrame extends JFrame {
     switch (result) {
       case JOptionPane.YES_OPTION:
         save(prefs.saveFile.getValue());
+        // fallthrough
       case JOptionPane.NO_OPTION:
         System.exit(0);
+        // fallthrough
       default: // Do Nothing (they called cancel)
     }
   }

@@ -28,9 +28,7 @@ public class DefaultDisplayElementRegistrar {
     DisplayElementRegistry.registerStaticWidget(ConnectionIndicator.class);
     DisplayElementRegistry.registerStaticWidget(Label.class);
     DisplayElementRegistry.registerStaticWidget(RobotPreferences.class);
-    DisplayElementRegistry.registerStaticWidget(VideoStreamViewerExtension.class);
-    DisplayElementRegistry.registerStaticWidget(WebcamViewerExtension.class);
-    DisplayElementRegistry.registerStaticWidget(MJPGStreamerViewerExtension.class);
+    DisplayElementRegistry.registerStaticWidget(MjpgStreamerViewerExtension.class);
   }
 
 }

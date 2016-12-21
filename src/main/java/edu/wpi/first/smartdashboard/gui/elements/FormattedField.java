@@ -30,7 +30,7 @@ public class FormattedField extends Widget {
   public void init() {
     setLayout(new BorderLayout());
 
-    JLabel nameLabel = new JLabel(getFieldName());
+    final JLabel nameLabel = new JLabel(getFieldName());
     valueField = new JFormattedTextField();
 
     update(foreground, valueField.getForeground());
@@ -60,8 +60,8 @@ public class FormattedField extends Widget {
     } else if (property == background) {
       valueField.setBackground(background.getValue());
     } else if (property == fontSize) {
-      valueField.setFont(new Font(valueField.getFont().getName(), valueField.getFont().getStyle()
-          , fontSize.getValue()));
+      valueField.setFont(new Font(valueField.getFont().getName(), valueField.getFont().getStyle(),
+          fontSize.getValue()));
     }
   }
 }

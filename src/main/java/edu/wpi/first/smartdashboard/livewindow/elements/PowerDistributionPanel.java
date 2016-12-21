@@ -20,7 +20,7 @@ public class PowerDistributionPanel extends AbstractTableWidget implements ITabl
 
   private final UneditableNumberField voltage = new UneditableNumberField();
   private final UneditableNumberField totCurrent = new UneditableNumberField();
-  private final UneditableNumberField current[] = new UneditableNumberField[16];
+  private final UneditableNumberField[] current = new UneditableNumberField[16];
   private final JLabel[] curLabel = new JLabel[16];
   private JLabel totCurLabel;
   private JLabel voltageLabel;

@@ -24,22 +24,19 @@ public class DisplayElementRegistry {
   /**
    * The widgets that we have available
    */
-  private static final Set<Class<? extends StaticWidget>> staticWidgets
-      = new LinkedHashSet<Class<? extends StaticWidget>>();
+  private static final Set<Class<? extends StaticWidget>> staticWidgets = new LinkedHashSet<>();
 
   /**
    * Maps types to the widgets that explicitly support that type
    */
-  private static final Map<DataType, Set<Class<? extends Widget>>> map
-      = new HashMap<DataType, Set<Class<? extends Widget>>>();
+  private static final Map<DataType, Set<Class<? extends Widget>>> map = new HashMap<>();
 
   /**
    * Maps the widgets to the types that they explicitly support
    */
-  private static final Map<Class<? extends Widget>, DataType[]> declaredTypes
-      = new HashMap<Class<? extends Widget>, DataType[]>();
+  private static final Map<Class<? extends Widget>, DataType[]> declaredTypes = new HashMap<>();
 
-  /**
+  /*
    * Forces the DisplayElementRegistry to register all widgets and types
    * supplied in SmartDashboard. This method does <b>not</b> read through the
    * file system to find extensions, that is done by {@link FileSniffer}.
@@ -59,7 +56,7 @@ public class DisplayElementRegistry {
    * Adds the new {@link StaticWidget} to the registry.
    *
    * @param clazz the class of the {@link StaticWidget}. If it is an abstract class, then it will be
-   * ignored.
+   *     ignored.
    */
   public static void registerStaticWidget(Class<? extends StaticWidget> clazz) {
     if (!Modifier.isAbstract(clazz.getModifiers())) {
@@ -77,9 +74,9 @@ public class DisplayElementRegistry {
    * cause a {@link RuntimeException}
    *
    * @param clazz the class of the {@link Widget}. If it is an abstract class, then it will be
-   * ignored.
+   *     ignored.
    * @throws RuntimeException there are several ways that this will be thrown.
-   * <p>
+   *
    * <p> <ul> <li>If there is no TYPES field <li>If the TYPES field is not static <li>If the TYPES
    * field is not final <li>If the TYPES field is not public <li>If the TYPES field is not an array
    * of {@link DataType} <li>If the TYPES field is null </ul> </p>

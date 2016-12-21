@@ -74,8 +74,8 @@ public class Image extends StaticWidget {
             (int) (height + scale * image.getHeight()) / 2,
             0, 0, image.getWidth(), image.getHeight(), null);
       } else {
-        g.drawImage(image, 0, 0, getWidth(), getHeight(), 0, 0, image.getWidth(), image.getHeight
-            (), null);
+        g.drawImage(image, 0, 0, getWidth(), getHeight(), 0, 0, image.getWidth(),
+            image.getHeight(), null);
       }
     }
   }

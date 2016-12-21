@@ -349,17 +349,6 @@ public class DashboardPanel extends JPanel {
   }
 
   /**
-   * Adds the field of the given name to the screen. The field does not need
-   * to be in the SmartDashboard table. This will add some default widget (for
-   * that type) with no value.
-   *
-   * @param key the key to add
-   */
-  public void addField(String key) {
-    setField(key, null, table.containsKey(key) ? table.getValue(key) : null, null);
-  }
-
-  /**
    * Sets the field to use the given values.
    *
    * @param key the key of the field
@@ -423,6 +412,17 @@ public class DashboardPanel extends JPanel {
             + "constructor!");
       }
     }
+  }
+
+  /**
+   * Adds the field of the given name to the screen. The field does not need
+   * to be in the SmartDashboard table. This will add some default widget (for
+   * that type) with no value.
+   *
+   * @param key the key to add
+   */
+  public void addField(String key) {
+    setField(key, null, table.containsKey(key) ? table.getValue(key) : null, null);
   }
 
   /**
@@ -528,8 +528,8 @@ public class DashboardPanel extends JPanel {
   private class RobotListener implements ITableListener {
 
     @Override
-    public void valueChanged(final ITable source, final String key, final Object value, final
-    boolean isNew) {
+    public void valueChanged(final ITable source, final String key, final Object value,
+                             final boolean isNew) {
       if (isNew && !frame.getPrefs().autoShowWidgets.getValue() && !fields.containsKey(key)) {
         hiddenFields.add(key);
       } else {
@@ -537,8 +537,8 @@ public class DashboardPanel extends JPanel {
           if (value instanceof ITable) {
             final ITable table = (ITable) value;
             table.addTableListenerEx("~TYPE~", new ITableListener() {
-              public void valueChanged(final ITable typeSource, final String typeKey, final
-              Object typeValue, final boolean typeIsNew) {
+              public void valueChanged(final ITable typeSource, final String typeKey,
+                                       final Object typeValue, final boolean typeIsNew) {
                 table.removeTableListener(this);
                 SwingUtilities.invokeLater(new Runnable() {
                   public void run() {

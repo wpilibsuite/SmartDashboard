@@ -35,7 +35,7 @@
 
     <module name="TreeWalker">
         <module name="SuppressWarningsHolder"/>
-        <module name="AvoidNestedBlocks"/>
+        <!--<module name="AvoidNestedBlocks"/>-->
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
@@ -88,7 +88,7 @@
         <module name="OneStatementPerLine"/>
         <module name="MultipleVariableDeclarations"/>
         <module name="ArrayTypeStyle"/>
-        <module name="MissingSwitchDefault"/>
+        <!--<module name="MissingSwitchDefault"/>-->
         <module name="FallThrough"/>
         <module name="UpperEll"/>
         <module name="ModifierOrder"/>
@@ -112,11 +112,13 @@
             <message key="name.invalidPattern"
                      value="Type name ''{0}'' must match pattern ''{1}''."/>
         </module>
+        <!--
         <module name="MemberName">
             <property name="format" value="^[a-z][a-z0-9]*[a-zA-Z0-9]*$"/>
             <message key="name.invalidPattern"
                      value="Member name ''{0}'' must match pattern ''{1}''."/>
         </module>
+        -->
         <module name="ParameterName">
             <property name="format" value="^[a-z][a-z0-9]*[a-zA-Z0-9]*$"/>
             <message key="name.invalidPattern"
@@ -197,18 +199,19 @@
             <property name="tokens" value="VARIABLE_DEF"/>
             <property name="allowSamelineMultipleAnnotations" value="true"/>
         </module>
-        <module name="NonEmptyAtclauseDescription"/>
+        <!--<module name="NonEmptyAtclauseDescription"/>-->
         <module name="JavadocTagContinuationIndentation"/>
-        <module name="SummaryJavadoc">
+        <!--<module name="SummaryJavadoc">
             <property name="forbiddenSummaryFragments"
                       value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
-        </module>
-        <module name="JavadocParagraph"/>
+        </module>-->
+        <!--<module name="JavadocParagraph"/>-->
         <module name="AtclauseOrder">
             <property name="tagOrder" value="@param, @return, @throws, @deprecated"/>
             <property name="target"
                       value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
         </module>
+        <!--
         <module name="JavadocMethod">
             <property name="scope" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
@@ -220,11 +223,14 @@
             <property name="allowThrowsTagsForSubclasses" value="true"/>
             <property name="tokens" value="METHOD_DEF"/>
         </module>
+        -->
+        <!--
         <module name="MethodName">
             <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$"/>
             <message key="name.invalidPattern"
                      value="Method name ''{0}'' must match pattern ''{1}''."/>
         </module>
+        -->
         <module name="EmptyCatchBlock">
             <property name="exceptionVariableName" value="expected|ignore"/>
             <property name="commentFormat" value=".*"/>

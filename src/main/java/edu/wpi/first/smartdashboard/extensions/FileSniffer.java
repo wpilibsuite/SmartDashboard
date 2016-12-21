@@ -126,9 +126,12 @@ public class FileSniffer {
 
                 System.out.println("Custom Static Widget: " + clazz.getSimpleName());
               } catch (ClassCastException ex2) {
+                // TODO
               }
             } catch (ClassNotFoundException ex) {
+              // TODO
             } catch (NoClassDefFoundError ex) {
+              // TODO
             }
           }
         }

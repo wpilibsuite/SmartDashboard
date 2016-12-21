@@ -1,6 +1,6 @@
 package edu.wpi.first.smartdashboard.gui;
 
-import edu.wpi.first.smartdashboard.main;
+import edu.wpi.first.smartdashboard.SmartDashboard;
 import edu.wpi.first.smartdashboard.properties.BooleanProperty;
 import edu.wpi.first.smartdashboard.properties.FileProperty;
 import edu.wpi.first.smartdashboard.properties.IntegerListProperty;
@@ -58,10 +58,10 @@ public class DashboardPrefs implements PropertyHolder {
 
   public DashboardPrefs(DashboardFrame frame) {
     this.frame = frame;
-    node = Preferences.userNodeForPackage(main.class);
+    node = Preferences.userNodeForPackage(SmartDashboard.class);
 
     for (Property property : properties.values()) {
-      if (property == logToCSV) {//always set logtoCSV to default on load
+      if (property == logToCSV) { //always set logtoCSV to default on load
         continue;
       }
       load(property);

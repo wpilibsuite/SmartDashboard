@@ -11,15 +11,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 /**
- * main SmartDashboard logic
+ * SmartDashboard logic
  *
  * @author Joe Grinstead
  * @author pmalmsten
  */
-public class main {
+public class SmartDashboard {
 
   /**
-   * Variable used in the {@link main#inCompetition() inCompetition()} method
+   * Variable used in the {@link SmartDashboard#inCompetition() inCompetition()} method
    */
   private static boolean inCompetition = false;
 
@@ -44,8 +44,8 @@ public class main {
    * Starts the program
    *
    * @param args the standard arguments. If "competition" is one of them, then the SmartDashboard
-   * will be in competition mode
-   * @see main#inCompetition() inCompetition()
+   *             will be in competition mode
+   * @see SmartDashboard#inCompetition() inCompetition()
    */
   public static void main(final String[] args) {
     try {
@@ -54,6 +54,7 @@ public class main {
           try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
           } catch (Exception e) {
+            // TODO
           }
         }
       });
@@ -107,6 +108,7 @@ public class main {
           }
           teamNumber = Integer.parseInt(input);
         } catch (Exception e) {
+          // TODO
         }
       }
 

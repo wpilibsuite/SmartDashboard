@@ -47,6 +47,6 @@ public class BooleanBox extends AbstractValueWidget {
 
   @Override
   public void propertyChanged(Property property) {
-    setValue(value);//force backgound change
+    setValue(value); //force background change
   }
 }

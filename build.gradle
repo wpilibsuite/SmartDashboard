@@ -49,7 +49,7 @@ checkstyle {
     }
 }
 
-mainClassName = "edu.wpi.first.smartdashboard.main"
+mainClassName = "edu.wpi.first.smartdashboard.SmartDashboard"
 
 project(':fakeRobot') {
   apply plugin: 'java'

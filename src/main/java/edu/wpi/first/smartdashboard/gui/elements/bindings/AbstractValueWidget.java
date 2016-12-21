@@ -21,20 +21,6 @@ public abstract class AbstractValueWidget extends Widget {
     }
   }
 
-
-  public void setBooleanBinding(BooleanBindable booleanDisplayer) {
-    this.booleanDisplayer = booleanDisplayer;
-  }
-
-  public void setNumberBinding(NumberBindable numberDisplayer) {
-    this.numberDisplayer = numberDisplayer;
-  }
-
-  public void setStringBinding(StringBindable stringDisplayer) {
-    this.stringDisplayer = stringDisplayer;
-  }
-
-
   public void setValue(boolean value) {
     booleanDisplayer.setBindableValue(value);
   }
@@ -47,6 +33,17 @@ public abstract class AbstractValueWidget extends Widget {
     stringDisplayer.setBindableValue(value);
   }
 
+  public void setBooleanBinding(BooleanBindable booleanDisplayer) {
+    this.booleanDisplayer = booleanDisplayer;
+  }
+
+  public void setNumberBinding(NumberBindable numberDisplayer) {
+    this.numberDisplayer = numberDisplayer;
+  }
+
+  public void setStringBinding(StringBindable stringDisplayer) {
+    this.stringDisplayer = stringDisplayer;
+  }
 
   public class EditableBooleanValueCheckBox extends BindableBooleanCheckBox {
     public EditableBooleanValueCheckBox(final String key) {

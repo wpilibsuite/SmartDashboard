@@ -181,6 +181,7 @@ public abstract class DisplayElement extends JPanel implements PropertyHolder {
         return (String) field.get(null);
       }
     } catch (Exception e) {
+      // TODO
     }
 
     return clazz.getSimpleName();

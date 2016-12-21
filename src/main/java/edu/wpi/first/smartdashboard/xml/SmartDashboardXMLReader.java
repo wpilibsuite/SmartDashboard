@@ -95,7 +95,8 @@ public class SmartDashboardXMLReader {
         NodeList values = elements.item(e).getChildNodes();
         for (int a = 0; a < values.getLength(); a++) {
           if (values.item(a).getNodeName().trim().equals("location")) {
-            int x = 0, y = 0;
+            int x = 0;
+            int y = 0;
             NamedNodeMap location = values.item(a).getAttributes();
             for (int b = 0; b < location.getLength(); b++) {
 
@@ -109,14 +110,15 @@ public class SmartDashboardXMLReader {
             }
             widget.setLocation(new Point(x, y));
           } else if (values.item(a).getNodeName().trim().equals("width")) {
-            widget.setWidth(Integer.parseInt(values.item(a).getChildNodes().item(0).getNodeValue
-                ()));
+            widget.setWidth(
+                Integer.parseInt(values.item(a).getChildNodes().item(0).getNodeValue()));
           } else if (values.item(a).getNodeName().trim().equals("height")) {
-            widget.setHeight(Integer.parseInt(values.item(a).getChildNodes().item(0).getNodeValue
-                ()));
+            widget.setHeight(
+                Integer.parseInt(values.item(a).getChildNodes().item(0).getNodeValue()));
           } else if (values.item(a).getNodeName().trim().equals("property")) {
             NamedNodeMap propAtribs = values.item(a).getAttributes();
-            String name = null, value = null;
+            String name = null;
+            String value = null;
             for (int b = 0; b < propAtribs.getLength(); b++) {
               if (propAtribs.item(b).getNodeName().equals("name")) {
                 name = propAtribs.item(b).getNodeValue();
@@ -145,7 +147,8 @@ public class SmartDashboardXMLReader {
             for (int b = 0; b < subvalues.getLength(); b++) {
               String nodename = subvalues.item(b).getNodeName().trim();
               if (nodename.equals("location")) {
-                int x = 0, y = 0;
+                int x = 0;
+                int y = 0;
                 NamedNodeMap location = subvalues.item(b).getAttributes();
                 for (int c = 0; c < location.getLength(); c++) {
                   if (location.item(c).getNodeName().trim().equals("x")) {
@@ -184,7 +187,8 @@ public class SmartDashboardXMLReader {
         }
       } else if (elements.item(e).getNodeName().equals("property")) {
         NamedNodeMap propAtribs = elements.item(e).getAttributes();
-        String name = null, value = null;
+        String name = null;
+        String value = null;
         for (int b = 0; b < propAtribs.getLength(); b++) {
           if (propAtribs.item(b).getNodeName().equals("name")) {
             name = propAtribs.item(b).getNodeValue();

@@ -47,6 +47,7 @@ public class Robot {
     try {
       NetworkTable.shutdown();
     } catch (IllegalStateException ex) {
+      // TODO
     }
     NetworkTable.setPort(port);
     NetworkTable.initialize();
@@ -69,7 +70,7 @@ public class Robot {
   }
 
   public static void addConnectionListener(IRemoteConnectionListener listener, boolean
-			immediateNotify) {
+      immediateNotify) {
     System.out.println("Adding connection listener");
     NetworkTable.getTable(TABLE_NAME).addConnectionListener(listener, immediateNotify);
   }

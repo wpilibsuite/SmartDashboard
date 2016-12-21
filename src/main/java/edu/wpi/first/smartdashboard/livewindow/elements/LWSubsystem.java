@@ -49,14 +49,14 @@ public class LWSubsystem extends AbstractTableWidget {
   /**
    * A list of components within this subsystem.
    */
-  private final ArrayList<Widget> widgets = new ArrayList<Widget>(20);
+  private final ArrayList<Widget> widgets = new ArrayList<>(20);
   /**
    * Responsible for reading data from a save file.
    */
   private static SmartDashboardXMLReader reader;
 
   public LWSubsystem() {
-    super(true);//listen for sub tables
+    super(true); //listen for sub tables
     MainPanel.getPanel("LiveWindow").addSubsystem(this);
   }
 
@@ -106,9 +106,7 @@ public class LWSubsystem extends AbstractTableWidget {
       revalidate();
       repaint();
       System.out.println();
-    } catch (InstantiationException ex) {
-      Logger.getLogger(LWSubsystem.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (IllegalAccessException ex) {
+    } catch (InstantiationException | IllegalAccessException ex) {
       Logger.getLogger(LWSubsystem.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
@@ -116,7 +114,6 @@ public class LWSubsystem extends AbstractTableWidget {
   /**
    * @param source Required by ITableListener. Not used.
    * @param key The name of the changed table.
-   * @param value The table that has been changed.
    * @param isNew Required by ITableListener. Not used.
    */
   @Override
@@ -144,10 +141,10 @@ public class LWSubsystem extends AbstractTableWidget {
   /**
    * Sets the reader responsible for loading a save file.
    *
-   * @param XMLreader
+   * @param xmlReader
    */
-  public static void setLoaded(SmartDashboardXMLReader XMLreader) {
-    reader = XMLreader;
+  public static void setLoaded(SmartDashboardXMLReader xmlReader) {
+    reader = xmlReader;
   }
 
   @Override
@@ -221,8 +218,8 @@ public class LWSubsystem extends AbstractTableWidget {
           int newIndex = index + (
               mouseY < yclick ? -1 : 1); // The index to insert the dragged widget
 
-          boolean goingUp = false, // Flags for which direction the widget is being dragged
-              goingDown = false;
+          boolean goingUp = false; // Flags for which direction the widget is being dragged
+          boolean goingDown = false;
 
           // Check to see if the new index is within acceptable bounds
           if (newIndex >= 0 && newIndex < (subsystem.getComponentCount())) {

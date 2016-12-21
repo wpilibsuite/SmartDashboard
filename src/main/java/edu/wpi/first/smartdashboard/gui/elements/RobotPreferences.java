@@ -243,14 +243,6 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
     int sz = str.length();
     for (int i = 0; i < sz; i++) {
       char ch = str.charAt(i);
-      // handle unicode
-            /*if (ch > 0xfff) {
-                out.append("\\u" + hex(ch));
-            } else if (ch > 0xff) {
-                out.append("\\u0" + hex(ch));
-            } else if (ch > 0x7f) {
-                out.append("\\u00" + hex(ch));
-            } else*/
       if (ch < 32) {
         switch (ch) {
           case '\b':
@@ -478,6 +470,7 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
             JOptionPane.showMessageDialog(RobotPreferences.this,
                 "Invalid string: " + e.getMessage(), "Bad Value", JOptionPane.ERROR_MESSAGE);
           }
+        // TODO: Should this be a fallthrough?
         case 3: // Raw
         {
           value = value.trim();
@@ -622,7 +615,7 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-      if (columnIndex == 0) {//Key
+      if (columnIndex == 0) { //Key
         Map.Entry<String, Object> entry = getRow(rowIndex);
         if (entry != null) {
           String oldName = entry.getKey();
@@ -638,7 +631,7 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
             }
           }
         }
-      } else if (columnIndex == 1) {//Value
+      } else if (columnIndex == 1) { //Value
         Map.Entry<String, Object> entry = getRow(rowIndex);
         if (entry != null) {
           putString(entry.getKey(), aValue.toString(), getTypeName(entry.getValue()));

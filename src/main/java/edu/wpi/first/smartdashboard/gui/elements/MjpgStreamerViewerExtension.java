@@ -4,6 +4,7 @@ import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
+import edu.wpi.first.smartdashboard.robot.Robot;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -20,10 +21,9 @@ import javax.imageio.ImageIO;
 /**
  * @author Greg Granito
  */
-public class VideoStreamViewerExtension extends StaticWidget {
+public class MjpgStreamerViewerExtension extends StaticWidget {
 
-  public static final String NAME = "Simple Camera Viewer";
-
+  public static final String NAME = "MJPG Stream Viewer";
 
   private static final int[] START_BYTES = new int[]{0xFF, 0xD8};
   private static final int[] END_BYTES = new int[]{0xFF, 0xD9};
@@ -31,6 +31,7 @@ public class VideoStreamViewerExtension extends StaticWidget {
   private boolean ipChanged = true;
   private String ipString = null;
   private double rotateAngleRad = 0;
+  private int port = 0;
   private long lastFPSCheck = 0;
   private int lastFPS = 0;
   private int fpsCounter = 0;
@@ -54,7 +55,7 @@ public class VideoStreamViewerExtension extends StaticWidget {
         try {
           System.out.println("Connecting to camera");
           ipChanged = false;
-          URL url = new URL("http://" + ipString + "/mjpg/video.mjpg");
+          URL url = new URL("http://" + ipString + ":" + port + "/?action=stream");
           connection = url.openConnection();
           connection.setReadTimeout(250);
           stream = connection.getInputStream();
@@ -99,7 +100,6 @@ public class VideoStreamViewerExtension extends StaticWidget {
             lastRepaint = System.currentTimeMillis();
             ByteArrayInputStream tmpStream = new ByteArrayInputStream(imageBuffer.toByteArray());
             imageToDraw = ImageIO.read(tmpStream);
-            System.out.println(System.currentTimeMillis() - lastRepaint);
             repaint();
           }
 
@@ -113,6 +113,7 @@ public class VideoStreamViewerExtension extends StaticWidget {
           try {
             Thread.sleep(500);
           } catch (InterruptedException ex) {
+            // Already fixed in #45
           }
         }
       }
@@ -128,14 +129,16 @@ public class VideoStreamViewerExtension extends StaticWidget {
   private BufferedImage imageToDraw;
   private BGThread bgThread = new BGThread();
   public final StringProperty ipProperty
-      = new StringProperty(this, "Camera IP Address or mDNS name", "axis-camera.local");
+      = new StringProperty(this, "Robot IP Address or mDNS name", Robot.getHost());
+  public final IntegerProperty portProperty = new IntegerProperty(this, "port", 1181);
   public final IntegerProperty rotateProperty = new IntegerProperty(this, "Degrees Rotation", 0);
 
   @Override
   public void init() {
-    setPreferredSize(new Dimension(100, 100));
+    setPreferredSize(new Dimension(160, 120));
     ipString = ipProperty.getSaveValue();
     rotateAngleRad = Math.toRadians(rotateProperty.getValue());
+    port = portProperty.getValue();
     bgThread.start();
     revalidate();
     repaint();
@@ -150,7 +153,10 @@ public class VideoStreamViewerExtension extends StaticWidget {
     if (property == rotateProperty) {
       rotateAngleRad = Math.toRadians(rotateProperty.getValue());
     }
-
+    if (property == portProperty) {
+      port = portProperty.getValue();
+      ipChanged = true;
+    }
   }
 
   @Override

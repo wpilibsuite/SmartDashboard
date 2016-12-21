@@ -56,7 +56,7 @@ public class LinePlot extends AbstractValueWidget {
   }
 
   @Override
-  public void setValue(double value) {//TODO make sample in thread instead of relying on set
+  public void setValue(double value) { //TODO make sample in thread instead of relying on set
     // value (so that the widget has even time scale)
     m_data.add(m_timeUnit++, value);
 

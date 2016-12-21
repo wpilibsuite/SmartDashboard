@@ -94,8 +94,8 @@ public abstract class Widget extends DisplayElement {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-      if (!getValueIsAdjusting())//TODO implement better delay
-      {
+      if (!getValueIsAdjusting()) {
+        //TODO implement better delay
         bindable.setBindableValue(getValue() * (max - min) / pixelWidth + min);
       }
     }
@@ -232,7 +232,7 @@ public abstract class Widget extends DisplayElement {
     }
   }
 
-  public static abstract class EditorTextField extends ThreadSafeTextField {
+  public abstract static class EditorTextField extends ThreadSafeTextField {
 
     public EditorTextField() {
       addActionListener(new ActionListener() {
@@ -265,7 +265,7 @@ public abstract class Widget extends DisplayElement {
     }
   }
 
-  public static abstract class BooleanCheckBox extends ThreadSafeCheckBox implements
+  public abstract static class BooleanCheckBox extends ThreadSafeCheckBox implements
       BooleanBindable {
 
     private boolean value;
@@ -299,7 +299,7 @@ public abstract class Widget extends DisplayElement {
     protected abstract boolean setValue(boolean value);
   }
 
-  public static abstract class BooleanField extends EditorTextField implements BooleanBindable {
+  public abstract static class BooleanField extends EditorTextField implements BooleanBindable {
 
     private boolean value = false;
 
@@ -313,7 +313,7 @@ public abstract class Widget extends DisplayElement {
             resetValue();
           }
         } else {
-          resetValue();//reset the text but don't set the value again
+          resetValue(); //reset the text but don't set the value again
         }
       }
     }
@@ -331,7 +331,7 @@ public abstract class Widget extends DisplayElement {
     protected abstract boolean setValue(boolean value);
   }
 
-  public static abstract class NumberField extends EditorTextField implements NumberBindable {
+  public abstract static class NumberField extends EditorTextField implements NumberBindable {
 
     private double value = Double.NaN;
 
@@ -367,7 +367,7 @@ public abstract class Widget extends DisplayElement {
     protected abstract boolean setValue(double value);
   }
 
-  public static abstract class StringField extends EditorTextField implements StringBindable {
+  public abstract static class StringField extends EditorTextField implements StringBindable {
 
     private String value = null;
 

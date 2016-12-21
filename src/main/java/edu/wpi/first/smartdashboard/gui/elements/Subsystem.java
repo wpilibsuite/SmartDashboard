@@ -23,7 +23,7 @@ public class Subsystem extends AbstractTableWidget implements ITableListener {
   private SubsystemCommandField valueField;
 
   public void init() {
-    JLabel nameLabel = new JLabel(getFieldName());
+    final JLabel nameLabel = new JLabel(getFieldName());
     valueField = new SubsystemCommandField();
 
     update(background, valueField.getBackground());
