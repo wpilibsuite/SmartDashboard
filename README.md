@@ -23,7 +23,7 @@ Building Smart Dashboard is very straightforward. Smart Dashboard uses Gradle to
 
 ## Running
 
-To run Smart Dashboard navigate to the `smartdashboard` directory and use the command `./gradlew run`.
+To run Smart Dashboard navigate to the `smartdashboard` directory and use the command `./gradlew :run`.
 
 # Contributing to WPILib
 
