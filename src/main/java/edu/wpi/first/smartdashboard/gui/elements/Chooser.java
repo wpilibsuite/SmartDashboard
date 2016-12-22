@@ -1,309 +1,274 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
-import edu.wpi.first.smartdashboard.properties.*;
-import edu.wpi.first.smartdashboard.types.*;
-import edu.wpi.first.smartdashboard.types.named.*;
+import edu.wpi.first.smartdashboard.properties.BooleanProperty;
+import edu.wpi.first.smartdashboard.properties.Property;
+import edu.wpi.first.smartdashboard.types.DataType;
+import edu.wpi.first.smartdashboard.types.named.StringChooserType;
 import edu.wpi.first.wpilibj.networktables2.type.StringArray;
-import edu.wpi.first.wpilibj.tables.*;
+import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.Component;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 /**
- *
  * @author Joe Grinstead
  */
-public class Chooser extends AbstractTableWidget implements ITableListener
-{
+public class Chooser extends AbstractTableWidget implements ITableListener {
 
-	private static final String DEFAULT = "default";
-	private static final String SELECTED = "selected";
-	private static final String OPTIONS = "options";
-	public static final DataType[] TYPES =
-	{
-		StringChooserType.get()
-	};
-	public final BooleanProperty editable = new BooleanProperty(this, "Editable", true);
-	public final BooleanProperty useRadioButtons = new BooleanProperty(this, "Use Radio Buttons", true);
-	private Display display;
-	private String selection;
-	private StringArray choices = new StringArray();
+  private static final String DEFAULT = "default";
+  private static final String SELECTED = "selected";
+  private static final String OPTIONS = "options";
+  public static final DataType[] TYPES =
+      {
+          StringChooserType.get()
+      };
+  public final BooleanProperty editable = new BooleanProperty(this, "Editable", true);
+  public final BooleanProperty useRadioButtons
+      = new BooleanProperty(this, "Use Radio Buttons", true);
+  private Display display;
+  private String selection;
+  private StringArray choices = new StringArray();
 
-	@Override
-	public void init()
-	{
-		setResizable(false);
+  @Override
+  public void init() {
+    setResizable(false);
 
-		selection = null;
+    selection = null;
 
-		display = useRadioButtons.getValue() ? new RadioButtons() : new ComboBox();
-		display.setChoices(choices);
-	}
+    display = useRadioButtons.getValue() ? new RadioButtons() : new ComboBox();
+    display.setChoices(choices);
+  }
 
-	@Override
-	public void valueChanged(ITable source, String key, Object value, boolean isNew)
-	{
-		if (key.equals(OPTIONS))
-		{
-			table.retrieveValue(OPTIONS, choices);
-			display.setChoices(choices);
-		}
-		//if(key.equals(DEFAULT))
-		//    display.setDefault(source.getString(DEFAULT)); //TODO handle change in default?
-		if (key.equals(SELECTED))
-		{
-			display.setSelected(source.getString(SELECTED));
-		}
+  @Override
+  public void valueChanged(ITable source, String key, Object value, boolean isNew) {
+    if (key.equals(OPTIONS)) {
+      table.retrieveValue(OPTIONS, choices);
+      display.setChoices(choices);
+    }
+    //if(key.equals(DEFAULT))
+    //    display.setDefault(source.getString(DEFAULT)); //TODO handle change in default?
+    if (key.equals(SELECTED)) {
+      display.setSelected(source.getString(SELECTED));
+    }
 
-		if (!source.containsKey(SELECTED)) {
-			source.putString(SELECTED, source.getString(DEFAULT, choices.get(0)));
-		}
-	}
+    if (!source.containsKey(SELECTED)) {
+      source.putString(SELECTED, source.getString(DEFAULT, choices.get(0)));
+    }
+  }
 
-	@Override
-	public void propertyChanged(Property property)
-	{
-		if (property == useRadioButtons)
-		{
-			changeChoices();
-		} else
-		{
-			if (property == editable)
-			{
-				display.setEditable(editable.getValue());
-			}
-		}
-	}
+  @Override
+  public void propertyChanged(Property property) {
+    if (property == useRadioButtons) {
+      changeChoices();
+    } else {
+      if (property == editable) {
+        display.setEditable(editable.getValue());
+      }
+    }
+  }
 
-	private void changeChoices()
-	{
-		remove(display.getComponent());
-		display = useRadioButtons.getValue() ? new RadioButtons() : new ComboBox();
-		display.setChoices(choices);
-	}
+  private void changeChoices() {
+    remove(display.getComponent());
+    display = useRadioButtons.getValue() ? new RadioButtons() : new ComboBox();
+    display.setChoices(choices);
+  }
 
-	private abstract class Display
-	{
+  private abstract class Display {
 
-		JPanel panel = new JPanel();
+    JPanel panel = new JPanel();
 
-		public Display()
-		{
-			panel.setOpaque(false);
+    public Display() {
+      panel.setOpaque(false);
 
-			add(panel);
-		}
+      add(panel);
+    }
 
-		abstract void setEditable(boolean editable);
+    abstract void setEditable(boolean editable);
 
-		abstract void setChoices(StringArray choices);
+    abstract void setChoices(StringArray choices);
 
-		abstract void setSelected(String selected);
-		
-		Component getComponent()
-		{
-			return panel;
-		}
-	}
+    abstract void setSelected(String selected);
 
-	private class RadioButtons extends Display implements ActionListener
-	{
+    Component getComponent() {
+      return panel;
+    }
+  }
 
-		JPanel groupPanel;
-		ButtonGroup group;
-		JRadioButton selected;
-		Map<String, JRadioButton> buttons;
+  private class RadioButtons extends Display implements ActionListener {
 
-		@Override
-		void setEditable(boolean editable)
-		{
-			for (JRadioButton button : buttons.values())
-			{
-				button.setEnabled(editable);
-			}
-		}
+    JPanel groupPanel;
+    ButtonGroup group;
+    JRadioButton selected;
+    Map<String, JRadioButton> buttons;
 
-		@Override
-		void setChoices(StringArray choices)
-		{
-			if (groupPanel != null)
-			{
-				panel.remove(groupPanel);
-				for (JRadioButton button : buttons.values())
-				{
-					group.remove(button);
-				}
-				buttons.clear();
-			}
+    @Override
+    void setEditable(boolean editable) {
+      for (JRadioButton button : buttons.values()) {
+        button.setEnabled(editable);
+      }
+    }
 
-			groupPanel = new JPanel();
-			groupPanel.setOpaque(false);
-			groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
+    @Override
+    void setChoices(StringArray choices) {
+      if (groupPanel != null) {
+        panel.remove(groupPanel);
+        for (JRadioButton button : buttons.values()) {
+          group.remove(button);
+        }
+        buttons.clear();
+      }
 
-			group = new ButtonGroup();
+      groupPanel = new JPanel();
+      groupPanel.setOpaque(false);
+      groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
 
-			buttons = new HashMap<String, JRadioButton>();
+      group = new ButtonGroup();
+
+      buttons = new HashMap<String, JRadioButton>();
 
 
-			boolean hasSelection = false;
+      boolean hasSelection = false;
 
-			for (int i = 0; i < choices.size(); i++)
-			{
-				String choice = choices.get(i);
-				hasSelection |= choice.equals(selection);
+      for (int i = 0; i < choices.size(); i++) {
+        String choice = choices.get(i);
+        hasSelection |= choice.equals(selection);
 
-				JRadioButton button = new JRadioButton(choice);
-				buttons.put(choice, button);
-				group.add(button);
-				groupPanel.add(button);
-				button.setActionCommand(choice);
-				button.addActionListener(this);
-			}
+        JRadioButton button = new JRadioButton(choice);
+        buttons.put(choice, button);
+        group.add(button);
+        groupPanel.add(button);
+        button.setActionCommand(choice);
+        button.addActionListener(this);
+      }
 
-			if (!hasSelection)
-			{
-				selection = null;
-			}
+      if (!hasSelection) {
+        selection = null;
+      }
 
-			if (table != null && table.containsKey(SELECTED))
-			{
-				selection = table.getString(SELECTED);
-			}
+      if (table != null && table.containsKey(SELECTED)) {
+        selection = table.getString(SELECTED);
+      }
 
-			if (table != null && selection != null)
-			{
-				table.putString(SELECTED, selection);
-				selected = buttons.get(selection);
-				selected.setSelected(true);
-			} else
-			{
-				if (table != null && table.containsKey(DEFAULT))
-				{
-					selected = buttons.get(table.getString(DEFAULT));
-					selected.setSelected(true);
-				} else
-				{
-					selected = null;
-				}
-			}
+      if (table != null && selection != null) {
+        table.putString(SELECTED, selection);
+        selected = buttons.get(selection);
+        selected.setSelected(true);
+      } else {
+        if (table != null && table.containsKey(DEFAULT)) {
+          selected = buttons.get(table.getString(DEFAULT));
+          selected.setSelected(true);
+        } else {
+          selected = null;
+        }
+      }
 
-			setEnabled(editable.getValue());
+      setEnabled(editable.getValue());
 
-			panel.add(groupPanel);
+      panel.add(groupPanel);
 
-			revalidate();
-			repaint();
+      revalidate();
+      repaint();
 
-			setSize(getPreferredSize());
-		}
+      setSize(getPreferredSize());
+    }
 
-		@Override
-		void setSelected(String selected)
-		{
-			buttons.get(selected).setSelected(true);
-		}
+    @Override
+    void setSelected(String selected) {
+      buttons.get(selected).setSelected(true);
+    }
 
-		public void actionPerformed(ActionEvent e)
-		{
-			String userChoice = e.getActionCommand();
-			if (selection == null || !selection.equals(userChoice))
-			{
-				selection = userChoice;
-				table.putString(SELECTED, selection);
-			}
-		}
-	}
+    public void actionPerformed(ActionEvent e) {
+      String userChoice = e.getActionCommand();
+      if (selection == null || !selection.equals(userChoice)) {
+        selection = userChoice;
+        table.putString(SELECTED, selection);
+      }
+    }
+  }
 
-	private class ComboBox extends Display implements ItemListener
-	{
+  private class ComboBox extends Display implements ItemListener {
 
-		JComboBox combo;
+    JComboBox combo;
 
-		@Override
-		void setEditable(boolean editable)
-		{
-			if (combo != null)
-			{
-				combo.setEnabled(editable);
-			}
-		}
+    @Override
+    void setEditable(boolean editable) {
+      if (combo != null) {
+        combo.setEnabled(editable);
+      }
+    }
 
-		@Override
-		void setChoices(StringArray choices)
-		{
-			if (combo != null)
-			{
-				panel.remove(combo);
-				combo.removeItemListener(this);
-			}
+    @Override
+    void setChoices(StringArray choices) {
+      if (combo != null) {
+        panel.remove(combo);
+        combo.removeItemListener(this);
+      }
 
-			combo = new JComboBox();
+      combo = new JComboBox();
 
-			boolean hasSelection = false;
+      boolean hasSelection = false;
 
-			for (int i = 0; i < choices.size(); i++)
-			{
-					String choice = choices.get(i);
-					hasSelection |= choice.equals(selection);
-					combo.addItem(choice);
-			}
+      for (int i = 0; i < choices.size(); i++) {
+        String choice = choices.get(i);
+        hasSelection |= choice.equals(selection);
+        combo.addItem(choice);
+      }
 
-			if (!hasSelection)
-			{
-					selection = null;
-			}
+      if (!hasSelection) {
+        selection = null;
+      }
 
-			if (table != null && table.containsKey(SELECTED))
-			{
-					selection = table.getString(SELECTED);
-			}
+      if (table != null && table.containsKey(SELECTED)) {
+        selection = table.getString(SELECTED);
+      }
 
-			if (table != null && selection != null)
-			{
-					combo.setSelectedItem(selection);
-					table.putString(SELECTED, selection);
-			} else
-			{
-					if (table != null && table.containsKey(DEFAULT))
-					{
-							combo.setSelectedItem(table.getString(DEFAULT));
-					}
-			}
+      if (table != null && selection != null) {
+        combo.setSelectedItem(selection);
+        table.putString(SELECTED, selection);
+      } else {
+        if (table != null && table.containsKey(DEFAULT)) {
+          combo.setSelectedItem(table.getString(DEFAULT));
+        }
+      }
 
-			panel.add(combo);
+      panel.add(combo);
 
-			combo.addItemListener(this);
+      combo.addItemListener(this);
 
-			combo.setEnabled(editable.getValue());
+      combo.setEnabled(editable.getValue());
 
-			revalidate();
-			repaint();
+      revalidate();
+      repaint();
 
-			setSize(getPreferredSize());
-		}
+      setSize(getPreferredSize());
+    }
 
-		@Override
-		void setSelected(String selected)
-		{
-			if (combo != null)
-			{
-				combo.setSelectedItem(selected);
-			}
-		}
+    @Override
+    void setSelected(String selected) {
+      if (combo != null) {
+        combo.setSelectedItem(selected);
+      }
+    }
 
-		public void itemStateChanged(ItemEvent e)
-		{
-			if (e.getStateChange() == ItemEvent.SELECTED)
-			{
-				String userChoice = (String) e.getItem();
-				if (!userChoice.equals(selection))
-				{
-					selection = userChoice;
-					table.putString(SELECTED, selection);
-				}
-			}
-		}
-	}
+    public void itemStateChanged(ItemEvent e) {
+      if (e.getStateChange() == ItemEvent.SELECTED) {
+        String userChoice = (String) e.getItem();
+        if (!userChoice.equals(selection)) {
+          selection = userChoice;
+          table.putString(SELECTED, selection);
+        }
+      }
+    }
+  }
 }

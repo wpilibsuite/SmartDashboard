@@ -1,21 +1,17 @@
 package edu.wpi.first.smartdashboard.extensions;
 
-import java.io.*;
-import java.lang.String;
-import java.lang.System;
-import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.jar.JarFile;
-import java.util.jar.JarEntry;
+import edu.wpi.first.smartdashboard.gui.StaticWidget;
+import edu.wpi.first.smartdashboard.gui.Widget;
+import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.net.*;
-
-import javax.swing.*;
-
-import edu.wpi.first.smartdashboard.gui.*;
-import edu.wpi.first.smartdashboard.gui.elements.*;
-import edu.wpi.first.smartdashboard.types.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import javax.swing.ProgressMonitor;
 
 /**
  * This class searches for library and extension jars and adds them
@@ -26,137 +22,140 @@ import edu.wpi.first.smartdashboard.types.*;
  * @author Joe Grinstead
  */
 public class FileSniffer {
-    private static final File EXTENSION_DIR =
-            new File(getUserHomeDir(), "SmartDashboard/extensions");
-    private static final File[] LIBRARY_DIRS = {
-            new File("./lib"),
-            new File(EXTENSION_DIR, "lib"),
-            EXTENSION_DIR
-    };
+  private static final File EXTENSION_DIR =
+      new File(getUserHomeDir(), "SmartDashboard/extensions");
+  private static final File[] LIBRARY_DIRS = {
+      new File("./lib"),
+      new File(EXTENSION_DIR, "lib"),
+      EXTENSION_DIR
+  };
 
-    public static void findExtensions(ProgressMonitor monitor, int min, int max) {
-        monitor.setNote("Loading Extensions");
+  public static void findExtensions(ProgressMonitor monitor, int min, int max) {
+    monitor.setNote("Loading Extensions");
 
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<?> sysclass = URLClassLoader.class;
+    URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+    Class<?> sysclass = URLClassLoader.class;
 
-        Method method = null;
+    Method method = null;
+    try {
+      method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
+      method.setAccessible(true);
+    } catch (Exception e) {
+      e.printStackTrace();
+      monitor.setProgress(max);
+      return;
+    }
+
+    for (File libDir : LIBRARY_DIRS) {
+      if (!libDir.exists()) {
+        monitor.setProgress(min + (max - min) / 5);
+        continue;
+      }
+      System.out.println("Searching for library jars in: " + libDir);
+      monitor.setNote("Searching for library jars in: " + libDir);
+
+      File[] files = libDir.listFiles(new FilenameFilter() {
+
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".jar");
+        }
+      });
+      if (files == null) {
+        monitor.setProgress(min + (max - min) / 5);
+        continue;
+      }
+
+      for (File file : files) {
+        System.out.println("Adding Jar: " + file);
+
         try {
-            method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
-            method.setAccessible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            monitor.setProgress(max);
-            return;
+          method.invoke(sysloader, new Object[]{file.toURI().toURL()});
+        } catch (Exception ex) {
+          ex.printStackTrace();
         }
+      }
 
-        for (File libDir : LIBRARY_DIRS) {
-            if (!libDir.exists()) {
-                monitor.setProgress(min + (max - min) / 5);
-                continue;
-            }
-            System.out.println("Searching for library jars in: " + libDir);
-            monitor.setNote("Searching for library jars in: " + libDir);
+      monitor.setProgress(min + (max - min) / 5);
+    }
 
-            File[] files = libDir.listFiles(new FilenameFilter() {
+    if (!EXTENSION_DIR.exists()) {
+      System.out.println("No Extension Folder");
+      monitor.setProgress(max);
+      return;
+    }
 
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".jar");
-                }
-            });
-            if (files == null) {
-                monitor.setProgress(min + (max - min) / 5);
-                continue;
-            }
+    File[] files = EXTENSION_DIR.listFiles(new FilenameFilter() {
 
-            for (File file : files) {
-                System.out.println("Adding Jar: " + file);
+      public boolean accept(File dir, String name) {
+        return name.endsWith(".jar");
+      }
+    });
 
-                try {
-                    method.invoke(sysloader, new Object[]{file.toURI().toURL()});
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+    double fileCount = 0;
+    for (File file : files) {
+      System.out.println("Searching for extensions in: " + file);
+      monitor.setProgress((int) ((min + max) / 2.0 * (1.0 + fileCount++ / files.length)));
+      monitor.setNote("Searching for extensions in: " + file);
 
-            monitor.setProgress(min + (max - min) / 5);
-        }
+      try {
+        JarFile jar = new JarFile(file);
 
-        if (!EXTENSION_DIR.exists()) {
-            System.out.println("No Extension Folder");
-            monitor.setProgress(max);
-            return;
-        }
+        Enumeration<JarEntry> entries = jar.entries();
+        while (entries.hasMoreElements()) {
+          JarEntry entry = entries.nextElement();
+          String name = entry.getName();
 
-        File[] files = EXTENSION_DIR.listFiles(new FilenameFilter() {
-
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".jar");
-            }
-        });
-
-        double fileCount = 0;
-        for (File file : files) {
-            System.out.println("Searching for extensions in: " + file);
-            monitor.setProgress((int) ((min + max) / 2.0 * (1.0 + fileCount++ / files.length)));
-            monitor.setNote("Searching for extensions in: " + file);
-
+          if (name.endsWith(".class")) {
+            Class<?> clazz = null;
             try {
-                JarFile jar = new JarFile(file);
+              // Get rid of class
+              name = name.substring(0, name.length() - 6);
+              // Change to package name
+              name = name.replaceAll("/", ".");
 
-                Enumeration<JarEntry> entries = jar.entries();
-                while (entries.hasMoreElements()) {
-                    JarEntry entry = entries.nextElement();
-                    String name = entry.getName();
+              clazz = Class.forName(name, false, sysloader);
 
-                    if (name.endsWith(".class")) {
-                        Class<?> clazz = null;
-                        try {
-                            // Get rid of class
-                            name = name.substring(0, name.length() - 6);
-                            // Change to package name
-                            name = name.replaceAll("/", ".");
+              Class<? extends Widget> element = clazz.asSubclass(Widget.class);
+              DisplayElementRegistry.registerWidget(element);
 
-                            clazz = Class.forName(name, false, sysloader);
+              System.out.println("Custom Widget: " + clazz.getSimpleName());
+            } catch (ClassCastException ex) {
+              try {
+                Class<? extends StaticWidget> element = clazz.asSubclass(StaticWidget.class);
+                DisplayElementRegistry.registerStaticWidget(element);
 
-                            Class<? extends Widget> element = clazz.asSubclass(Widget.class);
-                            DisplayElementRegistry.registerWidget(element);
-
-                            System.out.println("Custom Widget: " + clazz.getSimpleName());
-                        } catch (ClassCastException ex) {
-                            try {
-                                Class<? extends StaticWidget> element = clazz.asSubclass(StaticWidget.class);
-                                DisplayElementRegistry.registerStaticWidget(element);
-
-                                System.out.println("Custom Static Widget: " + clazz.getSimpleName());
-                            } catch (ClassCastException ex2) {
-                            }
-                        } catch (ClassNotFoundException ex) {
-                        } catch (NoClassDefFoundError ex) {
-                        }
-                    }
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-                System.out.println("Error, could not add URL to system classloader");
+                System.out.println("Custom Static Widget: " + clazz.getSimpleName());
+              } catch (ClassCastException ex2) {
+                // TODO
+              }
+            } catch (ClassNotFoundException ex) {
+              // TODO
+            } catch (NoClassDefFoundError ex) {
+              // TODO
             }
+          }
         }
-
-        monitor.setProgress(max);
+      } catch (Throwable t) {
+        t.printStackTrace();
+        System.out.println("Error, could not add URL to system classloader");
+      }
     }
 
-    private static File getUserHomeDir() {
-        final String homeDirPath;
-        if (isWindows()) {
-            homeDirPath = System.getenv("USERPROFILE");
-        } else {
-            homeDirPath = System.getProperty("user.home");
-        }
+    monitor.setProgress(max);
+  }
 
-        return new File(homeDirPath);
+  private static File getUserHomeDir() {
+    final String homeDirPath;
+    if (isWindows()) {
+      homeDirPath = System.getenv("USERPROFILE");
+    } else {
+      homeDirPath = System.getProperty("user.home");
     }
 
-    private static boolean isWindows() {
-        return System.getProperty("os.name").matches("(?i)Windows.*");
-    }
+    return new File(homeDirPath);
+  }
+
+  private static boolean isWindows() {
+    return System.getProperty("os.name").matches("(?i)Windows.*");
+  }
 }

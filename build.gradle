@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.5.1'
+    id 'checkstyle'
 }
 
 repositories {
@@ -39,7 +40,16 @@ if (!hasProperty('releaseType')) {
     }
 }
 
-mainClassName = "edu.wpi.first.smartdashboard.main"
+
+checkstyle {
+    configFile = new File(rootDir, "checkstyle.xml")
+    toolVersion = '6.19'
+    if (project.hasProperty("ignoreCheckstyle")) {
+        ignoreFailures = true
+    }
+}
+
+mainClassName = "edu.wpi.first.smartdashboard.SmartDashboard"
 
 project(':fakeRobot') {
   apply plugin: 'java'
