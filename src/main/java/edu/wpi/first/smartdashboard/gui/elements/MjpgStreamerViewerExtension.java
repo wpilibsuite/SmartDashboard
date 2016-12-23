@@ -2,9 +2,10 @@ package edu.wpi.first.smartdashboard.gui.elements;
 
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
+import edu.wpi.first.smartdashboard.properties.MultiProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
-import edu.wpi.first.smartdashboard.properties.StringProperty;
-import edu.wpi.first.smartdashboard.robot.Robot;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.tables.ITable;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 /**
@@ -29,13 +32,15 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
   private static final int[] START_BYTES = new int[]{0xFF, 0xD8};
   private static final int[] END_BYTES = new int[]{0xFF, 0xD9};
 
-  private boolean ipChanged = true;
-  private String ipString = null;
+  private static final String STREAMS_KEY = "streams";
+  private static final String STREAM_PREFIX = "mjpg:";
+
+  private boolean cameraChanged;
   private double rotateAngleRad = 0;
-  private int port = 0;
   private long lastFPSCheck = 0;
   private int lastFPS = 0;
   private int fpsCounter = 0;
+  private ITable cameraTable;
 
   public class BGThread extends Thread {
 
@@ -47,19 +52,47 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
     @Override
     public void run() {
-      URLConnection connection = null;
       InputStream stream = null;
       ByteArrayOutputStream imageBuffer = new ByteArrayOutputStream();
-      while (!interrupted()) {
-        try {
-          System.out.println("Connecting to camera");
-          ipChanged = false;
-          URL url = new URL("http://" + ipString + ":" + port + "/?action=stream");
-          connection = url.openConnection();
-          connection.setReadTimeout(250);
-          stream = connection.getInputStream();
 
-          while (!interrupted() && !ipChanged) {
+      while (!interrupted()) {
+        cameraChanged = true;
+
+        // Connect to Camera
+        while (!interrupted() && cameraChanged && cameraTable != null) {
+          for (String streamUrl
+              : Arrays.stream(cameraTable.getStringArray(STREAMS_KEY, new String[0]))
+              .filter(s -> s.startsWith(STREAM_PREFIX))
+              .map(s -> s.substring(STREAM_PREFIX.length()))
+              .collect(Collectors.toSet())) {
+            try {
+              System.out.println("Trying to connect to: " + streamUrl);
+              URL url = new URL(streamUrl);
+              URLConnection connection = url.openConnection();
+              connection.setReadTimeout(250);
+              stream = connection.getInputStream();
+
+              System.out.println("Connected to: " + streamUrl);
+              cameraChanged = false;
+              break;
+            } catch (IOException e) {
+              imageToDraw = null;
+              repaint();
+              // Clutters the log:
+              // e.printStackTrace();
+              try {
+                Thread.sleep(500);
+              } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(ex);
+              }
+            }
+          }
+        }
+
+        // Run Stream
+        try {
+          while (!interrupted() && !cameraChanged && stream != null) {
             while (System.currentTimeMillis() - lastRepaint < 10) {
               stream.skip(stream.available());
               Thread.sleep(1);
@@ -75,9 +108,8 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
                 i = 0;
               }
             }
-            for (int i = 0; i < START_BYTES.length; ++i) {
-              imageBuffer.write(START_BYTES[i]);
-            }
+
+            Arrays.stream(START_BYTES).forEachOrdered(imageBuffer::write);
 
             for (int i = 0; i < END_BYTES.length; ) {
               int b = stream.read();
@@ -105,19 +137,10 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
         } catch (IOException ex) {
           imageToDraw = null;
           repaint();
-          ex.printStackTrace();
+          //ex.printStackTrace();
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
           throw new RuntimeException(ex);
-        }
-
-        if (!ipChanged) {
-          try {
-            Thread.sleep(500);
-          } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(ex);
-          }
         }
       }
     }
@@ -125,17 +148,22 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
   private BufferedImage imageToDraw;
   private BGThread bgThread = new BGThread();
-  public final StringProperty ipProperty
-      = new StringProperty(this, "Robot IP Address or mDNS name", Robot.getHost());
-  public final IntegerProperty portProperty = new IntegerProperty(this, "port", 1181);
+
   public final IntegerProperty rotateProperty = new IntegerProperty(this, "Degrees Rotation", 0);
+  public final MultiProperty cameraProperty = new MultiProperty(this, "Camera Choice");
 
   @Override
   public void init() {
     setPreferredSize(new Dimension(160, 120));
-    ipString = ipProperty.getSaveValue();
     rotateAngleRad = Math.toRadians(rotateProperty.getValue());
-    port = portProperty.getValue();
+
+    NetworkTable.getTable("CameraPublisher").addSubTableListener(((source, key, value, isNew) -> {
+      cameraProperty.add(key, value);
+      if (cameraTable == null) {
+        cameraTable = (ITable) value;
+      }
+    }));
+
     bgThread.start();
     revalidate();
     repaint();
@@ -143,16 +171,12 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
   @Override
   public void propertyChanged(Property property) {
-    if (property == ipProperty) {
-      ipString = ipProperty.getSaveValue();
-      ipChanged = true;
+    if (property == cameraProperty) {
+      cameraChanged = true;
+      cameraTable = (ITable) cameraProperty.getValue();
     }
     if (property == rotateProperty) {
       rotateAngleRad = Math.toRadians(rotateProperty.getValue());
-    }
-    if (property == portProperty) {
-      port = portProperty.getValue();
-      ipChanged = true;
     }
   }
 
