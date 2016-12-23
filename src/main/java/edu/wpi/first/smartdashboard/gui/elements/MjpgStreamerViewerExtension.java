@@ -44,8 +44,6 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
   
   public class BGThread extends Thread {
 
-    boolean destroyed = false;
-
     public BGThread() {
       super("Camera Viewer Background");
     }
@@ -57,7 +55,7 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
       URLConnection connection = null;
       InputStream stream = null;
       ByteArrayOutputStream imageBuffer = new ByteArrayOutputStream();
-      while (!destroyed) {
+      while (!interrupted()) {
         try {
           System.out.println("Connecting to camera");
           ipChanged = false;
@@ -66,7 +64,7 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
           connection.setReadTimeout(250);
           stream = connection.getInputStream();
 
-          while (!destroyed && !ipChanged) {
+          while (!interrupted() && !ipChanged) {
             while (System.currentTimeMillis() - lastRepaint < 10) {
               stream.skip(stream.available());
               Thread.sleep(1);
@@ -130,12 +128,6 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
           }
         }
       }
-
-    }
-
-    @Override
-    public void destroy() {
-      destroyed = true;
     }
   }
 
@@ -174,7 +166,7 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
   @Override
   public void disconnect() {
-    bgThread.destroy();
+    bgThread.interrupt();
     super.disconnect();
   }
 
