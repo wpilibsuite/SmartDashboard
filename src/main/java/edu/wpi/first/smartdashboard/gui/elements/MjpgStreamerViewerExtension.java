@@ -29,7 +29,7 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
   private static final int[] END_BYTES = new int[]{0xFF, 0xD9};
   
   private static final int MS_TO_ACCUM_STATS = 1000;
-  private static final double BPS_TO_Mbps = 8.0/1024.0/1024.0;
+  private static final double BPS_TO_Mbps = 8.0 / 1024.0 / 1024.0;
 
   private boolean ipChanged = true;
   private String ipString = null;
@@ -97,10 +97,10 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
             fpsCounter++;
             bpsAccum += imageBuffer.size();
-            if(System.currentTimeMillis()-lastFPSCheck > MS_TO_ACCUM_STATS){  
+            if (System.currentTimeMillis() - lastFPSCheck > MS_TO_ACCUM_STATS) {  
               lastFPSCheck = System.currentTimeMillis();
               lastFPS = fpsCounter;
-              lastMbps = bpsAccum*BPS_TO_Mbps;
+              lastMbps = bpsAccum * BPS_TO_Mbps;
               fpsCounter = 0;
               bpsAccum = 0;
             }
