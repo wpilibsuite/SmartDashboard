@@ -222,7 +222,7 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
       g.setColor(Color.PINK);
       g.drawString("FPS: " + lastFPS, 10, 10);
-	  g.drawString("Mbps: " + String.format("%.2f", lastMbps), 10, 25);
+      g.drawString("Mbps: " + String.format("%.2f", lastMbps), 10, 25);
     } else {
       g.setColor(Color.PINK);
       g.fillRect(0, 0, getBounds().width, getBounds().height);
