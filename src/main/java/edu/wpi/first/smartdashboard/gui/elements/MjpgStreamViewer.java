@@ -197,7 +197,7 @@ public abstract class MjpgStreamViewer extends StaticWidget {
         } catch (IOException ex) {
           imageToDraw = null;
           repaint();
-          ex.printStackTrace();
+          System.out.println(ex.getMessage());
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
           throw new RuntimeException(ex);
