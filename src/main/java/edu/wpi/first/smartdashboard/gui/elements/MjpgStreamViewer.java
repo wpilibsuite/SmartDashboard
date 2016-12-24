@@ -28,6 +28,8 @@ public abstract class MjpgStreamViewer extends StaticWidget {
   protected static final String STREAM_PREFIX = "mjpg:";
   private static final int[] START_BYTES = new int[]{0xFF, 0xD8};
   private static final int[] END_BYTES = new int[]{0xFF, 0xD9};
+  private static final int MS_TO_ACCUM_STATS = 1000;
+  private static final double BPS_TO_MBPS = 8.0 / 1024.0 / 1024.0;
 
   public final IntegerProperty rotateProperty = new IntegerProperty(this, "Degrees Rotation", 0);
 
@@ -35,6 +37,8 @@ public abstract class MjpgStreamViewer extends StaticWidget {
   private long lastFPSCheck = 0;
   private int lastFPS = 0;
   private int fpsCounter = 0;
+  private long bpsAccum = 0;
+  private double lastMbps = 0;
   private BufferedImage imageToDraw;
   private BGThread bgThread = new BGThread();
   private boolean cameraChanged = false;
@@ -124,6 +128,7 @@ public abstract class MjpgStreamViewer extends StaticWidget {
 
       g.setColor(Color.PINK);
       g.drawString("FPS: " + lastFPS, 10, 10);
+      g.drawString("Mbps: " + String.format("%.2f", lastMbps), 10, 25);
     } else {
       g.setColor(Color.PINK);
       g.fillRect(0, 0, getBounds().width, getBounds().height);
@@ -212,10 +217,13 @@ public abstract class MjpgStreamViewer extends StaticWidget {
             readUntil(stream, END_BYTES, imageBuffer);
 
             fpsCounter++;
-            if (System.currentTimeMillis() - lastFPSCheck > 500) {
+            bpsAccum += imageBuffer.size();
+            if (System.currentTimeMillis() - lastFPSCheck > MS_TO_ACCUM_STATS) {
               lastFPSCheck = System.currentTimeMillis();
-              lastFPS = fpsCounter * 2;
+              lastFPS = fpsCounter;
+              lastMbps = bpsAccum * BPS_TO_MBPS;
               fpsCounter = 0;
+              bpsAccum = 0;
             }
 
             lastRepaint = System.currentTimeMillis();
