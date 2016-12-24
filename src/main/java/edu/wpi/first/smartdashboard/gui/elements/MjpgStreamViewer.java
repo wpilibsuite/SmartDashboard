@@ -209,6 +209,9 @@ public abstract class MjpgStreamViewer extends StaticWidget {
             repaint();
           }
 
+        } catch (ArrayIndexOutOfBoundsException ex) {
+          // Something really bad happened but we want to recover
+          ex.printStackTrace();
         } catch (IOException ex) {
           imageToDraw = null;
           repaint();
