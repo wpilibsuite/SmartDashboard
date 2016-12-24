@@ -13,6 +13,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -111,17 +112,21 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
             repaint();
           }
 
-        } catch (Exception e) {
+        } catch (IOException ex) {
           imageToDraw = null;
           repaint();
-          e.printStackTrace();
+          ex.printStackTrace();
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          throw new RuntimeException(ex);
         }
 
         if (!ipChanged) {
           try {
             Thread.sleep(500);
           } catch (InterruptedException ex) {
-            // Already fixed in #45
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ex);
           }
         }
       }
