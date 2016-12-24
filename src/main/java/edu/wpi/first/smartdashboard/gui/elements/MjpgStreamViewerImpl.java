@@ -1,6 +1,5 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
-import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
 import java.util.stream.Stream;
 
@@ -12,25 +11,23 @@ public class MjpgStreamViewerImpl extends MjpgStreamViewer {
 
   private String url = "";
 
+  public MjpgStreamViewerImpl() {
+    setOnInit(() ->
+      url = STREAM_PREFIX + urlProperty.getValue()
+    );
+
+    setOnPropertyChanged(property -> {
+      if (property == urlProperty) {
+        url = STREAM_PREFIX + urlProperty.getValue();
+        cameraChanged();
+      }
+    });
+
+  }
+
   @Override
   public Stream<String> streamPossibleCameraUrls() {
     return Stream.of(url);
   }
 
-  @Override
-  public void init() {
-    super.init();
-
-    url = urlProperty.getValue();
-  }
-
-  @Override
-  public void propertyChanged(Property property) {
-    super.propertyChanged(property);
-
-    if (property == urlProperty) {
-      url = STREAM_PREFIX + urlProperty.getValue();
-      cameraChanged();
-    }
-  }
 }

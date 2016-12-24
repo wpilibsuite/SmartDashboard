@@ -1,7 +1,6 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
 import edu.wpi.first.smartdashboard.properties.MultiProperty;
-import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import java.util.Arrays;
@@ -17,6 +16,26 @@ public class CameraServerViewer extends MjpgStreamViewer {
 
   private ITable cameraTable;
 
+  public CameraServerViewer() {
+    setOnInit(() ->
+        NetworkTable.getTable("CameraPublisher").addSubTableListener(((source, key, value, isNew)
+            -> {
+          System.out.println("Save Value: " + cameraProperty.getSaveValue());
+          cameraProperty.add(key, value);
+          if (cameraTable == null
+              && key.equals(cameraProperty.getSaveValue())) {
+            cameraTable = (ITable) value;
+          }
+        })));
+
+    setOnPropertyChanged(property -> {
+      if (property == cameraProperty) {
+        cameraTable = (ITable) cameraProperty.getValue();
+        cameraChanged();
+      }
+    });
+  }
+
   @Override
   public Stream<String> streamPossibleCameraUrls() {
     if (cameraTable == null) {
@@ -31,25 +50,4 @@ public class CameraServerViewer extends MjpgStreamViewer {
     });
   }
 
-  @Override
-  public void init() {
-    super.init();
-
-    NetworkTable.getTable("CameraPublisher").addSubTableListener(((source, key, value, isNew) -> {
-      cameraProperty.add(key, value);
-      if (cameraTable == null) {
-        cameraTable = (ITable) value;
-      }
-    }));
-  }
-
-  @Override
-  public void propertyChanged(Property property) {
-    super.propertyChanged(property);
-
-    if (property == cameraProperty) {
-      cameraTable = (ITable) cameraProperty.getValue();
-      cameraChanged();
-    }
-  }
 }

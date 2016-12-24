@@ -17,15 +17,11 @@ public class MultiProperty extends Property {
     super(holder, name);
   }
 
-  private JComboBox comboBox = new JComboBox();
+  private JComboBox<String> comboBox = new JComboBox<>();
   private DefaultCellEditor cellEditor = new DefaultCellEditor(comboBox);
-  private Map<String, Object> values = new HashMap<String, Object>();
-  private TableCellRenderer renderer = new TableCellRenderer() {
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean
-        isSelected, boolean hasFocus, int row, int column) {
-      return comboBox;
-    }
-  };
+  private Map<String, Object> values = new HashMap<>();
+  private TableCellRenderer renderer
+      = ((table, value, isSelected, hasFocus, row, column) -> comboBox);
 
   public void add(String key, Object value) {
     comboBox.addItem(key);
