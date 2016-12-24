@@ -19,6 +19,14 @@ dependencies {
     compile 'jfree:jfreechart:1.0.13'
 }
 
+jar {
+    baseName = 'SmartDashboard'
+}
+
+shadowJar {
+    baseName = 'SmartDashboard'
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -39,7 +47,6 @@ if (!hasProperty('releaseType')) {
         releaseType = 'dev'
     }
 }
-
 
 checkstyle {
     configFile = new File(rootDir, "checkstyle.xml")
