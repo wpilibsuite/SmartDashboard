@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
@@ -43,8 +42,6 @@ public abstract class MjpgStreamViewer extends StaticWidget {
   private BufferedImage imageToDraw;
   private BGThread bgThread = new BGThread();
   private boolean cameraChanged = true;
-  private Runnable onInit = () -> {};
-  private Consumer<Property> onPropertyChanged = property -> {};
 
   public abstract Stream<String> streamPossibleCameraUrls();
 
@@ -60,17 +57,17 @@ public abstract class MjpgStreamViewer extends StaticWidget {
     return false;
   }
 
-  public void setOnInit(Runnable onInit) {
-    this.onInit = onInit;
+  public void onInit() {
+    // Override me!
   }
 
-  public void setOnPropertyChanged(Consumer<Property> onPropertyChanged) {
-    this.onPropertyChanged = onPropertyChanged;
+  public void onPropertyChanged(Property property) {
+    // Override me!
   }
 
   @Override
   public final void init() {
-    onInit.run();
+    onInit();
 
     setPreferredSize(new Dimension(160, 120));
     rotateAngleRad = Math.toRadians(rotateProperty.getValue());
@@ -85,7 +82,7 @@ public abstract class MjpgStreamViewer extends StaticWidget {
       rotateAngleRad = Math.toRadians(rotateProperty.getValue());
     }
 
-    onPropertyChanged.accept(property);
+    onPropertyChanged(property);
   }
 
   @Override

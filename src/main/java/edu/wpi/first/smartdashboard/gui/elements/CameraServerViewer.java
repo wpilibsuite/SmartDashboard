@@ -1,6 +1,7 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
 import edu.wpi.first.smartdashboard.properties.MultiProperty;
+import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import java.util.Arrays;
@@ -16,23 +17,23 @@ public class CameraServerViewer extends MjpgStreamViewer {
 
   private ITable cameraTable;
 
-  public CameraServerViewer() {
-    setOnInit(() ->
-        NetworkTable.getTable("CameraPublisher").addSubTableListener(((source, key, value, isNew)
-            -> {
-          cameraProperty.add(key, value);
-          if (cameraTable == null
-              && (!cameraProperty.hasValue() || key.equals(cameraProperty.getValue()))) {
-            cameraTable = (ITable) value;
-          }
-        })));
-
-    setOnPropertyChanged(property -> {
-      if (property == cameraProperty) {
-        cameraTable = (ITable) cameraProperty.getValue();
-        cameraChanged();
+  @Override
+  public void onInit() {
+    NetworkTable.getTable("CameraPublisher").addSubTableListener(((source, key, value, isNew) -> {
+      cameraProperty.add(key, value);
+      if (cameraTable == null
+          && (!cameraProperty.hasValue() || key.equals(cameraProperty.getValue()))) {
+        cameraTable = (ITable) value;
       }
-    });
+    }));
+  }
+
+  @Override
+  public void onPropertyChanged(Property property) {
+    if (property == cameraProperty) {
+      cameraTable = (ITable) cameraProperty.getValue();
+      cameraChanged();
+    }
   }
 
   @Override
