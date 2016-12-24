@@ -27,6 +27,9 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
   private static final int[] START_BYTES = new int[]{0xFF, 0xD8};
   private static final int[] END_BYTES = new int[]{0xFF, 0xD9};
+  
+  private static final int MS_TO_ACCUM_STATS = 1000;
+  private static final double BPS_TO_Mbps = 8.0 / 1024.0 / 1024.0;
 
   private boolean ipChanged = true;
   private String ipString = null;
@@ -35,7 +38,9 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
   private long lastFPSCheck = 0;
   private int lastFPS = 0;
   private int fpsCounter = 0;
-
+  private long bpsAccum = 0;
+  private double lastMbps = 0;
+  
   public class BGThread extends Thread {
 
     boolean destroyed = false;
@@ -91,10 +96,13 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
             }
 
             fpsCounter++;
-            if (System.currentTimeMillis() - lastFPSCheck > 500) {
+            bpsAccum += imageBuffer.size();
+            if (System.currentTimeMillis() - lastFPSCheck > MS_TO_ACCUM_STATS) {  
               lastFPSCheck = System.currentTimeMillis();
-              lastFPS = fpsCounter * 2;
+              lastFPS = fpsCounter;
+              lastMbps = bpsAccum * BPS_TO_Mbps;
               fpsCounter = 0;
+              bpsAccum = 0;
             }
 
             lastRepaint = System.currentTimeMillis();
@@ -214,6 +222,7 @@ public class MjpgStreamerViewerExtension extends StaticWidget {
 
       g.setColor(Color.PINK);
       g.drawString("FPS: " + lastFPS, 10, 10);
+      g.drawString("Mbps: " + String.format("%.2f", lastMbps), 10, 25);
     } else {
       g.setColor(Color.PINK);
       g.fillRect(0, 0, getBounds().width, getBounds().height);
