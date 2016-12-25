@@ -50,7 +50,7 @@ public class MultiProperty extends Property {
 
   @Override
   protected Object transformValue(Object value) {
-    return value;
+    return values.get(value);
   }
 
   @Override
