@@ -50,7 +50,7 @@ public class MultiProperty extends Property {
 
   @Override
   protected Object transformValue(Object value) {
-    return value;
+    return values.get(value);
   }
 
   @Override
@@ -60,12 +60,12 @@ public class MultiProperty extends Property {
 
   @Override
   public String getSaveValue() {
-
     for (Map.Entry<String, Object> entry : values.entrySet()) {
       if (entry.getValue().equals(getValue())) {
         return entry.getKey();
       }
     }
-    return null;
+
+    return getSavedValue();
   }
 }
