@@ -22,7 +22,8 @@ public class CameraServerViewer extends MjpgStreamViewer {
     NetworkTable.getTable("CameraPublisher").addSubTableListener(((source, key, value, isNew) -> {
       cameraProperty.add(key, value);
       if (cameraTable == null
-          && (!cameraProperty.hasValue() || key.equals(cameraProperty.getValue()))) {
+          && (cameraProperty.getSavedValue().isEmpty()
+          || key.equals(cameraProperty.getSavedValue()))) {
         cameraTable = (ITable) value;
       }
     }));

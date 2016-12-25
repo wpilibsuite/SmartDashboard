@@ -13,6 +13,7 @@ public abstract class Property {
   private final String name;
   private Object defaultValue;
   private Object value;
+  private String savedValue = "";
 
   protected Property(PropertyHolder element, String name) {
     this.element = element;
@@ -73,7 +74,14 @@ public abstract class Property {
     return getValue().toString();
   }
 
+  public String getSavedValue() {
+    return savedValue;
+  }
+
   public void setSaveValue(String value) {
+    if (value != null) {
+      savedValue = value;
+    }
     _setValue(value);
   }
 
