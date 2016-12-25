@@ -40,6 +40,8 @@ publishing {
     }
 }
 
+publish.dependsOn shadowJar
+
 // Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
 // already specified on the command line
 if (!hasProperty('releaseType')) {
