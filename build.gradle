@@ -4,7 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'maven-publish'
     id 'idea'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.5.1'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.6'
     id 'checkstyle'
 }
 
@@ -27,6 +27,14 @@ shadowJar {
     baseName = 'SmartDashboard'
 }
 
+// Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
+// already specified on the command line
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -37,14 +45,6 @@ publishing {
             artifactId 'SmartDashboard'
             version WPILibVersion.version
         }
-    }
-}
-
-// Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
-// already specified on the command line
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
     }
 }
 
