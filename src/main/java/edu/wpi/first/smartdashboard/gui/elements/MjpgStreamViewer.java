@@ -213,6 +213,7 @@ public abstract class MjpgStreamViewer extends StaticWidget {
           imageToDraw = null;
           repaint();
           System.out.println(ex.getMessage());
+          cameraChanged();
         } catch (InterruptedException ex) {
           Thread.currentThread().interrupt();
           throw new RuntimeException(ex);
@@ -266,6 +267,9 @@ public abstract class MjpgStreamViewer extends StaticWidget {
         throws IOException {
       for (int i = 0; i < bytes.length; ) {
         int b = stream.read();
+        if (b == -1) {
+          throw new IOException("End of Stream reached");
+        }
         if (buffer != null) {
           buffer.write(b);
         }
