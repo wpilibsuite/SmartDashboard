@@ -133,6 +133,7 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
     table = new JTable(model);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     table.getTableHeader().setReorderingAllowed(false);
+    table.setAutoCreateRowSorter(true);
 
 
     JPanel buttonPanel = new JPanel();
