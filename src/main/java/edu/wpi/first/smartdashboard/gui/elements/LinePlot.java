@@ -27,7 +27,6 @@ public class LinePlot extends AbstractValueWidget {
   XYSeries m_data;
   XYDataset m_dataset;
   JFreeChart m_chart;
-  int m_timeUnit = 0;
   double startTime;
 
   @Override
@@ -61,7 +60,7 @@ public class LinePlot extends AbstractValueWidget {
   @Override
   public void setValue(double value) { //TODO make sample in thread instead of relying on set
     // value (so that the widget has even time scale)
-    m_data.add(System.currentTimeMillis() / 1000 - startTime, value);
+    m_data.add(System.currentTimeMillis() / 1000.0 - startTime, value);
 
     if (m_data.getItemCount() > bufferSize.getValue()) {
       m_data.remove(0);
