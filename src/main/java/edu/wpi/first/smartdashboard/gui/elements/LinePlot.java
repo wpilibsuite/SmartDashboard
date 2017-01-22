@@ -1,6 +1,7 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractValueWidget;
+import edu.wpi.first.smartdashboard.properties.BooleanProperty;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
@@ -23,6 +24,8 @@ public class LinePlot extends AbstractValueWidget {
   public static final DataType[] TYPES = {DataType.NUMBER};
   public final IntegerProperty bufferSize
       = new IntegerProperty(this, "Buffer Size (samples)", 5000);
+  public final BooleanProperty clear = new BooleanProperty(this, "Clear Graph", false);
+  
   JPanel m_chartPanel;
   XYSeries m_data;
   XYDataset m_dataset;
@@ -74,6 +77,12 @@ public class LinePlot extends AbstractValueWidget {
 
       while (m_data.getItemCount() > bufferSize.getValue()) {
         m_data.remove(0);
+      }
+    }
+    if (property == clear) {
+      if (clear.getValue()) {
+        m_data.clear();
+        clear.setValue(false);
       }
     }
   }
