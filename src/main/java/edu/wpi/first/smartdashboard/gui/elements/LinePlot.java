@@ -85,6 +85,7 @@ public class LinePlot extends AbstractValueWidget {
       if (clear.getValue()) {
         m_data.clear();
         clear.setValue(false);
+        startTime = System.currentTimeMillis() / 1000.0;
       }
     }
   }
