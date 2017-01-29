@@ -30,7 +30,7 @@ public class LinePlot extends AbstractValueWidget {
   XYSeries m_data;
   XYDataset m_dataset;
   JFreeChart m_chart;
-  int m_timeUnit = 0;
+  double startTime;
 
   @Override
   public void init() {
@@ -38,10 +38,12 @@ public class LinePlot extends AbstractValueWidget {
 
     m_data = new XYSeries(getFieldName());
     m_dataset = new XYSeriesCollection(m_data);
+    
+    startTime = System.currentTimeMillis() / 1000.0;
 
     JFreeChart chart = ChartFactory.createXYLineChart(
         getFieldName(),
-        "Time (units)",
+        "Time (Seconds)",
         "Data",
         m_dataset,
         PlotOrientation.VERTICAL,
@@ -61,7 +63,7 @@ public class LinePlot extends AbstractValueWidget {
   @Override
   public void setValue(double value) { //TODO make sample in thread instead of relying on set
     // value (so that the widget has even time scale)
-    m_data.add(m_timeUnit++, value);
+    m_data.add(System.currentTimeMillis() / 1000.0 - startTime, value);
 
     if (m_data.getItemCount() > bufferSize.getValue()) {
       m_data.remove(0);
@@ -83,6 +85,7 @@ public class LinePlot extends AbstractValueWidget {
       if (clear.getValue()) {
         m_data.clear();
         clear.setValue(false);
+        startTime = System.currentTimeMillis() / 1000.0;
       }
     }
   }
