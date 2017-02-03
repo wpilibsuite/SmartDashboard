@@ -239,7 +239,8 @@ public abstract class MjpgStreamViewer extends StaticWidget {
           try {
             URL url = new URL(streamUrl);
             URLConnection connection = url.openConnection();
-            connection.setReadTimeout(250);
+            connection.setConnectTimeout(500);
+            connection.setReadTimeout(5000);
             InputStream stream = connection.getInputStream();
 
             System.out.println("Connected to: " + streamUrl);
