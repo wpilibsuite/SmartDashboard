@@ -59,7 +59,8 @@ public class CameraServerViewer extends MjpgStreamViewer {
 
     return Arrays.stream(cameraTable.getStringArray(STREAMS_KEY, new String[0])).map(s -> {
       if (NetworkTable.connections().length > 0) {
-        return s.replaceFirst("roboRIO-\\d+-FRC.*(?=:)", NetworkTable.connections()[0].remote_ip);
+        return s.replaceFirst("roboRIO-\\d+-FRC.*(?=:)",
+            NetworkTable.connections()[0].remote_ip.replaceFirst(":.*", ""));
       }
       return s;
     });
