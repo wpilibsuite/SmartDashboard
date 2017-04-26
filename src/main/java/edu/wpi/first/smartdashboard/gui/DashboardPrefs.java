@@ -117,7 +117,6 @@ public class DashboardPrefs implements PropertyHolder {
       frame.setSize(frame.getWidth(), height.getValue());
     } else if (property == team) {
       Robot.setTeam(team.getValue());
-      frame.setTitle("SmartDashboard - " + team.getValue());
     } else if (property == hideMenu) {
       frame.setShouldHideMenu(hideMenu.getValue());
     } else if (property == logToCSV) {

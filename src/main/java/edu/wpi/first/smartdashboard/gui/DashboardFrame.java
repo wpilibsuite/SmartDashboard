@@ -10,6 +10,8 @@ import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLReader;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLWriter;
 import edu.wpi.first.smartdashboard.xml.XMLWidget;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -37,6 +39,8 @@ import javax.swing.JOptionPane;
  * @author Joe Grinstead
  */
 public class DashboardFrame extends JFrame {
+
+  private static final String TITLE = "SmartDashboard | ";
 
   /*
    * If the menu bar is set to "hidden," then this defines what portion of the
@@ -96,7 +100,18 @@ public class DashboardFrame extends JFrame {
    * @param competition whether or not to display as though it were on the netbook
    */
   public DashboardFrame(boolean competition) {
-    super("SmartDashboard - ");
+    NetworkTablesJNI.ConnectionListenerFunction clf = (uid, connected, conn) -> {
+      if (NetworkTable.getTable("").isServer()) {
+        setTitle(TITLE + "Number of Clients: " + NetworkTablesJNI.getConnections().length);
+      } else if (connected && conn != null) {
+        setTitle(TITLE + "Connected: " + conn.remote_ip);
+      } else {
+        setTitle(TITLE + "Disconnected");
+      }
+    };
+    clf.apply(0, false, null);
+
+    NetworkTablesJNI.addConnectionListener(clf, true);
 
     setLayout(new BorderLayout());
 
