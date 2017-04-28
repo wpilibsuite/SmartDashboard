@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
+import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.MultiProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
@@ -18,6 +19,10 @@ public class CameraServerViewer extends MjpgStreamViewer {
   public final MultiProperty cameraProperty = new MultiProperty(this, "Camera Choice");
   public final StringProperty selectedCameraPathProperty
       = new StringProperty(this, "Selected Camera Path", "");
+  public final IntegerProperty widthProperty = new IntegerProperty(this, "Width", 0);
+  public final IntegerProperty heightProperty = new IntegerProperty(this, "Height", 0);
+  public final IntegerProperty fpsProperty = new IntegerProperty(this, "FPS", 0);
+  public final IntegerProperty compressionProperty = new IntegerProperty(this, "Compression", 80);
 
   private ITable cameraTable;
   private ITable rootTable = NetworkTable.getTable("");
@@ -59,9 +64,16 @@ public class CameraServerViewer extends MjpgStreamViewer {
 
     return Arrays.stream(cameraTable.getStringArray(STREAMS_KEY, new String[0])).map(s -> {
       if (NetworkTable.connections().length > 0) {
-        return s.replaceFirst("roboRIO-\\d+-FRC.*(?=:)", NetworkTable.connections()[0].remote_ip);
+        s = s.replaceFirst("roboRIO-\\d+-FRC.*(?=:)", NetworkTable.connections()[0].remote_ip);
       }
-      return s;
+      return new StringBuilder().append(s)
+          .append("&resolution=")
+          .append(widthProperty.getValue()).append("x").append(heightProperty.getValue())
+          .append("&fps=")
+          .append(fpsProperty.getValue())
+          .append("&compression=")
+          .append(compressionProperty.getValue())
+          .toString();
     });
   }
 
