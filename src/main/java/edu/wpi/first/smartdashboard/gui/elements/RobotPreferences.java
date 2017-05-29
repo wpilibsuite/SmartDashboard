@@ -70,10 +70,13 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
         if (table.isEditing()) {
           table.getCellEditor().cancelCellEditing();
         }
-        int rowIndex = table.convertRowIndexToModel(table.getSelectedRow());
-        Map.Entry<String, Object> entry = model.getRow(rowIndex);
-        if (entry != null) {
-          model.delete(entry.getKey());
+        int viewIndex = table.getSelectedRow(); 
+        if (viewIndex != -1) {
+          int modelIndex = table.convertRowIndexToModel(viewIndex);
+          Map.Entry<String, Object> entry = model.getRow(modelIndex);
+          if (entry != null) {
+            model.delete(entry.getKey());
+          }
         }
       }
     });
