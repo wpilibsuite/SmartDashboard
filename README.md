@@ -25,6 +25,10 @@ Building Smart Dashboard is very straightforward. Smart Dashboard uses Gradle to
 
 To run Smart Dashboard navigate to the `smartdashboard` directory and use the command `./gradlew :run`.
 
+## Building
+
+To build Smart Dashboard navigate to the `smartdashboard` directory and use the command `./gradlew shadowjar`. The runnable jar is `build\libs\SmartDashboard-all.jar`.
+
 # Contributing to WPILib
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
