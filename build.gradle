@@ -69,6 +69,10 @@ project(':fakeRobot') {
   mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowFakeRobot"
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.3'
 }

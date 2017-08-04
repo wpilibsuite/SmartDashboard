@@ -338,7 +338,7 @@ public class DashboardFrame extends JFrame {
           Widget e = (Widget) element;
           Object value = null;
           if (Robot.getTable().containsKey(e.getFieldName())) {
-            value = Robot.getTable().getValue(e.getFieldName());
+            value = Robot.getTable().getValue(e.getFieldName(), null);
             DataType type = DataType.getType(value);
             if (DisplayElementRegistry.supportsType(e.getClass(), type)) {
               smartDashboardPanel.setField(e.getFieldName(), e, type, value, e.getSavedLocation());
@@ -362,7 +362,7 @@ public class DashboardFrame extends JFrame {
         mostRecentParent = subsystem;
         Object value1 = null;
         if (Robot.getLiveWindow().containsKey(subsystem.getFieldName())) {
-          value1 = Robot.getTable().getValue(subsystem.getFieldName());
+          value1 = Robot.getTable().getValue(subsystem.getFieldName(), null);
           DataType type = DataType.getType(value1);
           if (DisplayElementRegistry.supportsType(subsystem.getClass(), type)) {
             liveWindowPanel.setField(subsystem.getFieldName(), subsystem, type, value1, subsystem
