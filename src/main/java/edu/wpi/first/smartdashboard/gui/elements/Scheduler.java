@@ -4,8 +4,6 @@ import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.SchedulerType;
-import edu.wpi.first.wpilibj.networktables2.type.NumberArray;
-import edu.wpi.first.wpilibj.networktables2.type.StringArray;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.BorderLayout;
@@ -14,6 +12,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -40,9 +39,9 @@ public class Scheduler extends Widget {
   private GridLayout cancelLayout;
   private CardLayout cardLayout;
 
-  private StringArray commands = new StringArray();
-  private NumberArray ids = new NumberArray();
-  private NumberArray toCancel = new NumberArray();
+  private List<String> commands = new ArrayList<>();
+  private List<Double> ids = new ArrayList<>();
+  private List<Double> toCancel = new ArrayList<>();
 
   private ITableListener listener = new ITableListener() {
 
@@ -58,8 +57,8 @@ public class Scheduler extends Widget {
 
         public void run() {
           synchronized (table) {
-            table.retrieveValue("Names", commands);
-            table.retrieveValue("Ids", ids);
+            commands = Arrays.asList(table.getStringArray("Names", new String[0]));
+            ids = Arrays.asList(table.getNumberArray("Ids", new Double[0]));
             assert commands.size() == ids.size();
 
             // Update displayed commands
@@ -76,7 +75,7 @@ public class Scheduler extends Widget {
                 button.addActionListener(new ActionListener() {
                   public void actionPerformed(ActionEvent e) {
                     // Cancel commands
-                    table.retrieveValue("Cancel", toCancel);
+                    toCancel = Arrays.asList(table.getNumberArray("Cancel", new Double[0]));
                     toCancel.add(ids.get(index));
                     table.putValue("Cancel", toCancel);
                   }

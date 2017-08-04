@@ -5,7 +5,6 @@ import edu.wpi.first.smartdashboard.properties.BooleanProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.StringChooserType;
-import edu.wpi.first.wpilibj.networktables2.type.StringArray;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.Component;
@@ -13,7 +12,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -38,7 +40,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
       = new BooleanProperty(this, "Use Radio Buttons", true);
   private Display display;
   private String selection;
-  private StringArray choices = new StringArray();
+  private List<String> choices = new ArrayList<>();
 
   @Override
   public void init() {
@@ -53,13 +55,13 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
   @Override
   public void valueChanged(ITable source, String key, Object value, boolean isNew) {
     if (key.equals(OPTIONS)) {
-      table.retrieveValue(OPTIONS, choices);
+      choices = Arrays.asList(table.getStringArray(OPTIONS, new String[]{}));
       display.setChoices(choices);
     }
     //if(key.equals(DEFAULT))
     //    display.setDefault(source.getString(DEFAULT)); //TODO handle change in default?
     if (key.equals(SELECTED)) {
-      display.setSelected(source.getString(SELECTED));
+      display.setSelected(source.getString(SELECTED, ""));
     }
 
     if (!source.containsKey(SELECTED)) {
@@ -96,7 +98,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
 
     abstract void setEditable(boolean editable);
 
-    abstract void setChoices(StringArray choices);
+    abstract void setChoices(List<String> choices);
 
     abstract void setSelected(String selected);
 
@@ -120,7 +122,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
     }
 
     @Override
-    void setChoices(StringArray choices) {
+    void setChoices(List<String> choices) {
       if (groupPanel != null) {
         panel.remove(groupPanel);
         for (JRadioButton button : buttons.values()) {
@@ -164,8 +166,8 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
         }
       } else {
         if (table != null && table.containsKey(DEFAULT)) {
-          selection = table.getString(DEFAULT);
-          selected = buttons.get(table.getString(DEFAULT));
+          selection = table.getString(DEFAULT, "");
+          selected = buttons.get(table.getString(DEFAULT, ""));
           selected.setSelected(true);
         } else {
           selected = null;
@@ -212,7 +214,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
     }
 
     @Override
-    void setChoices(StringArray choices) {
+    void setChoices(List<String> choices) {
       if (combo != null) {
         panel.remove(combo);
         combo.removeItemListener(this);
@@ -233,7 +235,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
       }
 
       if (table != null && table.containsKey(SELECTED)) {
-        selection = table.getString(SELECTED);
+        selection = table.getString(SELECTED, "");
       }
 
       if (table != null && selection != null) {
@@ -241,7 +243,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
         table.putString(SELECTED, selection);
       } else {
         if (table != null && table.containsKey(DEFAULT)) {
-          combo.setSelectedItem(table.getString(DEFAULT));
+          combo.setSelectedItem(table.getString(DEFAULT, ""));
         }
       }
 

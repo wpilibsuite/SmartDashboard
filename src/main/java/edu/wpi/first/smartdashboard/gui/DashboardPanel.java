@@ -422,7 +422,7 @@ public class DashboardPanel extends JPanel {
    * @param key the key to add
    */
   public void addField(String key) {
-    setField(key, null, table.containsKey(key) ? table.getValue(key) : null, null);
+    setField(key, null, table.containsKey(key) ? table.getValue(key, null) : null, null);
   }
 
   /**

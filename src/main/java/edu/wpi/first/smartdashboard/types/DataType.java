@@ -90,7 +90,7 @@ public class DataType {
       ITable table = (ITable) value;
 
       if (table.containsKey("~TYPE~")) {
-        String typeName = table.getString("~TYPE~");
+        String typeName = table.getString("~TYPE~", null);
         return NamedDataType.get(typeName);
       } else {
         return DataType.TABLE;
