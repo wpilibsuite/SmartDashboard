@@ -84,7 +84,7 @@ public class DashboardFrame extends JFrame {
   private boolean shouldHideMenu = prefs.hideMenu.getValue();
 
   private static final String LW_SAVE = "_"
-      + Robot.getLiveWindow().getSubTable("~STATUS~").getString("Robot", "LiveWindow") + ".xml";
+      + Robot.getLiveWindow().getSubTable(".status").getString("Robot", "LiveWindow") + ".xml";
 
   private final LogToCSV logger = new LogToCSV(this);
 
