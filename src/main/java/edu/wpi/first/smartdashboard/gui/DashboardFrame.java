@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.gui;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.smartdashboard.LogToCSV;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
@@ -10,8 +11,6 @@ import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLReader;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLWriter;
 import edu.wpi.first.smartdashboard.xml.XMLWidget;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -30,6 +29,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  * This class defines the SmartDashboard window for the FRC program. It contains almost no
@@ -100,18 +100,18 @@ public class DashboardFrame extends JFrame {
    * @param competition whether or not to display as though it were on the netbook
    */
   public DashboardFrame(boolean competition) {
-    NetworkTablesJNI.ConnectionListenerFunction clf = (uid, connected, conn) -> {
-      if (NetworkTable.getTable("").isServer()) {
-        setTitle(TITLE + "Number of Clients: " + NetworkTablesJNI.getConnections().length);
-      } else if (connected && conn != null) {
-        setTitle(TITLE + "Connected: " + conn.remote_ip);
+    setTitle(TITLE + "Disconnected");
+    NetworkTableInstance.getDefault().addConnectionListener((event) -> {
+      String newTitle;
+      if ((event.getInstance().getNetworkMode() & NetworkTableInstance.kNetModeServer) != 0) {
+        newTitle = TITLE + "Number of Clients: " + event.getInstance().getConnections().length;
+      } else if (event.connected && event.conn != null) {
+        newTitle = TITLE + "Connected: " + event.conn.remote_ip;
       } else {
-        setTitle(TITLE + "Disconnected");
+        newTitle = TITLE + "Disconnected";
       }
-    };
-    clf.apply(0, false, null);
-
-    NetworkTablesJNI.addConnectionListener(clf, true);
+      SwingUtilities.invokeLater(() -> setTitle(newTitle));
+    }, true);
 
     setLayout(new BorderLayout());
 
