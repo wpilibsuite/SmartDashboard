@@ -86,7 +86,7 @@ public class LWSubsystem extends AbstractTableWidget {
       System.out.println(
           "\nSubsystem \"" + getFieldName() + "\" does not contain widget \"" + key + "\"");
       System.out.println("Table: " + value);
-      System.out.println("Type: " + value.getString("~TYPE~", ""));
+      System.out.println("Type: " + value.getString(".type", null));
       System.out.println(
           "Trying to add a widget of type \"" + DataType.getType(value) + "\" and key " + key);
       Class<? extends Widget> widgetClass = DataType.getType(value).getDefault();
@@ -124,7 +124,7 @@ public class LWSubsystem extends AbstractTableWidget {
     }
 
     if (!alreadyHasWidget) {
-      table.addTableListenerEx("~TYPE~", new ITableListener() {
+      table.addTableListenerEx(".type", new ITableListener() {
         public void valueChanged(final ITable typeSource, final String typeKey, final Object
             typeValue, final boolean typeIsNew) {
           table.removeTableListener(this);

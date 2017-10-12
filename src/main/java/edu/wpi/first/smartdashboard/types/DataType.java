@@ -89,8 +89,8 @@ public class DataType {
     } else if (value instanceof ITable) {
       ITable table = (ITable) value;
 
-      if (table.containsKey("~TYPE~")) {
-        String typeName = table.getString("~TYPE~", null);
+      if (table.containsKey(".type")) {
+        String typeName = table.getString(".type", null);
         return NamedDataType.get(typeName);
       } else {
         return DataType.TABLE;

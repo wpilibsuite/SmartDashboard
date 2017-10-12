@@ -536,7 +536,7 @@ public class DashboardPanel extends JPanel {
         if (!hiddenFields.contains(key)) {
           if (value instanceof ITable) {
             final ITable table = (ITable) value;
-            table.addTableListenerEx("~TYPE~", new ITableListener() {
+            table.addTableListenerEx(".type", new ITableListener() {
               public void valueChanged(final ITable typeSource, final String typeKey,
                                        final Object typeValue, final boolean typeIsNew) {
                 table.removeTableListener(this);

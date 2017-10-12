@@ -13,7 +13,7 @@ public class LiveWindowFakeRobot {
     
     private static final NetworkTable liveWindow = NetworkTable.getTable("LiveWindow");
     
-    private static final ITable STATUS          = createTable(liveWindow, "~STATUS~", "LW Status"), 
+    private static final ITable STATUS          = createTable(liveWindow, ".status", "LW Status"),
             
                                 wrist           = createTable(liveWindow, "Wrist", "LW Subsystem"),
                                 wPotentiometer  = createTable(wrist, "Potentiometer", "Analog Input"),
@@ -88,7 +88,7 @@ public class LiveWindowFakeRobot {
     private static ITable createTable(ITable parent, String name, String type) {
         ITable table = parent.getSubTable(name);
         System.out.println(table);
-        table.putString("~TYPE~", type);
+        table.putString(".type", type);
         table.putString("Name", name);
         return table;
     }
