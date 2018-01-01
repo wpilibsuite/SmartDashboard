@@ -45,7 +45,7 @@ public class Subsystem extends AbstractTableWidget implements ITableListener {
 
     public SubsystemCommandField() {
       super(StringBindable.NULL);
-      setStringBinding("command", new StringBindable() {
+      setStringBinding(".command", new StringBindable() {
 
         public void setBindableValue(String value) {
           commandName = value;
@@ -56,7 +56,7 @@ public class Subsystem extends AbstractTableWidget implements ITableListener {
           }
         }
       }, "---");
-      setBooleanBinding("hasCommand", new BooleanBindable() {
+      setBooleanBinding(".hasCommand", new BooleanBindable() {
 
         public void setBindableValue(boolean value) {
           hasCommand = value;
