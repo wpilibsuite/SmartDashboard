@@ -279,6 +279,14 @@ public class DashboardFrame extends JFrame {
       boolean isWidget = element instanceof Widget;
       assert isWidget || element instanceof StaticWidget;
       if (isWidget) {
+        if (((Widget) element).getFieldName() == null) {
+          System.err.println("Unable to save element");
+          break;
+        }
+        if (((Widget) element).getType() == null || element.getClass().getName() == null) {
+          System.err.println("Unable to save element: " + ((Widget) element).getFieldName());
+          break;
+        }
         writer.beginWidget(((Widget) element).getFieldName(), ((Widget) element).getType()
             .getName(), element.getClass().getName());
       } else {
