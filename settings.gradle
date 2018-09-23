@@ -1,1 +1,2 @@
 include 'fakeRobot'
+enableFeaturePreview('STABLE_PUBLISHING')
