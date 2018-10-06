@@ -4,7 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id 'maven-publish'
     id 'idea'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.0'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.2'
     id 'checkstyle'
 }
 
@@ -65,7 +65,9 @@ project(':fakeRobot') {
   apply plugin: 'application'
 
   dependencies {
-      compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:desktop'
+    compile "edu.wpi.first.ntcore:ntcore-java:4.+"
+    compile "edu.wpi.first.wpiutil:wpiutil-java:3.+"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:4.+:all"
   }
 
   mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowFakeRobot"
