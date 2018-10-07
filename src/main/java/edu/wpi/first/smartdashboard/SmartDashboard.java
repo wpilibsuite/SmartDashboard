@@ -1,6 +1,6 @@
 package edu.wpi.first.smartdashboard;
 
-import edu.wpi.first.smartdashboard.extensions.FileSniffer;
+//import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
@@ -69,7 +69,8 @@ public class SmartDashboard {
         1000);
 
     // Search the filesystem for extensions (49%)
-    FileSniffer.findExtensions(monitor, 0, 490);
+    //FileSniffer.findExtensions(monitor, 0, 490);
+    // Extensions disabled until classloading can be fixed
 
     // Parse arguments
     ArgParser argParser = new ArgParser(args, true, true, new String[]{"ip"});
