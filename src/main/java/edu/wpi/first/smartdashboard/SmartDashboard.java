@@ -70,7 +70,8 @@ public class SmartDashboard {
 
     // Search the filesystem for extensions (49%)
     //FileSniffer.findExtensions(monitor, 0, 490);
-    // Extensions disabled until classloading can be fixed
+    // Extensions disabled until classloading can be fixed, see
+    // https://github.com/wpilibsuite/SmartDashboard/issues/107
 
     // Parse arguments
     ArgParser argParser = new ArgParser(args, true, true, new String[]{"ip"});
