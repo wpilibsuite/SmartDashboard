@@ -1,6 +1,5 @@
 package edu.wpi.first.smartdashboard;
 
-//import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
