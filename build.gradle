@@ -13,12 +13,12 @@ repositories {
 }
 
 dependencies {
-    compile "edu.wpi.first.ntcore:ntcore-java:4.+"
-    compile "edu.wpi.first.wpiutil:wpiutil-java:3.+"
+    compile "edu.wpi.first.ntcore:ntcore-java:2019.+"
+    compile "edu.wpi.first.wpiutil:wpiutil-java:2019.+"
     compile 'junit:junit:4.12'
     compile 'jfree:jcommon:1.0.16'
     compile 'jfree:jfreechart:1.0.13'
-    runtime "edu.wpi.first.ntcore:ntcore-jni:4.+:all"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2019.+:all"
 }
 
 jar {
