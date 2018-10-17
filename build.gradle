@@ -65,9 +65,9 @@ project(':fakeRobot') {
   apply plugin: 'application'
 
   dependencies {
-    compile "edu.wpi.first.ntcore:ntcore-java:4.+"
-    compile "edu.wpi.first.wpiutil:wpiutil-java:3.+"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:4.+:all"
+    compile "edu.wpi.first.ntcore:ntcore-java:2019.+"
+    compile "edu.wpi.first.wpiutil:wpiutil-java:2019.+"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2019.+:all"
   }
 
   mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowFakeRobot"
