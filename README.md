@@ -25,7 +25,7 @@ The latest release build of SmartDashboard can be found on [WPI's server](http:/
 Building SmartDashboard is very straightforward. SmartDashboard uses Gradle to compile.
 
 ## Requirements
-- [JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+- [Java 11](http://jdk.java.net/11/)
 
 ## Running
 
