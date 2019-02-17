@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 
+import edu.wpi.first.smartdashboard.gui.elements.ArctosLogo;
 import edu.wpi.first.smartdashboard.gui.elements.ConfigurableMjpgStreamViewer;
 import edu.wpi.first.smartdashboard.gui.elements.GoArctos;
 import edu.wpi.first.smartdashboard.properties.Property;
@@ -189,6 +190,7 @@ public abstract class DisplayElement extends JPanel implements PropertyHolder {
     }
 
     return clazz.equals(ConfigurableMjpgStreamViewer.class) ? "Configurable MJPG Stream Viewer"
-            : clazz.equals(GoArctos.class) ? "Go Arctos" : clazz.getSimpleName();
+            : clazz.equals(GoArctos.class) ? "Go Arctos" 
+            : clazz.equals(ArctosLogo.class) ? "Arctos Logo" : clazz.getSimpleName();
   }
 }

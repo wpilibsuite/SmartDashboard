@@ -20,7 +20,7 @@ public class Image extends StaticWidget {
   public final FileProperty img = new FileProperty(this, "Image File");
   public final BooleanProperty aspectKept
       = new BooleanProperty(this, "Maintain Aspect Ratio", false);
-  private BufferedImage image;
+  protected BufferedImage image;
 
   public Image() {
     setObstruction(false);

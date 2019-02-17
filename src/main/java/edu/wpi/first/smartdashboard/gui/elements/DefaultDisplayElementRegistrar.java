@@ -32,6 +32,7 @@ public class DefaultDisplayElementRegistrar {
     DisplayElementRegistry.registerStaticWidget(MjpgStreamViewerImpl.class);
     DisplayElementRegistry.registerStaticWidget(CameraServerViewer.class);
     DisplayElementRegistry.registerStaticWidget(GoArctos.class);
+    DisplayElementRegistry.registerStaticWidget(ArctosLogo.class);
   }
 
 }
