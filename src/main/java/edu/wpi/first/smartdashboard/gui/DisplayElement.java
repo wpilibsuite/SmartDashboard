@@ -1,14 +1,17 @@
 package edu.wpi.first.smartdashboard.gui;
 
-import edu.wpi.first.smartdashboard.properties.Property;
-import edu.wpi.first.smartdashboard.properties.PropertyHolder;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import javax.swing.JPanel;
+
+import edu.wpi.first.smartdashboard.gui.elements.ConfigurableMjpgStreamViewer;
+import edu.wpi.first.smartdashboard.properties.Property;
+import edu.wpi.first.smartdashboard.properties.PropertyHolder;
 
 /**
  * This class is the super class of everything which can be seen on the SmartDashboard
@@ -184,6 +187,6 @@ public abstract class DisplayElement extends JPanel implements PropertyHolder {
       // TODO
     }
 
-    return clazz.getSimpleName();
+    return clazz.equals(ConfigurableMjpgStreamViewer.class) ? "Configurable MJPG Stream Viewer" : clazz.getSimpleName();
   }
 }

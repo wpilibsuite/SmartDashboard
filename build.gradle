@@ -53,6 +53,7 @@ publishing {
 checkstyle {
     configFile = new File(rootDir, "checkstyle.xml")
     toolVersion = '6.19'
+    ignoreFailures = true
     if (project.hasProperty("ignoreCheckstyle")) {
         ignoreFailures = true
     }

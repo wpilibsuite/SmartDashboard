@@ -24,6 +24,7 @@ public class DefaultDisplayElementRegistrar {
     DisplayElementRegistry.registerWidget(Command.class);
     DisplayElementRegistry.registerWidget(Scheduler.class);
 
+    DisplayElementRegistry.registerStaticWidget(ConfigurableMjpgStreamViewer.class);
     DisplayElementRegistry.registerStaticWidget(Image.class);
     DisplayElementRegistry.registerStaticWidget(ConnectionIndicator.class);
     DisplayElementRegistry.registerStaticWidget(Label.class);
