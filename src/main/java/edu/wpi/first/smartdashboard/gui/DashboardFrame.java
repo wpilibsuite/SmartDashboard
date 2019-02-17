@@ -1,5 +1,28 @@
 package edu.wpi.first.smartdashboard.gui;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.smartdashboard.LogToCSV;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
@@ -11,25 +34,6 @@ import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLReader;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLWriter;
 import edu.wpi.first.smartdashboard.xml.XMLWidget;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 /**
  * This class defines the SmartDashboard window for the FRC program. It contains almost no
@@ -40,7 +44,7 @@ import javax.swing.SwingUtilities;
  */
 public class DashboardFrame extends JFrame {
 
-  private static final String TITLE = "SmartDashboard | ";
+  private static final String TITLE = "ArctosDashboard | ";
 
   /*
    * If the menu bar is set to "hidden," then this defines what portion of the
@@ -112,6 +116,16 @@ public class DashboardFrame extends JFrame {
       }
       SwingUtilities.invokeLater(() -> setTitle(newTitle));
     }, true);
+
+    try {
+      var imgStream = ClassLoader.getSystemClassLoader().getResourceAsStream("arctos1.PNG");
+      BufferedImage img = ImageIO.read(imgStream);
+      SwingUtilities.invokeLater(() -> setIconImage(img));
+    }
+    catch(Exception e) {
+      System.out.println("I don't care");
+    }
+
 
     setLayout(new BorderLayout());
 
