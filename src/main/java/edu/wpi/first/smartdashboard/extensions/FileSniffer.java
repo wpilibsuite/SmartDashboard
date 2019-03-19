@@ -76,21 +76,11 @@ public class FileSniffer {
     if (!EXTENSION_DIR.exists()) {
       System.out.println("No Extension Folder");
       monitor.setProgress(max);
-      try {
-        classLoader.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
       return;
     }
 
     File[] extensionJars = EXTENSION_DIR.listFiles(jarFileFilter);
     if (extensionJars == null) {
-      try {
-        classLoader.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
       return;
     }
 
@@ -149,12 +139,6 @@ public class FileSniffer {
     }
 
     monitor.setProgress(max);
-
-    try {
-      classLoader.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   private static File getUserHomeDir() {
