@@ -19,10 +19,12 @@ public class StringProperty extends TextInputProperty<String> {
     // Therefore here we replace these invalid characters by their escape sequences.
     // Retrieve the save value from the superclass
     String saveValue = super.getSaveValue();
-    // Replace &
+    // Replace &, <, >, ', and "
     saveValue = saveValue.replace("&", "&amp;");
-    // Replace <
     saveValue = saveValue.replace("<", "&lt;");
+    saveValue = saveValue.replace(">", "&gt;");
+    saveValue = saveValue.replace("\'", "&apos;");
+    saveValue = saveValue.replace("\"", "&quot;");
     return saveValue;
   }
 
