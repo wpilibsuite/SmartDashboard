@@ -1,15 +1,53 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '4.0.3'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
     id 'maven-publish'
     id 'idea'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.3'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.0.1'
+    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.1'
     id 'checkstyle'
 }
 
-repositories {
-    mavenCentral()
+if (project.hasProperty('buildServer')) {
+    wpilibVersioning.buildServerMode = true
+}
+
+if (project.hasProperty('releaseMode')) {
+    wpilibVersioning.releaseMode = true
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+    if (project.hasProperty('releaseMode')) {
+        wpilibRepositories.addAllReleaseRepositories(it)
+    } else {
+        wpilibRepositories.addAllDevelopmentRepositories(it)
+    }
+}
+
+if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
+  artifactory {
+    contextUrl = 'https://frcmaven.wpi.edu/artifactory' // base artifactory url
+    publish {
+      repository {
+        if (project.hasProperty('releaseMode')) {
+          repoKey = 'release'
+        } else {
+          repoKey = 'development'
+        }
+        username = System.getenv()['ARTIFACTORY_PUBLISH_USERNAME']
+        password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
+        maven = true
+      }
+      defaults {
+          publications ('maven')
+      }
+    }
+  }
+  publish.dependsOn artifactoryPublish
 }
 
 dependencies {
@@ -18,7 +56,10 @@ dependencies {
     compile 'junit:junit:4.12'
     compile 'jfree:jcommon:1.0.16'
     compile 'jfree:jfreechart:1.0.13'
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2019.+:all"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2019.+:windowsx86"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2019.+:windowsx86-64"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2019.+:linuxx86-64"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2019.+:osxx86-64"
 }
 
 jar {
@@ -29,13 +70,7 @@ shadowJar {
     baseName = 'SmartDashboard'
 }
 
-// Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
-// already specified on the command line
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
-    }
-}
+wpilibVersioning.version.finalizeValue()
 
 publishing {
     publications {
@@ -45,7 +80,7 @@ publishing {
             }
             groupId 'edu.wpi.first.wpilib'
             artifactId 'SmartDashboard'
-            version WPILibVersion.version
+            version wpilibVersioning.version.get()
         }
     }
 }
@@ -78,5 +113,5 @@ tasks.withType(JavaCompile) {
 }
 
 wrapper {
-    gradleVersion = '5.0'
+    gradleVersion = '5.4.1'
 }
