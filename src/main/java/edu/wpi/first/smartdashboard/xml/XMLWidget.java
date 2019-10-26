@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.xml;
 
+import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DisplayElement;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.properties.Property;
@@ -98,7 +99,7 @@ public class XMLWidget {
   public DisplayElement convertToDisplayElement() {
     DisplayElement element = null;
     try {
-      element = (DisplayElement) Class.forName(className).newInstance();
+      element = (DisplayElement) FileSniffer.classLoader.loadClass(className).newInstance();
       if (field != null) {
         ((Widget) element).setFieldName(field);
       }

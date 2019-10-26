@@ -3,48 +3,47 @@ package edu.wpi.first.smartdashboard.extensions;
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
+import edu.wpi.first.smartdashboard.types.NamedDataType;
+
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import javax.swing.ProgressMonitor;
 
 /**
- * This class searches for library and extension jars and adds them
- * to the system class loader. It then searches within extension jars for
+ * This class searches for library and extension jars and adds them to the
+ * system class loader. It then searches within extension jars for
  * {@link StaticWidget StaticWidget}s or {@link Widget Widget}s, and registers
  * them in the dashboard.
  *
  * @author Joe Grinstead
  */
 public class FileSniffer {
-  private static final File EXTENSION_DIR =
-      new File(getUserHomeDir(), "SmartDashboard/extensions");
+  private static final File EXTENSION_DIR = new File(getUserHomeDir(), "SmartDashboard/extensions");
   private static final File[] LIBRARY_DIRS = {
-      new File("./lib"),
-      new File(EXTENSION_DIR, "lib"),
-      EXTENSION_DIR
+    new File("./lib"),
+    new File(EXTENSION_DIR, "lib"),
+    EXTENSION_DIR
   };
+
+  public static final FileSnifferClassLoader classLoader = new FileSnifferClassLoader(
+      ClassLoader.getSystemClassLoader()
+  );
 
   public static void findExtensions(ProgressMonitor monitor, int min, int max) {
     monitor.setNote("Loading Extensions");
 
-    URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-    Class<?> sysclass = URLClassLoader.class;
-
-    Method method = null;
-    try {
-      method = sysclass.getDeclaredMethod("addURL", new Class[]{URL.class});
-      method.setAccessible(true);
-    } catch (Exception e) {
-      e.printStackTrace();
-      monitor.setProgress(max);
-      return;
-    }
+    FilenameFilter jarFileFilter = new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.toLowerCase().endsWith(".jar");
+      }
+    };
 
     for (File libDir : LIBRARY_DIRS) {
       if (!libDir.exists()) {
@@ -54,23 +53,19 @@ public class FileSniffer {
       System.out.println("Searching for library jars in: " + libDir);
       monitor.setNote("Searching for library jars in: " + libDir);
 
-      File[] files = libDir.listFiles(new FilenameFilter() {
+      File[] libJars = libDir.listFiles(jarFileFilter);
 
-        public boolean accept(File dir, String name) {
-          return name.endsWith(".jar");
-        }
-      });
-      if (files == null) {
+      if (libJars == null) {
         monitor.setProgress(min + (max - min) / 5);
         continue;
       }
 
-      for (File file : files) {
-        System.out.println("Adding Jar: " + file);
+      for (File file : libJars) {
+        System.out.println("Adding Library Jar: " + file);
 
         try {
-          method.invoke(sysloader, new Object[]{file.toURI().toURL()});
-        } catch (Exception ex) {
+          classLoader.addURL(file.toURI().toURL());
+        } catch (MalformedURLException ex) {
           ex.printStackTrace();
         }
       }
@@ -84,60 +79,62 @@ public class FileSniffer {
       return;
     }
 
-    File[] files = EXTENSION_DIR.listFiles(new FilenameFilter() {
-
-      public boolean accept(File dir, String name) {
-        return name.endsWith(".jar");
-      }
-    });
+    File[] extensionJars = EXTENSION_DIR.listFiles(jarFileFilter);
+    if (extensionJars == null) {
+      return;
+    }
 
     double fileCount = 0;
-    for (File file : files) {
+    for (File file : extensionJars) {
       System.out.println("Searching for extensions in: " + file);
-      monitor.setProgress((int) ((min + max) / 2.0 * (1.0 + fileCount++ / files.length)));
+      monitor.setProgress((int) ((min + max) / 2.0 * (1.0 + fileCount++ / extensionJars.length)));
       monitor.setNote("Searching for extensions in: " + file);
 
       try {
-        JarFile jar = new JarFile(file);
-
-        Enumeration<JarEntry> entries = jar.entries();
+        classLoader.addURL(file.toURI().toURL());
+        JarFile jarFile = new JarFile(file);
+        Enumeration<JarEntry> entries = jarFile.entries();
         while (entries.hasMoreElements()) {
           JarEntry entry = entries.nextElement();
-          String name = entry.getName();
-
-          if (name.endsWith(".class")) {
-            Class<?> clazz = null;
+          if (entry.isDirectory()) {
+            continue;
+          }
+          if (entry.getName().endsWith(".class")) {
             try {
-              // Get rid of class
-              name = name.substring(0, name.length() - 6);
-              // Change to package name
-              name = name.replaceAll("/", ".");
-
-              clazz = Class.forName(name, false, sysloader);
-
-              Class<? extends Widget> element = clazz.asSubclass(Widget.class);
-              DisplayElementRegistry.registerWidget(element);
-
-              System.out.println("Custom Widget: " + clazz.getSimpleName());
-            } catch (ClassCastException ex) {
-              try {
-                Class<? extends StaticWidget> element = clazz.asSubclass(StaticWidget.class);
-                DisplayElementRegistry.registerStaticWidget(element);
-
-                System.out.println("Custom Static Widget: " + clazz.getSimpleName());
-              } catch (ClassCastException ex2) {
-                // TODO
+              String className = entry.getName();
+              className = className.substring(0, className.length() - 6);
+              className = className.replace('/', '.');
+              Class<?> clazz = classLoader.loadClass(className);
+              if (Widget.class.isAssignableFrom(clazz)) {
+                System.out.println("Custom Widget Loaded: " + clazz.getSimpleName());
+                DisplayElementRegistry.registerWidget(clazz.asSubclass(Widget.class));
+              } else if (StaticWidget.class.isAssignableFrom(clazz)) {
+                System.out.println("Custom Static Widget Loaded: " + clazz.getSimpleName());
+                DisplayElementRegistry.registerStaticWidget(clazz.asSubclass(StaticWidget.class));
+              } else if (NamedDataType.class.isAssignableFrom(clazz)) {
+                try {
+                  Object ret = clazz.asSubclass(NamedDataType.class).getMethod("get").invoke(null);
+                  if (ret == null) {
+                    System.out.println(
+                        "ERROR: custom named data type " + clazz.getSimpleName()
+                        + " failed to load"
+                    );
+                  } else {
+                    System.out.println("Custom Named Data Type Loaded: " + clazz.getSimpleName());
+                  }
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
               }
-            } catch (ClassNotFoundException ex) {
-              // TODO
-            } catch (NoClassDefFoundError ex) {
-              // TODO
+            } catch (ClassNotFoundException e) {
+              e.printStackTrace();
             }
           }
         }
-      } catch (Throwable t) {
-        t.printStackTrace();
-        System.out.println("Error, could not add URL to system classloader");
+      } catch (MalformedURLException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
       }
     }
 
