@@ -361,7 +361,7 @@ public abstract class Widget extends DisplayElement {
     @Override
     public void setBindableValue(double value) {
       this.value = value;
-      setText(Double.toString((new BigDecimal(value)).stripTrailingZeros().doubleValue()));
+      setText(String.format("%f", Double.valueOf(value)));
     }
 
     protected abstract boolean setValue(double value);
