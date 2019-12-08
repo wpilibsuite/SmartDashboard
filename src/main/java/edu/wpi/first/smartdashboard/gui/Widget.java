@@ -12,7 +12,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.math.BigDecimal;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -361,7 +360,7 @@ public abstract class Widget extends DisplayElement {
     @Override
     public void setBindableValue(double value) {
       this.value = value;
-      setText(Double.toString((new BigDecimal(value)).stripTrailingZeros().doubleValue()));
+      setText(String.format("%f", Double.valueOf(value)));
     }
 
     protected abstract boolean setValue(double value);
