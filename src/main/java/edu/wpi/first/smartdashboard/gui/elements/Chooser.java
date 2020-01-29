@@ -165,7 +165,8 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
           selected.setSelected(true);
         }
       } else {
-        if (table != null && table.containsKey(DEFAULT) && !table.getString(DEFAULT, "").equals("")) {
+        if (table != null && table.containsKey(DEFAULT)
+            && !table.getString(DEFAULT, "").equals("")) {
           selection = table.getString(DEFAULT, "");
           selected = buttons.get(table.getString(DEFAULT, ""));
           selected.setSelected(true);
