@@ -25,6 +25,9 @@ public class LinePlot extends AbstractValueWidget {
   public final IntegerProperty bufferSize
       = new IntegerProperty(this, "Buffer Size (samples)", 5000);
   public final BooleanProperty clear = new BooleanProperty(this, "Clear Graph", false);
+  public final BooleanProperty autoScale = new BooleanProperty(this, "Autoscale Y Values", true);
+  public final IntegerProperty minY = new IntegerProperty(this, "Minimum Y Value", 0);
+  public final IntegerProperty maxY = new IntegerProperty(this, "Maximum Y Value", 1);
   
   JPanel m_chartPanel;
   XYSeries m_data;
@@ -41,7 +44,7 @@ public class LinePlot extends AbstractValueWidget {
     
     startTime = System.currentTimeMillis() / 1000.0;
 
-    JFreeChart chart = ChartFactory.createXYLineChart(
+    m_chart = ChartFactory.createXYLineChart(
         getFieldName(),
         "Time (Seconds)",
         "Data",
@@ -51,7 +54,9 @@ public class LinePlot extends AbstractValueWidget {
         true,
         false);
 
-    m_chartPanel = new ChartPanel(chart);
+    updateChartRange();
+
+    m_chartPanel = new ChartPanel(m_chart);
     m_chartPanel.setPreferredSize(new Dimension(400, 300));
     m_chartPanel.setBackground(getBackground());
 
@@ -87,6 +92,27 @@ public class LinePlot extends AbstractValueWidget {
         clear.setValue(false);
         startTime = System.currentTimeMillis() / 1000.0;
       }
+    }
+
+    if (property == minY || property == maxY || property == autoScale) {
+      System.out.println(minY.getValue());
+      System.out.println(maxY.getValue());
+
+      if (property == minY && minY.getValue() > maxY.getValue()) {
+        minY.setValue(maxY.getValue() - 1);
+      } else if (property == maxY && maxY.getValue() < minY.getValue()) {
+        maxY.setValue(minY.getValue() + 1);
+      }
+
+      updateChartRange();
+    }
+  }
+
+  public void updateChartRange() {
+    if (autoScale.getValue()) {
+      m_chart.getXYPlot().getRangeAxis().setAutoRange(true);
+    } else {
+      m_chart.getXYPlot().getRangeAxis().setRange(minY.getValue(), maxY.getValue());
     }
   }
 }
