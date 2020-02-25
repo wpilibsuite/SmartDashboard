@@ -2,7 +2,7 @@ package edu.wpi.first.smartdashboard;
 
 import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
-import edu.wpi.first.smartdashboard.properties.IntegerProperty;
+import edu.wpi.first.smartdashboard.properties.StringProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import java.io.File;
 import javax.swing.JOptionPane;
@@ -95,27 +95,38 @@ public class SmartDashboard {
     } else {
       monitor.setProgress(600);
       monitor.setNote("Getting Team Number");
-      IntegerProperty teamProp = frame.getPrefs().team;
-      int teamNumber = teamProp.getValue();
+      StringProperty hostProp = frame.getPrefs().networkTablesHost;
 
-      teamNumberLoop:
-      while (teamNumber <= 0) {
+      HostParser hostParser = new HostParser();
+
+      var hostInfoOpt = hostParser.parse(hostProp.getValue());
+
+      String input = "";
+      while (hostInfoOpt.isEmpty() || input == "") {
         try {
-          String input = JOptionPane.showInputDialog("Input Team Number");
-          if (input == null) {
-            teamNumber = 0;
-            break teamNumberLoop;
-          }
-          teamNumber = Integer.parseInt(input);
+          input = JOptionPane.showInputDialog("Input Team Number");
+          hostInfoOpt = hostParser.parse(input);
         } catch (Exception e) {
           // TODO
         }
       }
 
+      var hostInfo = hostInfoOpt.get();
+
       monitor.setProgress(650);
-      monitor.setNote("Connecting to robot of team: " + teamNumber);
-      teamProp.setValue(teamNumber);
-      Robot.setTeam(teamNumber);
+
+      int teamNumber = hostInfo.getTeam();
+      if (teamNumber != -1) {
+        monitor.setNote("Connecting to robot of team: " + teamNumber);
+        hostProp.setValue(teamNumber);
+        Robot.setTeam(teamNumber);
+      } else if (hostInfo.getHost().isEmpty()) {
+        Robot.setHost("localhost");
+      } else {
+        Robot.setHost(hostInfo.getHost());
+      }
+
+      Robot.setPort(hostInfo.getPort());
     }
 
     try {

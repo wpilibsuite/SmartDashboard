@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.gui;
 
+import edu.wpi.first.smartdashboard.HostParser;
 import edu.wpi.first.smartdashboard.SmartDashboard;
 import edu.wpi.first.smartdashboard.properties.BooleanProperty;
 import edu.wpi.first.smartdashboard.properties.FileProperty;
@@ -7,6 +8,7 @@ import edu.wpi.first.smartdashboard.properties.IntegerListProperty;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.PropertyHolder;
+import edu.wpi.first.smartdashboard.properties.StringProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -28,7 +30,7 @@ public class DashboardPrefs implements PropertyHolder {
   }
 
   private Map<String, Property> properties = new LinkedHashMap<String, Property>();
-  public final IntegerProperty team = new IntegerProperty(this, "Team Number", 0);
+  public final StringProperty networkTablesHost = new StringProperty(this, "Team Number / IP", "");
   public final BooleanProperty hideMenu = new BooleanProperty(this, "Hide Menu", false);
   public final BooleanProperty autoShowWidgets
       = new BooleanProperty(this, "Automatically Show Widgets", true);
@@ -48,6 +50,8 @@ public class DashboardPrefs implements PropertyHolder {
       = new FileProperty(this, "CSV File", new File(USER_SMARTDASHBOARD_HOME, "csv.txt")
       .getAbsolutePath());
   private Preferences node;
+
+  private final HostParser hostParser = new HostParser();
 
 
   public static DashboardPrefs getInstance() {
@@ -77,7 +81,7 @@ public class DashboardPrefs implements PropertyHolder {
   }
 
   public boolean validatePropertyChange(Property property, Object value) {
-    if (property == team || property == width || property == height) {
+    if (property == width || property == height) {
       return (Integer) value > 0;
     } else if (property == grid_widths || property == grid_heights) {
       int[] values = (int[]) value;
@@ -100,6 +104,10 @@ public class DashboardPrefs implements PropertyHolder {
             "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, false);
         return result == JOptionPane.YES_OPTION;
       }
+    } else if (property == networkTablesHost) {
+      if (hostParser.parse(networkTablesHost.getValue()).isEmpty()) {
+        return false;
+      }
     }
     return true;
   }
@@ -115,8 +123,20 @@ public class DashboardPrefs implements PropertyHolder {
       frame.setSize(width.getValue(), frame.getHeight());
     } else if (property == height) {
       frame.setSize(frame.getWidth(), height.getValue());
-    } else if (property == team) {
-      Robot.setTeam(team.getValue());
+    } else if (property == networkTablesHost) {
+      // will always be non-optional as is validated
+      var hostInfoOpt = hostParser.parse(((StringProperty) property).getValue());
+      var hostInfo = hostInfoOpt.get();
+
+      Robot.setPort(hostInfo.getPort());
+
+      if (hostInfo.getTeam() != -1) {
+        Robot.setTeam(hostInfo.getTeam());
+      } else if (hostInfo.getHost().isEmpty()) {
+        Robot.setHost("localhost");
+      } else {
+        Robot.setHost(hostInfo.getHost());
+      }
     } else if (property == hideMenu) {
       frame.setShouldHideMenu(hideMenu.getValue());
     } else if (property == logToCSV) {
