@@ -41,7 +41,7 @@ public class LinePlot extends AbstractValueWidget {
 
     m_data = new XYSeries(getFieldName());
     m_dataset = new XYSeriesCollection(m_data);
-    
+
     startTime = System.currentTimeMillis() / 1000.0;
 
     m_chart = ChartFactory.createXYLineChart(
@@ -95,9 +95,6 @@ public class LinePlot extends AbstractValueWidget {
     }
 
     if (property == minY || property == maxY || property == autoScale) {
-      System.out.println(minY.getValue());
-      System.out.println(maxY.getValue());
-
       if (property == minY && minY.getValue() > maxY.getValue()) {
         minY.setValue(maxY.getValue() - 1);
       } else if (property == maxY && maxY.getValue() < minY.getValue()) {
