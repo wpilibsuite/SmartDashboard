@@ -1,3 +1,11 @@
+import org.gradle.api.internal.artifacts.transform.UnzipTransform
+import org.gradle.api.internal.artifacts.ArtifactAttributes
+import java.security.MessageDigest
+import groovy.json.JsonOutput
+
+import static org.gradle.api.artifacts.type.ArtifactTypeDefinition.DIRECTORY_TYPE
+import static org.gradle.api.artifacts.type.ArtifactTypeDefinition.ZIP_TYPE
+
 plugins {
     id 'java'
     id 'application'
@@ -9,6 +17,7 @@ plugins {
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.1'
     id 'checkstyle'
 }
+
 
 if (project.hasProperty('buildServer')) {
     wpilibVersioning.buildServerMode = true
@@ -52,17 +61,117 @@ if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
   publish.dependsOn artifactoryPublish
 }
 
+configurations {
+    nativeLibraries
+}
+
+def artifactType = Attribute.of('artifactType', String)
+
 dependencies {
-    compile "edu.wpi.first.ntcore:ntcore-java:2020.+"
-    compile "edu.wpi.first.wpiutil:wpiutil-java:2020.+"
+    registerTransform(UnzipTransform) {
+        from.attribute(artifactType, ZIP_TYPE)
+        to.attribute(artifactType, DIRECTORY_TYPE)
+    }
+}
+
+dependencies {
+    compile "edu.wpi.first.ntcore:ntcore-java:2020.3.+"
+    compile "edu.wpi.first.wpiutil:wpiutil-java:2020.3.+"
     compile 'junit:junit:4.12'
     compile 'jfree:jcommon:1.0.16'
     compile 'jfree:jfreechart:1.0.13'
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:linuxx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:osxx86-64"
+
+    compile "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+    compile "com.fasterxml.jackson.core:jackson-core:2.10.0"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+
+    nativeLibraries "edu.wpi.first.ntcore:ntcore-cpp:2020.3.+:windowsx86@zip"
+    nativeLibraries "edu.wpi.first.ntcore:ntcore-cpp:2020.3.+:windowsx86-64@zip"
+    nativeLibraries "edu.wpi.first.ntcore:ntcore-cpp:2020.3.+:linuxx86-64@zip"
+    nativeLibraries "edu.wpi.first.ntcore:ntcore-cpp:2020.3.+:osxx86-64@zip"
+
+    nativeLibraries "edu.wpi.first.wpiutil:wpiutil-cpp:2020.3.+:windowsx86@zip"
+    nativeLibraries "edu.wpi.first.wpiutil:wpiutil-cpp:2020.3.+:windowsx86-64@zip"
+    nativeLibraries "edu.wpi.first.wpiutil:wpiutil-cpp:2020.3.+:linuxx86-64@zip"
+    nativeLibraries "edu.wpi.first.wpiutil:wpiutil-cpp:2020.3.+:osxx86-64@zip"
 }
+
+
+task extractRuntimeLibs(type: Copy) {
+    into "$buildDir/RuntimeLibs"
+    def dirs = configurations.nativeLibraries.incoming.artifactView {
+        attributes {
+            attribute(ArtifactAttributes.ARTIFACT_FORMAT, ArtifactTypeDefinition.DIRECTORY_TYPE);
+        }
+    }
+
+    from {
+        dirs.files.collect { it }
+    }
+
+    from "RuntimeLibs"
+
+    include '**/*.so'
+    include '**/*.dll'
+    include '**/*.dylib'
+}
+
+task hashRuntimeLibs {
+    inputs.dir "$buildDir/RuntimeLibs"
+    outputs.file "$buildDir/ResourceInformation.json"
+    dependsOn extractRuntimeLibs
+
+    outputs.upToDateWhen { false }
+
+    doLast {
+        def inputDir = new File("$buildDir/RuntimeLibs")
+        def inputPath = inputDir.toPath()
+        def hash = MessageDigest.getInstance("MD5")
+        def platforms = [:]
+        inputDir.eachFileRecurse {
+            if (!it.file) return
+            def path = inputPath.relativize(it.toPath())
+            hash.update(it.bytes)
+            def platform = path.getName(0)
+            def arch = path.getName(1)
+
+            path = '/' + path.toString().replace("\\", "/")
+
+            def platformMap = platforms[platform]
+            if (platformMap == null) {
+                platformMap = [:]
+                platformMap[arch] = [path.toString()]
+                platforms[platform] = platformMap
+            }
+            else
+            {
+                def archList = platformMap[arch]
+                if (archList == null) 
+                {
+                    archList = [path.toString()]
+                    platformMap[arch] = archList
+                }
+                else
+                {
+                    archList.add(path.toString())
+                }
+            }
+        }
+
+        platforms["hash"] = hash.digest().encodeHex().toString()
+        def json = JsonOutput.prettyPrint(JsonOutput.toJson(platforms))
+        new File("$buildDir/ResourceInformation.json").text = json
+    }
+}
+
+task assembleResources(type: Copy) {
+    from hashRuntimeLibs
+    from extractRuntimeLibs
+
+    into "$buildDir/AssembledResources"
+}
+
+sourceSets.main.output.dir "$buildDir/AssembledResources", builtBy: assembleResources
 
 jar {
     baseName = 'SmartDashboard'
@@ -97,6 +206,8 @@ checkstyle {
 
 mainClassName = "edu.wpi.first.smartdashboard.SmartDashboard"
 
+
+
 project(':fakeRobot') {
   apply plugin: 'java'
   apply plugin: 'application'
@@ -104,10 +215,10 @@ project(':fakeRobot') {
   dependencies {
     compile "edu.wpi.first.ntcore:ntcore-java:2020.+"
     compile "edu.wpi.first.wpiutil:wpiutil-java:2020.+"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:linuxx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:osxx86-64"
+    // runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86"
+    // runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86-64"
+    // runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:linuxx86-64"
+    // runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:osxx86-64"
   }
 
   mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowFakeRobot"
