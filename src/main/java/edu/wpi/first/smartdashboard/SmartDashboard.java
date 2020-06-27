@@ -5,6 +5,8 @@ import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
+import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +54,9 @@ public class SmartDashboard {
    * @see SmartDashboard#inCompetition() inCompetition()
    */
   public static void main(final String[] args) throws IOException {
-    NativeLoader.LoadLibraries("wpiutiljni", "ntcorejni");
+    WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
+    NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
+    CombinedRuntimeLoader.loadLibraries(SmartDashboard.class, "wpiutiljni", "ntcorejni");
 
 
     NetworkTablesJNI.getDefaultInstance();
