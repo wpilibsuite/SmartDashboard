@@ -115,7 +115,16 @@ checkstyle {
 
 mainClassName = "edu.wpi.first.smartdashboard.SmartDashboard"
 
+def outputsFolder = file("$buildDir/allOutputs")
 
+task copyAllOutputs(type: Copy) {
+    destinationDir outputsFolder
+
+    dependsOn shadowJar
+    from shadowJar
+}
+
+build.dependsOn copyAllOutputs
 
 project(':fakeRobot') {
   apply plugin: 'java'
