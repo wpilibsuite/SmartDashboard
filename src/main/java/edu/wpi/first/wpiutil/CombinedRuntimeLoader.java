@@ -7,6 +7,9 @@
 
 package edu.wpi.first.wpiutil;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,9 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public final class CombinedRuntimeLoader {
   private CombinedRuntimeLoader() {
@@ -59,7 +59,7 @@ public final class CombinedRuntimeLoader {
    * @return                List of all libraries that were extracted
    * @throws IOException    Thrown if resource not found or file could not be extracted
    */
-  @SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnnecessaryCastRule"})
+  @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnnecessaryCastRule"})
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
     TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {

@@ -89,6 +89,7 @@ jar {
 
 shadowJar {
     archiveBaseName = 'SmartDashboard'
+    archiveClassifier.set(wpilibTools.platformMapper.currentPlatform.platformName)
 }
 
 wpilibVersioning.version.finalizeValue()
@@ -96,9 +97,7 @@ wpilibVersioning.version.finalizeValue()
 publishing {
     publications {
         maven(MavenPublication) {
-            artifact(shadowJar) {
-                classifier null
-            }
+            artifact(shadowJar)
             groupId 'edu.wpi.first.wpilib'
             artifactId 'SmartDashboard'
             version wpilibVersioning.version.get()
