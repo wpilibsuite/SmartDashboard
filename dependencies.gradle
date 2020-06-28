@@ -1,0 +1,25 @@
+wpilibTools.deps.wpilibVersion = "2020.+"
+
+wpilibTools.deps.wpilib(dependencies, "ntcore")
+wpilibTools.deps.wpilib(dependencies, "wpiutil")
+
+dependencies {
+    implementation wpilibTools.deps.wpilibJava("ntcore")
+    implementation wpilibTools.deps.wpilibJava("wpiutil")
+
+    implementation 'jfree:jcommon:1.0.16'
+    implementation 'jfree:jfreechart:1.0.13'
+
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+    implementation "com.fasterxml.jackson.core:jackson-core:2.10.0"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+}
+
+ext.projectMainClass = "edu.wpi.first.smartdashboard.SmartDashboard"
+
+pmdMain {
+    pmdMain.enabled = false
+}
+
+spotbugsMain.enabled = false
+//spotlessExtraneous.enabled = false
