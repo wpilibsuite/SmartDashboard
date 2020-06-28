@@ -1,3 +1,6 @@
+wpilibTools.createNativeConfigurations()
+wpilibTools.addNativeResourcesToSourceSet(sourceSets.main)
+
 wpilibTools.deps.wpilibVersion = "2020.+"
 
 wpilibTools.deps.wpilib(dependencies, "ntcore")
