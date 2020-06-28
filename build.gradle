@@ -84,11 +84,11 @@ apply from: 'dependencies.gradle'
 wpilibTools.addNativeResourcesToSourceSet(sourceSets.main)
 
 jar {
-    artifactBaseName = project.name
+    archiveBaseName = project.name
 }
 
 shadowJar {
-    artifactBaseName = project.name
+    archiveBaseName = project.name
     archiveClassifier.set(wpilibTools.platformMapper.currentPlatform.platformName)
 }
 
