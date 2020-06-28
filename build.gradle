@@ -44,32 +44,32 @@ def outputsFolder = file("$buildDir/allOutputs")
 
 def publishingFromAllOutputs = false
 if (project.hasProperty('prCombinePublish')) {
-  publishingFromAllOutputs = true
+    publishingFromAllOutputs = true
 }
 
 if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
-  publishingFromAllOutputs = true
+    publishingFromAllOutputs = true
 
-  artifactory {
-    contextUrl = 'https://frcmaven.wpi.edu/artifactory' // base artifactory url
-    publish {
-      repository {
-        if (project.hasProperty('releaseMode')) {
-          repoKey = 'release'
-        } else {
-          repoKey = 'development'
+    artifactory {
+        contextUrl = 'https://frcmaven.wpi.edu/artifactory' // base artifactory url
+        publish {
+            repository {
+                if (project.hasProperty('releaseMode')) {
+                repoKey = 'release'
+                } else {
+                repoKey = 'development'
+                }
+                username = System.getenv()['ARTIFACTORY_PUBLISH_USERNAME']
+                password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
+                maven = true
+            }
+            defaults {
+                publications ('maven')
+            }
         }
-        username = System.getenv()['ARTIFACTORY_PUBLISH_USERNAME']
-        password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
-        maven = true
-      }
-      defaults {
-          publications ('maven')
-      }
+        clientConfig.info.setBuildName('SmartDashboard')
     }
-    clientConfig.info.setBuildName('SmartDashboard')
-  }
-  publish.dependsOn artifactoryPublish
+    publish.dependsOn artifactoryPublish
 }
 
 wpilibTools.createNativeConfigurations()
@@ -103,26 +103,25 @@ shadowJar {
     archiveClassifier.set(wpilibTools.platformMapper.currentPlatform.platformName)
 }
 
-
-  publishing {
-      publications {
-          maven(MavenPublication) {
-            if (publishingFromAllOutputs) {
-              outputsFolder.eachFile {
+publishing {
+    publications {
+        maven(MavenPublication) {
+        if (publishingFromAllOutputs) {
+            outputsFolder.eachFile {
                 def clfr = it.name.split('-')[1].split('\\.')[0]
                 artifact(it) {
-                  classifier = clfr
+                classifier = clfr
                 }
-              }
-            } else {
-              artifact(shadowJar)
             }
-            groupId 'edu.wpi.first.wpilib'
-            artifactId 'SmartDashboard'
-            version wpilibVersioning.version.get()
-          }
-      }
-  }
+        } else {
+            artifact(shadowJar)
+        }
+        groupId 'edu.wpi.first.wpilib'
+        artifactId 'SmartDashboard'
+        version wpilibVersioning.version.get()
+        }
+    }
+}
 
 checkstyle {
     configFile = new File(rootDir, "checkstyle.xml")
@@ -143,35 +142,10 @@ task copyAllOutputs(type: Copy) {
 
 build.dependsOn copyAllOutputs
 
-project(':fakeRobot') {
-  apply plugin: 'java'
-  apply plugin: 'application'
-
-  apply plugin: 'edu.wpi.first.WpilibTools'
-
-  wpilibTools.createNativeConfigurations()
-
-  wpilibTools.deps.wpilibVersion = "2020.+"
-
-  wpilibTools.deps.wpilib(dependencies, "ntcore")
-  wpilibTools.deps.wpilib(dependencies, "wpiutil")
-
-  dependencies {
-    implementation wpilibTools.deps.wpilibJava("ntcore")
-    implementation wpilibTools.deps.wpilibJava("wpiutil")
-
-    implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.10.0"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
-  }
-
-  wpilibTools.addNativeResourcesToSourceSet(sourceSets.main)
-  mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowFakeRobot"
-}
-
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation"
 }
+
 
 wrapper {
     gradleVersion = '6.0.1'
