@@ -93,6 +93,8 @@ publishing {
         if (publishingFromAllOutputs) {
             outputsFolder.eachFile {
                 def clfr = it.name.split('-')[1].split('\\.')[0]
+                println clfr
+                println it
                 artifact(it) {
                 classifier = clfr
                 }
@@ -122,14 +124,14 @@ pmd {
 
 // Spotless is used to lint and reformat source files.
 spotless {
-    groovyGradle  {
+    groovyGradle {
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
     }
     format("extraneous") {
         target("src/**/*.fxml", "src/**/*.css", "*.xml", "*.yml", "*.md")
-                    trimTrailingWhitespace()
+        trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
     }
