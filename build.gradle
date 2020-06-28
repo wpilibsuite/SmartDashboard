@@ -38,7 +38,18 @@ allprojects {
     }
 }
 
+wpilibVersioning.version.finalizeValue()
+
+def outputsFolder = file("$buildDir/allOutputs")
+
+def publishingFromAllOutputs = false
+if (project.hasProperty('prCombinePublish')) {
+  publishingFromAllOutputs = true
+}
+
 if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
+  publishingFromAllOutputs = true
+
   artifactory {
     contextUrl = 'https://frcmaven.wpi.edu/artifactory' // base artifactory url
     publish {
@@ -92,18 +103,26 @@ shadowJar {
     archiveClassifier.set(wpilibTools.platformMapper.currentPlatform.platformName)
 }
 
-wpilibVersioning.version.finalizeValue()
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifact(shadowJar)
+  publishing {
+      publications {
+          maven(MavenPublication) {
+            if (publishingFromAllOutputs) {
+              outputsFolder.eachFile {
+                def clfr = it.name.split('-')[1].split('\\.')[0]
+                artifact(it) {
+                  classifier = clfr
+                }
+              }
+            } else {
+              artifact(shadowJar)
+            }
             groupId 'edu.wpi.first.wpilib'
             artifactId 'SmartDashboard'
             version wpilibVersioning.version.get()
-        }
-    }
-}
+          }
+      }
+  }
 
 checkstyle {
     configFile = new File(rootDir, "checkstyle.xml")
@@ -114,8 +133,6 @@ checkstyle {
 }
 
 mainClassName = "edu.wpi.first.smartdashboard.SmartDashboard"
-
-def outputsFolder = file("$buildDir/allOutputs")
 
 task copyAllOutputs(type: Copy) {
     destinationDir outputsFolder

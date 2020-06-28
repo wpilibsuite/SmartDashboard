@@ -37,9 +37,9 @@ stages:
 
   - template: azure-templates/job-build-mac.yml
 
-# - template: azure-templates/stage-combine.yml
-#   parameters:
-#     publish: True
-#     publishUserName: $(PublishUserName)
-#     publishPassword: $(PublishPassword)
-#     artifacts: [Mac, Win32, Win64, Linux, Raspbian, Athena, Aarch64]
+- template: azure-templates/stage-combine.yml
+  parameters:
+    publish: True
+    publishUserName: $(PublishUserName)
+    publishPassword: $(PublishPassword)
+    artifacts: [Mac, Win32, Win64, Linux]

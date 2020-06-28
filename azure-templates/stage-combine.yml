@@ -16,38 +16,40 @@ stages:
     timeoutInMinutes: 0
 
     steps:
-    - checkout: none
 
     - script: |
-        git clone https://github.com/wpilibsuite/build-tools
-      displayName: 'Clone Combiner'
+        mkdir build
+        export JAVA_HOME=`/usr/libexec/java_home -v 11`
+      displayName: 'Setup JDK'
 
     - ${{ each artifact in parameters.artifacts }}:
       - task: DownloadPipelineArtifact@0
         displayName: 'DownloadPipelineArtifact ${{ artifact }}'
         inputs:
           artifactName: ${{ artifact }}
-          targetPath: 'build-tools/combiner/products/build/allOutputs'
+          targetPath: 'build/allOutputs'
 
 # PR Builds
     - ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))) }}:
       - task: Gradle@2
         inputs:
-          workingDirectory: 'build-tools/combiner'
-          gradleWrapperFile: 'build-tools/combiner/gradlew'
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          jdkVersionOption: '1.11'
           gradleOptions: '-Xmx3072m'
-          tasks: 'publish '
-          options: '-Pallwpilib'
+          tasks: 'publish'
+          options: '-PbuildServer -PprCombinePublish'
 
 # Master Builds
     - ${{ if and(parameters.publish, eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
       - task: Gradle@2
         inputs:
-          workingDirectory: 'build-tools/combiner'
-          gradleWrapperFile: 'build-tools/combiner/gradlew'
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          jdkVersionOption: '1.11'
           gradleOptions: '-Xmx3072m'
-          tasks: 'publish '
-          options: '-Pallwpilib'
+          tasks: 'publish'
+          options: '-PbuildServer'
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
           ARTIFACTORY_PUBLISH_USERNAME: $(publishUserName)
@@ -57,11 +59,12 @@ stages:
       - ${{ if and(parameters.publish, startsWith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:
         - task: Gradle@2
           inputs:
-            workingDirectory: 'build-tools/combiner'
-            gradleWrapperFile: 'build-tools/combiner/gradlew'
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            jdkVersionOption: '1.11'
             gradleOptions: '-Xmx3072m'
-            tasks: 'publish '
-            options: '-Pallwpilib -PreleaseRepoPublish'
+            tasks: 'publish'
+            options: '-PreleaseMode -PbuildServer'
           env:
             RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
             ARTIFACTORY_PUBLISH_USERNAME: $(publishUserName)
