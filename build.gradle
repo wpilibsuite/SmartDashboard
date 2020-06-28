@@ -83,7 +83,12 @@ apply from: 'dependencies.gradle'
 
 wpilibTools.addNativeResourcesToSourceSet(sourceSets.main)
 
+jar {
+    artifactBaseName = project.name
+}
+
 shadowJar {
+    artifactBaseName = project.name
     archiveClassifier.set(wpilibTools.platformMapper.currentPlatform.platformName)
 }
 
@@ -93,8 +98,6 @@ publishing {
         if (publishingFromAllOutputs) {
             outputsFolder.eachFile {
                 def clfr = it.name.split('-')[1].split('\\.')[0]
-                println clfr
-                println it
                 artifact(it) {
                 classifier = clfr
                 }
