@@ -1,10 +1,16 @@
-wpilibTools.createNativeConfigurations()
-wpilibTools.addNativeResourcesToSourceSet(sourceSets.main)
+def nativeConfigName = 'wpilibNatives'
+def nativeConfig = configurations.create(nativeConfigName)
+
+def nativeTasks = wpilibTools.createExtractionTasks {
+    configurationName = nativeConfigName
+}
+
+nativeTasks.addToSourceSetResources(sourceSets.main)
 
 wpilibTools.deps.wpilibVersion = "2020.+"
 
-wpilibTools.deps.wpilib(dependencies, "ntcore")
-wpilibTools.deps.wpilib(dependencies, "wpiutil")
+nativeConfig.dependencies.add wpilibTools.deps.wpilib("ntcore")
+nativeConfig.dependencies.add wpilibTools.deps.wpilib("wpiutil")
 
 dependencies {
     implementation wpilibTools.deps.wpilibJava("ntcore")
