@@ -80,7 +80,7 @@ if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
 apply from: 'dependencies.gradle'
 
 shadowJar {
-    archiveVersion = null
+    archiveVersion = ""
     exclude("module-info.class")
     archiveClassifier.set(wpilibTools.currentPlatform.platformName)
 }
