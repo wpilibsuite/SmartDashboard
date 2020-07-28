@@ -1,7 +1,12 @@
 package edu.wpi.livewindowfakerobot;
 
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
+
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,7 +48,10 @@ public class LiveWindowFakeRobot {
                                 canJag          = createTable(canSystem, "CAN Jaguar", "CANSpeedController"),
                                 canTalon        = createTable(canSystem, "CAN Talon", "CANSpeedController");
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
+        NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
+        CombinedRuntimeLoader.loadLibraries(LiveWindowFakeRobot.class, "wpiutiljni", "ntcorejni");
         
         System.out.println();
         

@@ -1,1 +1,10 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
 include 'fakeRobot'
+
+rootProject.name = "SmartDashboard"

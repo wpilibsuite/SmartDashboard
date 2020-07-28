@@ -1,10 +1,16 @@
 package edu.wpi.first.smartdashboard;
 
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
+import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
+
 import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
@@ -47,7 +53,14 @@ public class SmartDashboard {
    *             will be in competition mode
    * @see SmartDashboard#inCompetition() inCompetition()
    */
-  public static void main(final String[] args) {
+  public static void main(final String[] args) throws IOException {
+    WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
+    NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
+    CombinedRuntimeLoader.loadLibraries(SmartDashboard.class, "wpiutiljni", "ntcorejni");
+
+
+    NetworkTablesJNI.getDefaultInstance();
+
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
         public void run() {

@@ -1,13 +1,26 @@
+import org.gradle.api.internal.artifacts.transform.UnzipTransform
+import org.gradle.api.internal.artifacts.ArtifactAttributes
+import java.security.MessageDigest
+import groovy.json.JsonOutput
+
+import static org.gradle.api.artifacts.type.ArtifactTypeDefinition.DIRECTORY_TYPE
+import static org.gradle.api.artifacts.type.ArtifactTypeDefinition.ZIP_TYPE
+
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
-    id "com.jfrog.artifactory" version "4.9.8"
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id "com.jfrog.artifactory" version "4.16.0"
+    id "com.diffplug.gradle.spotless" version "3.28.0" // DO NOT UPDATE
+    id "com.github.spotbugs" version "4.4.4"
     id 'maven-publish'
     id 'idea'
+    id 'jacoco'
+    id 'pmd'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.0.1'
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.1'
+    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'checkstyle'
+    id 'edu.wpi.first.WpilibTools' version '0.6.1'
 }
 
 if (project.hasProperty('buildServer')) {
@@ -29,94 +42,159 @@ allprojects {
     }
 }
 
+wpilibVersioning.version.finalizeValue()
+version = wpilibVersioning.version.get()
+
+def outputsFolder = file("$buildDir/allOutputs")
+
+def publishingFromAllOutputs = false
+if (project.hasProperty('prCombinePublish')) {
+    publishingFromAllOutputs = true
+}
+
 if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
-  artifactory {
-    contextUrl = 'https://frcmaven.wpi.edu/artifactory' // base artifactory url
-    publish {
-      repository {
-        if (project.hasProperty('releaseMode')) {
-          repoKey = 'release'
-        } else {
-          repoKey = 'development'
+    publishingFromAllOutputs = true
+
+    artifactory {
+        contextUrl = 'https://frcmaven.wpi.edu/artifactory' // base artifactory url
+        publish {
+            repository {
+                if (project.hasProperty('releaseMode')) {
+                repoKey = 'release'
+                } else {
+                repoKey = 'development'
+                }
+                username = System.getenv()['ARTIFACTORY_PUBLISH_USERNAME']
+                password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
+                maven = true
+            }
+            defaults {
+                publications ('maven')
+            }
         }
-        username = System.getenv()['ARTIFACTORY_PUBLISH_USERNAME']
-        password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
-        maven = true
-      }
-      defaults {
-          publications ('maven')
-      }
+        clientConfig.info.setBuildName(project.name)
     }
-    clientConfig.info.setBuildName('SmartDashboard')
-  }
-  publish.dependsOn artifactoryPublish
+    publish.dependsOn artifactoryPublish
 }
 
-dependencies {
-    compile "edu.wpi.first.ntcore:ntcore-java:2020.+"
-    compile "edu.wpi.first.wpiutil:wpiutil-java:2020.+"
-    compile 'junit:junit:4.12'
-    compile 'jfree:jcommon:1.0.16'
-    compile 'jfree:jfreechart:1.0.13'
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:linuxx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:osxx86-64"
-}
-
-jar {
-    baseName = 'SmartDashboard'
-}
+apply from: 'dependencies.gradle'
 
 shadowJar {
-    baseName = 'SmartDashboard'
+    archiveVersion = ""
+    exclude("module-info.class")
+    archiveClassifier.set(wpilibTools.currentPlatform.platformName)
 }
-
-wpilibVersioning.version.finalizeValue()
 
 publishing {
     publications {
         maven(MavenPublication) {
-            artifact(shadowJar) {
-                classifier null
+        if (publishingFromAllOutputs) {
+            outputsFolder.eachFile {
+                def dashSplit = it.name.split('-')
+                def clfr = dashSplit[dashSplit.length - 1].split('\\.')[0]
+                artifact(it) {
+                classifier = clfr
+                }
             }
-            groupId 'edu.wpi.first.wpilib'
-            artifactId 'SmartDashboard'
-            version wpilibVersioning.version.get()
+        } else {
+            artifact(shadowJar)
+        }
+        groupId 'edu.wpi.first.tools'
+        artifactId project.name
+        version project.version
         }
     }
 }
 
 checkstyle {
-    configFile = new File(rootDir, "checkstyle.xml")
-    toolVersion = '6.19'
-    if (project.hasProperty("ignoreCheckstyle")) {
-        ignoreFailures = true
+    toolVersion = "8.30"
+}
+
+pmd {
+    toolVersion = "6.22.0"
+    consoleOutput = true
+    sourceSets = [project.sourceSets.main, project.sourceSets.test]
+    reportsDir = file("${project.buildDir}/reports/pmd")
+    ruleSetFiles = files(file("$rootDir/pmd-ruleset.xml"))
+    ruleSets = []
+}
+
+// Spotless is used to lint and reformat source files.
+spotless {
+    groovyGradle {
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    format("extraneous") {
+        target("src/**/*.fxml", "src/**/*.css", "*.xml", "*.yml", "*.md")
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
     }
 }
 
-mainClassName = "edu.wpi.first.smartdashboard.SmartDashboard"
+spotbugs {
+    ignoreFailures.set(false)
+    showProgress.set(true)
+    effort.set(com.github.spotbugs.snom.Effort.MAX)
 
-project(':fakeRobot') {
-  apply plugin: 'java'
-  apply plugin: 'application'
-
-  dependencies {
-    compile "edu.wpi.first.ntcore:ntcore-java:2020.+"
-    compile "edu.wpi.first.wpiutil:wpiutil-java:2020.+"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:windowsx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:linuxx86-64"
-    runtime "edu.wpi.first.ntcore:ntcore-jni:2020.+:osxx86-64"
-  }
-
-  mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowFakeRobot"
+    tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+        def sbTask = it
+        reports {
+            create("text") {
+                enabled = true
+            }
+        }
+        finalizedBy(task("${name}Report") {
+            mustRunAfter(sbTask)
+            doLast {
+                def dest = sbTask.reports.first().destination;
+                if (dest.exists()) {
+                    def text = dest.text
+                    if (text != null && !text.isBlank()) {
+                        logger.warn(text)
+                    }
+                }
+            }
+        })
+    }
 }
 
+jacoco {
+    toolVersion = "0.8.5"
+}
+
+tasks.withType(JacocoReport).configureEach {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+mainClassName = ext.projectMainClass
+
+task copyAllOutputs(type: Copy) {
+    destinationDir outputsFolder
+
+    dependsOn shadowJar
+    from shadowJar
+}
+
+build.dependsOn copyAllOutputs
+
 tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
     options.compilerArgs << "-Xlint:deprecation"
 }
 
+tasks.withType(Jar).configureEach {
+    manifest {
+        attributes["Implementation-Version"] = project.version as String
+        attributes["Built-Date"] = Instant.now().toString()
+    }
+}
+
 wrapper {
-    gradleVersion = '5.4.1'
+    gradleVersion = '6.0.1'
 }
