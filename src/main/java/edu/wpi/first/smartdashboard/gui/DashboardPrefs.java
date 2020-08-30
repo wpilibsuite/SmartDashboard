@@ -7,6 +7,7 @@ import edu.wpi.first.smartdashboard.properties.IntegerListProperty;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.PropertyHolder;
+import edu.wpi.first.smartdashboard.properties.StringProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -28,7 +29,7 @@ public class DashboardPrefs implements PropertyHolder {
   }
 
   private Map<String, Property> properties = new LinkedHashMap<String, Property>();
-  public final IntegerProperty team = new IntegerProperty(this, "Team Number", 0);
+  public final StringProperty team = new StringProperty(this, "Team Number/Host", "0");
   public final BooleanProperty hideMenu = new BooleanProperty(this, "Hide Menu", false);
   public final BooleanProperty autoShowWidgets
       = new BooleanProperty(this, "Automatically Show Widgets", true);
@@ -77,7 +78,7 @@ public class DashboardPrefs implements PropertyHolder {
   }
 
   public boolean validatePropertyChange(Property property, Object value) {
-    if (property == team || property == width || property == height) {
+    if (property == width || property == height) {
       return (Integer) value > 0;
     } else if (property == grid_widths || property == grid_heights) {
       int[] values = (int[]) value;
@@ -100,6 +101,14 @@ public class DashboardPrefs implements PropertyHolder {
             "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, false);
         return result == JOptionPane.YES_OPTION;
       }
+    } else if (property == team) {
+      try {
+        if (Integer.parseInt((String) value) == 0) {
+          return false;
+        }
+      } catch (NumberFormatException ex) {
+        //a non-integer value is a host
+      }
     }
     return true;
   }
@@ -116,7 +125,7 @@ public class DashboardPrefs implements PropertyHolder {
     } else if (property == height) {
       frame.setSize(frame.getWidth(), height.getValue());
     } else if (property == team) {
-      Robot.setTeam(team.getValue());
+      Robot.setHost(team.getValue());
     } else if (property == hideMenu) {
       frame.setShouldHideMenu(hideMenu.getValue());
     } else if (property == logToCSV) {

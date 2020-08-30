@@ -30,9 +30,14 @@ public class Robot {
   }
 
   public static void setHost(String host) {
-    _host = host;
-    System.out.println("Host: " + host);
-    NetworkTable.setIPAddress(host);
+    try {
+      int teamNumber = Integer.parseInt(host);
+      setTeam(teamNumber);
+    } catch (NumberFormatException ex) {
+      _host = host;
+      System.out.println("Host: " + host);
+      NetworkTable.setIPAddress(host);
+    }
   }
 
   public static String getHost() {
