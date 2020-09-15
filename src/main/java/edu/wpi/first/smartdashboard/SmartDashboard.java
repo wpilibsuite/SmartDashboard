@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.properties.IntegerProperty;
+import edu.wpi.first.smartdashboard.properties.StringProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
 import edu.wpi.first.wpiutil.WPIUtilJNI;
@@ -108,27 +109,22 @@ public class SmartDashboard {
     } else {
       monitor.setProgress(600);
       monitor.setNote("Getting Team Number");
-      IntegerProperty teamProp = frame.getPrefs().team;
-      int teamNumber = teamProp.getValue();
+      StringProperty teamProp = frame.getPrefs().team;
+      String teamNumber = teamProp.getValue();
 
       teamNumberLoop:
-      while (teamNumber <= 0) {
-        try {
-          String input = JOptionPane.showInputDialog("Input Team Number");
+      while (teamNumber.equals("0")) {
+          String input = JOptionPane.showInputDialog("Input Team Number\\Host");
           if (input == null) {
-            teamNumber = 0;
             break teamNumberLoop;
           }
-          teamNumber = Integer.parseInt(input);
-        } catch (Exception e) {
-          // TODO
-        }
+          teamNumber = input;
       }
 
       monitor.setProgress(650);
-      monitor.setNote("Connecting to robot of team: " + teamNumber);
+      monitor.setNote("Connecting to robot: " + teamNumber);
+      Robot.setHost(teamNumber);
       teamProp.setValue(teamNumber);
-      Robot.setTeam(teamNumber);
     }
 
     try {

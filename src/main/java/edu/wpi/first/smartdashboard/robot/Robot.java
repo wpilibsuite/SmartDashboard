@@ -30,9 +30,19 @@ public class Robot {
   }
 
   public static void setHost(String host) {
-    _host = host;
-    System.out.println("Host: " + host);
-    NetworkTable.setIPAddress(host);
+    if (host.matches("^\\d{1,5}$") ) { //matches team number 5 digits or less
+      try {
+        int teamNumber = Integer.parseInt(host);
+        setTeam(teamNumber);
+      } catch (NumberFormatException ex) {
+        //should not get here, protected by regex
+        ex.printStackTrace();
+      }
+    } else {
+      _host = host;
+      System.out.println("Host: " + host);
+      NetworkTable.setIPAddress(host);
+    }
   }
 
   public static String getHost() {
