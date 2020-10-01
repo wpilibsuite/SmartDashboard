@@ -1,4 +1,4 @@
-# SmartDashboard Project
+# SmartDashboard Project - an amazing project
 
 [![Build Status](https://dev.azure.com/wpilib/DesktopTools/_apis/build/status/wpilibsuite.SmartDashboard)](https://dev.azure.com/wpilib/DesktopTools/_build/latest?definitionId=12)
 
