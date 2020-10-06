@@ -15,17 +15,17 @@ The WPILib Mission is to enable FIRST teams to focus on writing game-specific so
 
 # Getting SmartDashboard
 
-The latest release build of SmartDashboard can be found on [WPI's server](http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/SmartDashboard/).  First select the version you would like to download.  Once inside the version directory, the largest file listed is the jar file.  You can check what each file is by hovering over the link which will reveal the full path, including the extension.
+The latest release build of SmartDashboard can be found on [WPI's server](https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilib/SmartDashboard/).  First select the version you would like to download.  Once inside the version directory, the largest file listed is the jar file.  You can check what each file is by hovering over the link which will reveal the full path, including the extension.
 
 ## Requirements
-- [Java 11](http://jdk.java.net/11/)
+- [Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 
 # Building SmartDashboard
 
 Building SmartDashboard is very straightforward. SmartDashboard uses Gradle to compile.
 
 ## Requirements
-- [Java 11](http://jdk.java.net/11/)
+- [Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 
 ## Running
 
