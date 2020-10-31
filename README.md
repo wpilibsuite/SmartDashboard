@@ -1,6 +1,6 @@
 # SmartDashboard Project
 
-[![Build Status](https://dev.azure.com/wpilib/DesktopTools/_apis/build/status/wpilibsuite.SmartDashboard)](https://dev.azure.com/wpilib/DesktopTools/_build/latest?definitionId=12)
+![CI](https://github.com/wpilibsuite/SmartDashboard/workflows/CI/badge.svg)
 
 Welcome to the WPILib project. This repository contains the SmartDashboard project.
 
