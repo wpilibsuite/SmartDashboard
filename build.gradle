@@ -9,7 +9,7 @@ import static org.gradle.api.artifacts.type.ArtifactTypeDefinition.ZIP_TYPE
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
     id "com.jfrog.artifactory" version "4.16.0"
     id "com.diffplug.gradle.spotless" version "3.28.0" // DO NOT UPDATE
     id "com.github.spotbugs" version "4.4.4"
@@ -204,5 +204,5 @@ tasks.withType(Jar).configureEach {
 }
 
 wrapper {
-    gradleVersion = '6.0.1'
+    gradleVersion = '7.1.1'
 }
