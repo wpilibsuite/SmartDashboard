@@ -6,8 +6,11 @@ import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.AccelerometerType;
 import edu.wpi.first.smartdashboard.types.named.AnalogInputType;
 import edu.wpi.first.smartdashboard.types.named.CounterType;
+import edu.wpi.first.smartdashboard.types.named.ExternalDirectionCounterType;
 import edu.wpi.first.smartdashboard.types.named.GearToothSensorType;
+import edu.wpi.first.smartdashboard.types.named.TachometerType;
 import edu.wpi.first.smartdashboard.types.named.UltrasonicType;
+import edu.wpi.first.smartdashboard.types.named.UpDownCounterType;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import javax.swing.BoxLayout;
 
@@ -25,7 +28,10 @@ public class SingleNumberDisplay extends AbstractTableWidget implements ITableLi
       UltrasonicType.get(),
       AccelerometerType.get(),
       GearToothSensorType.get(),
-      CounterType.get()};
+      CounterType.get(),
+      ExternalDirectionCounterType.get(),
+      TachometerType.get(),
+      UpDownCounterType.get()};
 
   protected final String defaultText = " ---- ";
   private final UneditableNumberField display = new UneditableNumberField();
