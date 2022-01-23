@@ -76,10 +76,16 @@ public class DisplayElementRegistry {
    * @param clazz the class of the {@link Widget}. If it is an abstract class, then it will be
    *     ignored.
    * @throws RuntimeException there are several ways that this will be thrown.
-   *
-   * <p> <ul> <li>If there is no TYPES field <li>If the TYPES field is not static <li>If the TYPES
-   * field is not final <li>If the TYPES field is not public <li>If the TYPES field is not an array
-   * of {@link DataType} <li>If the TYPES field is null </ul> </p>
+   *     <p>
+   *         <ul>
+   *             <li>If there is no TYPES field</li>
+   *             <li>If the TYPES field is not static</li>
+   *             <li>If the TYPES field is not final</li>
+   *             <li>If the TYPES field is not public</li>
+   *             <li>If the TYPES field is not an array of {@link DataType}</li>
+   *             <li>If the TYPES field is null</li>
+   *         </ul>
+   *     </p>
    */
   public static void registerWidget(Class<? extends Widget> clazz) {
     if (Modifier.isAbstract(clazz.getModifiers())) {

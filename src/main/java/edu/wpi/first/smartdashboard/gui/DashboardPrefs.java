@@ -102,8 +102,8 @@ public class DashboardPrefs implements PropertyHolder {
         return result == JOptionPane.YES_OPTION;
       }
     } else if (property == team) {
-      return ((String)value).matches("^\\d{1,5}$") |  //matches team number 5 digits or less
-       ((String) value).matches("^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|"
+      return ((String)value).matches("^\\d{1,5}$")  //matches team number 5 digits or less
+        | ((String) value).matches("^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|"
               + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9]))*$");
         //matches hostname.
         //regex from https://stackoverflow.com/questions/106179/regular-expression-to-match-dns-hostname-or-ip-address
