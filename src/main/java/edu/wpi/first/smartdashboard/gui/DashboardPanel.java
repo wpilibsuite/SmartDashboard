@@ -159,6 +159,13 @@ public class DashboardPanel extends JPanel {
   }
 
   /**
+   * Returns all the {@link Widget Widgets} that are currently being displayed.
+   */
+  public Iterable<Widget> getWidgets() {
+    return fields.values();
+  }
+
+  /**
    * Takes the given value and manipulates it based on the given type to be
    * able to be handed to a {@link Widget}. Basically, if the type is a
    * primitive, the value will be returned. If the type is a
