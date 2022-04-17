@@ -176,9 +176,10 @@ public abstract class MjpgStreamViewer extends StaticWidget {
       long lastRepaint = 0;
 
       while (!interrupted()) {
-        stream = getCameraStream();
         try {
-          while (!interrupted() && !isCameraChanged() && stream != null) {
+          stream = waitForCameraStream();
+
+          while (!interrupted() && !isCameraChanged()) {
             while (System.currentTimeMillis() - lastRepaint < 10) {
               stream.skip(stream.available());
               Thread.sleep(1);
@@ -229,31 +230,39 @@ public abstract class MjpgStreamViewer extends StaticWidget {
       }
     }
 
-    private InputStream getCameraStream() {
-      while (!interrupted()) {
-        for (String streamUrl : streamPossibleCameraUrls()
-            .filter(s -> s.startsWith(STREAM_PREFIX))
-            .map(s -> s.substring(STREAM_PREFIX.length()))
-            .collect(Collectors.toSet())) {
-          System.out.println("Trying to connect to: " + streamUrl);
-          try {
-            URL url = new URL(streamUrl);
-            URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(500);
-            connection.setReadTimeout(5000);
-            InputStream stream = connection.getInputStream();
+    private InputStream waitForCameraStream() throws InterruptedException {
+      InputStream cameraStream = getCameraStream();
+      while (cameraStream == null) {
+        // cameras not available
+        Thread.sleep(100);
+        cameraStream = getCameraStream();
+      }
+      return cameraStream;
+    }
 
-            System.out.println("Connected to: " + streamUrl);
-            return stream;
-          } catch (IOException e) {
-            imageToDraw = null;
-            repaint();
-            try {
-              Thread.sleep(500);
-            } catch (InterruptedException ex) {
-              Thread.currentThread().interrupt();
-              throw new RuntimeException(ex);
-            }
+    private InputStream getCameraStream() {
+      for (String streamUrl : streamPossibleCameraUrls()
+          .filter(s -> s.startsWith(STREAM_PREFIX))
+          .map(s -> s.substring(STREAM_PREFIX.length()))
+          .collect(Collectors.toSet())) {
+        System.out.println("Trying to connect to: " + streamUrl);
+        try {
+          URL url = new URL(streamUrl);
+          URLConnection connection = url.openConnection();
+          connection.setConnectTimeout(500);
+          connection.setReadTimeout(5000);
+          InputStream stream = connection.getInputStream();
+
+          System.out.println("Connected to: " + streamUrl);
+          return stream;
+        } catch (IOException e) {
+          imageToDraw = null;
+          repaint();
+          try {
+            Thread.sleep(500);
+          } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ex);
           }
         }
       }
