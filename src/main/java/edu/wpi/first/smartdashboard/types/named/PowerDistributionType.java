@@ -5,25 +5,25 @@
 
 package edu.wpi.first.smartdashboard.types.named;
 
-import edu.wpi.first.smartdashboard.livewindow.elements.PowerDistributionPanel;
+import edu.wpi.first.smartdashboard.livewindow.elements.PowerDistribution;
 import edu.wpi.first.smartdashboard.types.NamedDataType;
 
 /**
  * @author Sam
  */
-public class PowerDistributionPanelType extends NamedDataType {
+public class PowerDistributionType extends NamedDataType {
 
-  public static final String LABEL = "PowerDistributionPanel";
+  public static final String LABEL = "PowerDistribution";
 
-  private PowerDistributionPanelType() {
-    super(LABEL, PowerDistributionPanel.class);
+  private PowerDistributionType() {
+    super(LABEL, PowerDistribution.class);
   }
 
   public static NamedDataType get() {
     if (NamedDataType.get(LABEL) != null) {
       return NamedDataType.get(LABEL);
     } else {
-      return new PowerDistributionPanelType();
+      return new PowerDistributionType();
     }
   }
 

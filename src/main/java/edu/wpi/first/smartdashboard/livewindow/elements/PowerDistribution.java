@@ -3,7 +3,7 @@ package edu.wpi.first.smartdashboard.livewindow.elements;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
-import edu.wpi.first.smartdashboard.types.named.PowerDistributionPanelType;
+import edu.wpi.first.smartdashboard.types.named.PowerDistributionType;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -14,9 +14,9 @@ import javax.swing.JLabel;
 /**
  * Displays the current and voltage from the PDP
  */
-public class PowerDistributionPanel extends AbstractTableWidget implements ITableListener {
+public class PowerDistribution extends AbstractTableWidget implements ITableListener {
 
-  public static final DataType[] TYPES = {PowerDistributionPanelType.get()};
+  public static final DataType[] TYPES = {PowerDistributionType.get()};
 
   private final UneditableNumberField voltage = new UneditableNumberField();
   private final UneditableNumberField totCurrent = new UneditableNumberField();

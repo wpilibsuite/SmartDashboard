@@ -21,7 +21,7 @@ public class LiveWindowWidgetRegistrar {
     DisplayElementRegistry.registerWidget(GyroDisplay.class);
     DisplayElementRegistry.registerWidget(EncoderDisplay.class);
     DisplayElementRegistry.registerWidget(ServoController.class);
-    DisplayElementRegistry.registerWidget(PowerDistributionPanel.class);
+    DisplayElementRegistry.registerWidget(PowerDistribution.class);
     DisplayElementRegistry.registerWidget(ThreeAxisAccelerometer.class);
     DisplayElementRegistry.registerWidget(CANSpeedController.class);
   }
