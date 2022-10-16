@@ -88,9 +88,8 @@ public class LinePlot extends AbstractValueWidget {
     }
     if (property == clear) {
       if (clear.getValue()) {
-        m_data.clear();
+        clearPlot();
         clear.setValue(false);
-        startTime = System.currentTimeMillis() / 1000.0;
       }
     }
 
@@ -111,5 +110,10 @@ public class LinePlot extends AbstractValueWidget {
     } else {
       m_chart.getXYPlot().getRangeAxis().setRange(minY.getValue(), maxY.getValue());
     }
+  }
+
+  public void clearPlot() {
+    m_data.clear();
+    startTime = System.currentTimeMillis() / 1000.0;
   }
 }

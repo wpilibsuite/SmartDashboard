@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.gui;
 
+import edu.wpi.first.smartdashboard.gui.elements.LinePlot;
 import edu.wpi.first.smartdashboard.livewindow.elements.Controller;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
 import edu.wpi.first.smartdashboard.robot.Robot;
@@ -142,6 +143,20 @@ public class DashboardMenu extends JMenuBar {
         KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK));
     editSystems.doClick();
     viewMenu.add(editSystems);
+
+    final JMenuItem clearPlots = new JMenuItem("Clear All Plots");
+    clearPlots.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        for (Widget component : MainPanel.getCurrentPanel().getWidgets()) {
+          if (component instanceof LinePlot) {
+            ((LinePlot)component).clearPlot();
+            ((LinePlot)component).updateChartRange();
+          }
+        }
+      }
+    });
+    clearPlots.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.SHIFT_DOWN_MASK));
+    viewMenu.add(clearPlots);
 
     final JMenuItem resetLW = new JMenuItem("Reset LiveWindow");
     resetLW.addActionListener(new ActionListener() {
