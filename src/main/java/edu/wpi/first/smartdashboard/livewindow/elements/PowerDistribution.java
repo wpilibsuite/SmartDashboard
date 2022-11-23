@@ -20,8 +20,8 @@ public class PowerDistribution extends AbstractTableWidget implements ITableList
 
   private final UneditableNumberField voltage = new UneditableNumberField();
   private final UneditableNumberField totCurrent = new UneditableNumberField();
-  private final UneditableNumberField[] current = new UneditableNumberField[16];
-  private final JLabel[] curLabel = new JLabel[16];
+  private final UneditableNumberField[] current = new UneditableNumberField[24];
+  private final JLabel[] curLabel = new JLabel[24];
   private JLabel totCurLabel;
   private JLabel voltageLabel;
 
@@ -34,7 +34,7 @@ public class PowerDistribution extends AbstractTableWidget implements ITableList
 
     nameTag = new NameTag(getFieldName());
     add(nameTag);
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 12; i++) {
       c.gridx = 0;
       c.gridy = i + 1;
       curLabel[i] = new JLabel("Chan" + i);
@@ -46,9 +46,9 @@ public class PowerDistribution extends AbstractTableWidget implements ITableList
       current[i].setColumns(6);
       add(current[i], c);
     }
-    for (int i = 8; i < 16; i++) {
+    for (int i = 12; i < 24; i++) {
       c.gridx = 2;
-      c.gridy = 16 - i;
+      c.gridy = 24 - i;
       curLabel[i] = new JLabel("Chan" + i);
       curLabel[i].setHorizontalAlignment(JLabel.RIGHT);
       add(curLabel[i], c);
@@ -59,7 +59,7 @@ public class PowerDistribution extends AbstractTableWidget implements ITableList
       add(current[i], c);
     }
 
-    c.gridy = 9;
+    c.gridy = 13;
     c.gridx = 0;
     voltageLabel = new JLabel("Voltage");
     add(voltageLabel, c);
