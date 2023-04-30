@@ -3,7 +3,6 @@ package edu.wpi.first.smartdashboard;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
-import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import edu.wpi.first.wpiutil.CombinedRuntimeLoader;

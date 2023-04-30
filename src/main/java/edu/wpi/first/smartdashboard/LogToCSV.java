@@ -1,9 +1,12 @@
 package edu.wpi.first.smartdashboard;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.TableEntryListener;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.robot.Robot;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.JOptionPane;
@@ -13,12 +16,13 @@ import javax.swing.JOptionPane;
  *
  * @author pmalmsten
  */
-public class LogToCSV implements ITableListener {
+public class LogToCSV implements TableEntryListener {
 
   private static final String s_lineSeparator = System.getProperty("line.separator");
   private long m_startTime;
   private FileWriter m_fw;
   private final DashboardFrame frame;
+  private int listenerHandle;
 
   public LogToCSV(DashboardFrame frame) {
     this.frame = frame;
@@ -38,9 +42,9 @@ public class LogToCSV implements ITableListener {
         m_fw = new FileWriter(path);
         m_fw.write("Time (ms),Name,Value" + s_lineSeparator);
         m_fw.flush();
-        Robot.getTable().addTableListenerEx(this,
-            ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW
-                | ITable.NOTIFY_UPDATE);
+        listenerHandle = Robot.getTable().addEntryListener(this,
+            EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
       } catch (IOException ex) {
         ex.printStackTrace();
         JOptionPane.showMessageDialog(null,
@@ -66,13 +70,14 @@ public class LogToCSV implements ITableListener {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
-    Robot.getTable().removeTableListener(this);
+    Robot.getTable().removeTableListener(listenerHandle);
     m_fw = null;
   }
 
   @Override
-  public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-    if (!(value instanceof ITable) && m_fw != null) {
+  public void valueChanged(NetworkTable source, String key, 
+                           NetworkTableEntry entry, NetworkTableValue value, int flags) {
+    if (m_fw != null) {
       try {
         long timeStamp = System.currentTimeMillis() - m_startTime;
         m_fw.write(timeStamp + "," + "\"" + key + "\"," + "\"" + value + "\"" + s_lineSeparator);

@@ -38,7 +38,7 @@ public class GyroDisplay extends AbstractTableWidget { // TODO: get the compass 
    * Options in a ComboBox for which display to show.
    */
   private final String[] names = {"Display as Text", "Display as Compass"};
-  private final JComboBox menu = new JComboBox(names);
+  private final JComboBox<String> menu = new JComboBox<String>(names);
 
   @Override
   public void init() {
@@ -56,7 +56,7 @@ public class GyroDisplay extends AbstractTableWidget { // TODO: get the compass 
 
     menu.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        JComboBox box = (JComboBox) e.getSource();
+        JComboBox<String> box = (JComboBox<String>) e.getSource();
         String name = box.getSelectedItem().toString();
         if (name.equals(names[1])) {
           self.remove(feedback);

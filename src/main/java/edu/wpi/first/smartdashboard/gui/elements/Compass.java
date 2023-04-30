@@ -7,7 +7,7 @@ import edu.wpi.first.smartdashboard.properties.DoubleProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.GyroType;
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -53,13 +53,13 @@ public class Compass extends AbstractTableWidget implements NumberBindable {
 
   public void setValue(double value) {
     if (table != null) {
-      setValue((ITable) null);
+      setValue((NetworkTable) null);
     }
     updateValue(value);
   }
 
   @Override
-  public void doubleChanged(ITable source, String key, double value, boolean isNew) {
+  public void doubleChanged(NetworkTable source, String key, double value, boolean isNew) {
     if (key.equals("angle") || key.equals("Value")) {
       updateValue(value);
     }

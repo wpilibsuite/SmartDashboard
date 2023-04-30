@@ -11,7 +11,6 @@ import edu.wpi.first.smartdashboard.types.named.GearToothSensorType;
 import edu.wpi.first.smartdashboard.types.named.TachometerType;
 import edu.wpi.first.smartdashboard.types.named.UltrasonicType;
 import edu.wpi.first.smartdashboard.types.named.UpDownCounterType;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import javax.swing.BoxLayout;
 
 
@@ -22,7 +21,7 @@ import javax.swing.BoxLayout;
  *
  * @author Sam
  */
-public class SingleNumberDisplay extends AbstractTableWidget implements ITableListener {
+public class SingleNumberDisplay extends AbstractTableWidget {
 
   public static final DataType[] TYPES = {AnalogInputType.get(),
       UltrasonicType.get(),

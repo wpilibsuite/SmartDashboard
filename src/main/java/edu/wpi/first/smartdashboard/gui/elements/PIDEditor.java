@@ -20,7 +20,6 @@ public class PIDEditor extends AbstractTableWidget implements Controller {
 
   private final boolean editType;
 
-  private NumberTableComboBox tBox;
   private NumberTableField pField;
   private NumberTableField iField;
   private NumberTableField dField;

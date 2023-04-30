@@ -41,7 +41,7 @@ public class DigitalOutputController extends AbstractTableWidget implements Cont
 
       public void actionPerformed(ActionEvent e) {
         controller.setText(controller.isSelected() ? "On" : "Off");
-        table.putBoolean("Value", controller.getText().equals("On"));
+        table.getEntry("Value").setBoolean(controller.getText().equals("On"));
       }
     });
     add(controller);

@@ -1,21 +1,22 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
+import edu.wpi.first.networktables.ConnectionNotification;
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.properties.ColorProperty;
 import edu.wpi.first.smartdashboard.properties.MultiProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.robot.Robot;
-import edu.wpi.first.wpilibj.tables.IRemote;
-import edu.wpi.first.wpilibj.tables.IRemoteConnectionListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.function.Consumer;
+
 import javax.swing.SwingUtilities;
 
 /**
  * @author Joe Grinstead
  */
-public class ConnectionIndicator extends StaticWidget implements IRemoteConnectionListener {
+public class ConnectionIndicator extends StaticWidget implements Consumer<ConnectionNotification> {
 
   public static final String NAME = "Connection Indicator";
   private static final int DRAW_EMBOSSED = 0;
@@ -26,6 +27,7 @@ public class ConnectionIndicator extends StaticWidget implements IRemoteConnecti
   public final ColorProperty negative = new ColorProperty(this, "No Connection Color", Color.RED);
   public final MultiProperty display = new MultiProperty(this, "Graphics");
   private boolean connected = false;
+  private int listenerHandle;
   private Runnable repainter = new Runnable() {
 
     public void run() {
@@ -45,12 +47,12 @@ public class ConnectionIndicator extends StaticWidget implements IRemoteConnecti
 
   @Override
   public void init() {
-    Robot.addConnectionListener(this, true);
+    listenerHandle = Robot.addConnectionListener(this, true);
   }
 
   @Override
   public void disconnect() {
-    Robot.removeConnectionListener(this);
+    Robot.removeConnectionListener(listenerHandle);
   }
 
   @Override
@@ -91,20 +93,20 @@ public class ConnectionIndicator extends StaticWidget implements IRemoteConnecti
   }
 
   @Override
-  public void connected(IRemote remote) {
-    System.out.println("ConnectionIndicator CONNECTED");
-    if (!connected) {
-      connected = true;
-      SwingUtilities.invokeLater(repainter);
+  public void accept(ConnectionNotification notification) {
+    if (notification.connected) {
+      System.out.println("ConnectionIndicator CONNECTED");
+      if (!connected) {
+        connected = true;
+        SwingUtilities.invokeLater(repainter);
+      } else {
+        System.out.println("ConnectionIndicator DISCONNECTED");
+        if (connected) {
+          connected = false;
+          SwingUtilities.invokeLater(repainter);
+        }
+      }
     }
   }
 
-  @Override
-  public void disconnected(IRemote remote) {
-    System.out.println("ConnectionIndicator DISCONNECTED");
-    if (connected) {
-      connected = false;
-      SwingUtilities.invokeLater(repainter);
-    }
-  }
 }

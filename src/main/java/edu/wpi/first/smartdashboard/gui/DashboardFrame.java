@@ -84,7 +84,8 @@ public class DashboardFrame extends JFrame {
   private boolean shouldHideMenu = prefs.hideMenu.getValue();
 
   private static final String LW_SAVE = "_"
-      + Robot.getLiveWindow().getSubTable(".status").getString("Robot", "LiveWindow") + ".xml";
+      + Robot.getLiveWindow().getSubTable(".status")
+      .getEntry("Robot").getString("LiveWindow") + ".xml";
 
   private final LogToCSV logger = new LogToCSV(this);
 
@@ -346,7 +347,7 @@ public class DashboardFrame extends JFrame {
           Widget e = (Widget) element;
           Object value = null;
           if (Robot.getTable().containsKey(e.getFieldName())) {
-            value = Robot.getTable().getValue(e.getFieldName(), null);
+            value = Robot.getTable().getEntry(e.getFieldName()).getValue();
             DataType type = DataType.getType(value);
             if (DisplayElementRegistry.supportsType(e.getClass(), type)) {
               smartDashboardPanel.setField(e.getFieldName(), e, type, value, e.getSavedLocation());
@@ -370,7 +371,7 @@ public class DashboardFrame extends JFrame {
         mostRecentParent = subsystem;
         Object value1 = null;
         if (Robot.getLiveWindow().containsKey(subsystem.getFieldName())) {
-          value1 = Robot.getTable().getValue(subsystem.getFieldName(), null);
+          value1 = Robot.getTable().getEntry(subsystem.getFieldName()).getValue();
           DataType type = DataType.getType(value1);
           if (DisplayElementRegistry.supportsType(subsystem.getClass(), type)) {
             liveWindowPanel.setField(subsystem.getFieldName(), subsystem, type, value1, subsystem

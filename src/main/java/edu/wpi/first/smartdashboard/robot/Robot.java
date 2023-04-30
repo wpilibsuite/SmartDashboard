@@ -1,8 +1,10 @@
 package edu.wpi.first.smartdashboard.robot;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.IRemoteConnectionListener;
-import edu.wpi.first.wpilibj.tables.ITable;
+import java.util.function.Consumer;
+
+import edu.wpi.first.networktables.ConnectionNotification;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * @author Joe
@@ -16,17 +18,16 @@ public class Robot {
   public static final String identity = "SmartDashboard";
 
   private static volatile String _host = "";
-  private static volatile int _port = NetworkTable.DEFAULT_PORT;
+  private static volatile int _port = NetworkTableInstance.kDefaultPort;
+  private static final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 
   static {
-    NetworkTable.setClientMode();
-    NetworkTable.setNetworkIdentity(identity);
-    NetworkTable.initialize();
+    ntInstance.startClient(identity);
   }
 
   public static void setTeam(int team) {
     _host = "roboRIO-" + team + "-FRC.local";
-    NetworkTable.setTeam(team);
+    ntInstance.setServerTeam(team);
   }
 
   public static void setHost(String host) {
@@ -41,7 +42,7 @@ public class Robot {
     } else {
       _host = host;
       System.out.println("Host: " + host);
-      NetworkTable.setIPAddress(host);
+      ntInstance.setServer(host);
     }
   }
 
@@ -49,45 +50,32 @@ public class Robot {
     return _host;
   }
 
-  public static void setPort(int port) {
-    if (_port == port) {
-      return;
-    }
-    _port = port;
-    try {
-      NetworkTable.shutdown();
-    } catch (IllegalStateException ex) {
-      // TODO
-    }
-    NetworkTable.setPort(port);
-    NetworkTable.initialize();
+
+  public static NetworkTable getTable(String tableName) {
+    return ntInstance.getTable(tableName);
   }
 
-  public static ITable getTable(String tableName) {
-    return NetworkTable.getTable(tableName);
+  public static NetworkTable getTable() {
+    return ntInstance.getTable(TABLE_NAME);
   }
 
-  public static ITable getTable() {
-    return NetworkTable.getTable(TABLE_NAME);
+  public static NetworkTable getPreferences() {
+    return ntInstance.getTable(PREFERENCES_NAME);
   }
 
-  public static ITable getPreferences() {
-    return NetworkTable.getTable(PREFERENCES_NAME);
+  public static NetworkTable getLiveWindow() {
+    return ntInstance.getTable(LIVE_WINDOW_NAME);
   }
 
-  public static ITable getLiveWindow() {
-    return NetworkTable.getTable(LIVE_WINDOW_NAME);
-  }
-
-  public static void addConnectionListener(IRemoteConnectionListener listener, boolean
+  public static int addConnectionListener(Consumer<ConnectionNotification> listener, boolean
       immediateNotify) {
     System.out.println("Adding connection listener");
-    NetworkTable.getTable(TABLE_NAME).addConnectionListener(listener, immediateNotify);
+    return ntInstance.addConnectionListener(listener, immediateNotify);
   }
 
-  public static void removeConnectionListener(IRemoteConnectionListener listener) {
+  public static void removeConnectionListener(int listenerHandle) {
     System.out.println("Removing connection listener");
-    NetworkTable.getTable(TABLE_NAME).removeConnectionListener(listener);
+    ntInstance.removeConnectionListener(listenerHandle);
   }
 
 }

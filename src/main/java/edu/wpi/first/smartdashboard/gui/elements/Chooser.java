@@ -1,12 +1,13 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.properties.BooleanProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.StringChooserType;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,7 +27,7 @@ import javax.swing.JRadioButton;
 /**
  * @author Joe Grinstead
  */
-public class Chooser extends AbstractTableWidget implements ITableListener {
+public class Chooser extends AbstractTableWidget {
 
   private static final String DEFAULT = "default";
   private static final String SELECTED = "selected";
@@ -53,19 +54,20 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
   }
 
   @Override
-  public void valueChanged(ITable source, String key, Object value, boolean isNew) {
+  public void valueChanged(NetworkTable source, String key, NetworkTableEntry entry,
+                           NetworkTableValue value, int flags) {
     if (key.equals(OPTIONS)) {
-      choices = Arrays.asList(table.getStringArray(OPTIONS, new String[]{}));
+      choices = Arrays.asList(table.getEntry(OPTIONS).getStringArray(new String[]{}));
       display.setChoices(choices);
     }
     //if(key.equals(DEFAULT))
     //    display.setDefault(source.getString(DEFAULT)); //TODO handle change in default?
     if (key.equals(SELECTED)) {
-      display.setSelected(source.getString(SELECTED, ""));
+      display.setSelected(source.getEntry(SELECTED).getString(""));
     }
 
     if (!source.containsKey(SELECTED)) {
-      source.putString(SELECTED, source.getString(DEFAULT, choices.get(0)));
+      source.getEntry(SELECTED).setString(source.getEntry(DEFAULT).getString(choices.get(0)));
     }
   }
 
@@ -159,16 +161,16 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
       }
 
       if (table != null && selection != null) {
-        table.putString(SELECTED, selection);
+        table.getEntry(SELECTED).setString(selection);
         if (buttons.get(selection) != null) {
           selected = buttons.get(selection);
           selected.setSelected(true);
         }
       } else {
         if (table != null && table.containsKey(DEFAULT)
-            && !table.getString(DEFAULT, "").equals("")) {
-          selection = table.getString(DEFAULT, "");
-          selected = buttons.get(table.getString(DEFAULT, ""));
+            && !table.getEntry(DEFAULT).getString("").equals("")) {
+          selection = table.getEntry(DEFAULT).getString("");
+          selected = buttons.get(table.getEntry(DEFAULT).getString(""));
           selected.setSelected(true);
         } else {
           selected = null;
@@ -198,14 +200,14 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
       String userChoice = e.getActionCommand();
       if (selection == null || !selection.equals(userChoice)) {
         selection = userChoice;
-        table.putString(SELECTED, selection);
+        table.getEntry(SELECTED).setString(selection);
       }
     }
   }
 
   private class ComboBox extends Display implements ItemListener {
 
-    JComboBox combo;
+    JComboBox<String> combo;
 
     @Override
     void setEditable(boolean editable) {
@@ -221,7 +223,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
         combo.removeItemListener(this);
       }
 
-      combo = new JComboBox();
+      combo = new JComboBox<String>();
 
       boolean hasSelection = false;
 
@@ -236,15 +238,15 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
       }
 
       if (table != null && table.containsKey(SELECTED)) {
-        selection = table.getString(SELECTED, "");
+        selection = table.getEntry(SELECTED).getString("");
       }
 
       if (table != null && selection != null) {
         combo.setSelectedItem(selection);
-        table.putString(SELECTED, selection);
+        table.getEntry(SELECTED).setString(selection);
       } else {
         if (table != null && table.containsKey(DEFAULT)) {
-          combo.setSelectedItem(table.getString(DEFAULT, ""));
+          combo.setSelectedItem(table.getEntry(DEFAULT).getString(""));
         }
       }
 
@@ -272,7 +274,7 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
         String userChoice = (String) e.getItem();
         if (!userChoice.equals(selection)) {
           selection = userChoice;
-          table.putString(SELECTED, selection);
+          table.getEntry(SELECTED).setString(selection);
         }
       }
     }

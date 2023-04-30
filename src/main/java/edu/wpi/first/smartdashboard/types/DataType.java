@@ -1,8 +1,8 @@
 package edu.wpi.first.smartdashboard.types;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.gui.elements.TextBox;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * @author Joe Grinstead
@@ -86,11 +86,11 @@ public class DataType {
   public static DataType getType(Object value) {
     if (value == null) {
       throw new IllegalArgumentException("Can not be given null value");
-    } else if (value instanceof ITable) {
-      ITable table = (ITable) value;
+    } else if (value instanceof NetworkTable) {
+      NetworkTable table = (NetworkTable) value;
 
       if (table.containsKey(".type")) {
-        String typeName = table.getString(".type", null);
+        String typeName = table.getEntry(".type").getString(null);
         return NamedDataType.get(typeName);
       } else {
         return DataType.TABLE;

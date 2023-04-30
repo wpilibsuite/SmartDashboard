@@ -4,8 +4,13 @@ import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
 import edu.wpi.first.smartdashboard.livewindow.elements.NameTag;
 import edu.wpi.first.smartdashboard.types.DataType;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.networktables.TableListener;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,8 +23,10 @@ import javax.swing.JComboBox;
  *
  * @author Mitchell
  */
-public abstract class AbstractTableWidget extends Widget implements ITableListener {
-  protected ITable table;
+public abstract class AbstractTableWidget extends Widget implements TableEntryListener, TableListener {
+  protected NetworkTable table;
+  protected int entryListenerHandle;
+  protected int tableListenerHandle;
 
   /**
    * A NameTag for this widget.
@@ -38,20 +45,22 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
 
   @Override
   public void setValue(Object value) {
-    if (value instanceof ITable) {
-      ITable table = (ITable) value;
+    if (value instanceof NetworkTable) {
+      NetworkTable table = (NetworkTable) value;
 
       if (table != null) {
-        table.removeTableListener(this);
+        // should this be this.table.removeTableListener?
+        table.removeTableListener(tableListenerHandle);
       }
 
       this.table = table;
       if (table != null) {
-        table.addTableListenerEx(this,
-            ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW
-                | ITable.NOTIFY_UPDATE);
+        entryListenerHandle = table.addEntryListener(this,
+            EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal 
+            | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
         if (listenSubtables) {
-          table.addSubTableListener(this, true);
+          tableListenerHandle = table.addSubTableListener(this, true);
         }
       }
     }
@@ -73,23 +82,21 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
   private Map<String, List<StringBindable>> stringFields = new HashMap<>();
 
   @Override
-  public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-    if (value instanceof Boolean) {
-      booleanChanged(source, key, ((Boolean) value).booleanValue(), isNew);
+  public void valueChanged(NetworkTable source, String key, NetworkTableEntry entry,
+                           NetworkTableValue value, int flags) {
+    boolean isNew = (flags & EntryListenerFlags.kNew) != 0;
+    if (value.isBoolean()) {
+      booleanChanged(source, key, value.getBoolean(), isNew);
     }
-    if (value instanceof Double) {
-      doubleChanged(source, key, ((Double) value).doubleValue(), isNew);
+    if (value.isDouble()) {
+      doubleChanged(source, key, value.getDouble(), isNew);
     }
-    if (value instanceof String) {
-      stringChanged(source, key, (String) value, isNew);
-    }
-    if (value instanceof ITable) {
-      tableChanged(source, key, (ITable) value, isNew);
+    if (value.isString()) {
+      stringChanged(source, key, value.getString(), isNew);
     }
   }
 
-
-  public void booleanChanged(ITable source, String key, boolean value, boolean isNew) {
+  public void booleanChanged(NetworkTable source, String key, boolean value, boolean isNew) {
     if (!booleanFields.containsKey(key)) {
       booleanFields.put(key, new ArrayList<>());
     }
@@ -97,7 +104,7 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
     field.stream().forEach(bindable -> bindable.setBindableValue(value));
   }
 
-  public void doubleChanged(ITable source, String key, double value, boolean isNew) {
+  public void doubleChanged(NetworkTable source, String key, double value, boolean isNew) {
     if (!numberFields.containsKey(key)) {
       numberFields.put(key, new ArrayList<>());
     }
@@ -105,7 +112,7 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
     field.stream().forEach(bindable -> bindable.setBindableValue(value));
   }
 
-  public void stringChanged(ITable source, String key, String value, boolean isNew) {
+  public void stringChanged(NetworkTable source, String key, String value, boolean isNew) {
     if (!stringFields.containsKey(key)) {
       stringFields.put(key, new ArrayList<>());
     }
@@ -113,7 +120,8 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
     field.stream().forEach(bindable -> bindable.setBindableValue(value));
   }
 
-  public void tableChanged(ITable source, String key, ITable value, boolean isNew) {
+  @Override
+  public void tableCreated(NetworkTable parent, String name, NetworkTable newTable) {
   }
 
 
@@ -122,21 +130,21 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
       @Override
       public void setBindableValue(boolean value) {
         if (table != null) {
-          table.putBoolean(key, value);
+          table.getEntry(key).setBoolean(value);
         }
       }
 
       @Override
       public void setBindableValue(double value) {
         if (table != null) {
-          table.putNumber(key, value);
+          table.getEntry(key).setNumber(value);
         }
       }
 
       @Override
       public void setBindableValue(String value) {
         if (table != null) {
-          table.putString(key, value);
+          table.getEntry(key).setString(value);
         }
       }
     };
@@ -199,7 +207,7 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
       super(items);
       getTableEntryBindable(key);
       setStringBinding(key, this, "");
-      addActionListener(e -> table.putString(key, (String) getSelectedItem()));
+      addActionListener(e -> table.getEntry(key).setString((String) getSelectedItem()));
     }
 
     @Override
@@ -213,7 +221,7 @@ public abstract class AbstractTableWidget extends Widget implements ITableListen
       super(items);
       getTableEntryBindable(key);
       setNumberBinding(key, this);
-      addActionListener(e -> table.putNumber(key, getSelectedIndex()));
+      addActionListener(e -> table.getEntry(key).setNumber(getSelectedIndex()));
     }
 
     @Override

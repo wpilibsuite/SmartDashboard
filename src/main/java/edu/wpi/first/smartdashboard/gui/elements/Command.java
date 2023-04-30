@@ -5,7 +5,7 @@ import edu.wpi.first.smartdashboard.properties.ColorProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.CommandType;
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -45,7 +45,7 @@ public class Command extends AbstractTableWidget {
     start.addActionListener(new ActionListener() {
 
       public void actionPerformed(ActionEvent e) {
-        table.putBoolean("running", true);
+        table.getEntry("running").setBoolean(true);
       }
     });
     start.setForeground(startBackground.getValue());
@@ -57,7 +57,7 @@ public class Command extends AbstractTableWidget {
     cancel.addActionListener(new ActionListener() {
 
       public void actionPerformed(ActionEvent e) {
-        table.putBoolean("running", false);
+        table.getEntry("running").setBoolean(false);
       }
     });
     cancel.setForeground(cancelBackground.getValue());
@@ -70,7 +70,7 @@ public class Command extends AbstractTableWidget {
   }
 
   @Override
-  public void booleanChanged(ITable source, String key, final boolean value, boolean isNew) {
+  public void booleanChanged(NetworkTable source, String key, final boolean value, boolean isNew) {
     if (key.equals("running")) {
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {

@@ -93,49 +93,53 @@ public class FileSniffer {
       try {
         classLoader.addURL(file.toURI().toURL());
         JarFile jarFile = new JarFile(file);
-        Enumeration<JarEntry> entries = jarFile.entries();
-        while (entries.hasMoreElements()) {
-          JarEntry entry = entries.nextElement();
-          if (entry.isDirectory()) {
-            continue;
-          }
-          if (entry.getName().endsWith(".class")) {
-            try {
-              String className = entry.getName();
-              className = className.substring(0, className.length() - 6);
-              className = className.replace('/', '.');
-              Class<?> clazz = classLoader.loadClass(className);
-              if (Widget.class.isAssignableFrom(clazz)) {
-                System.out.println("Custom Widget Loaded: " + clazz.getSimpleName());
-                DisplayElementRegistry.registerWidget(clazz.asSubclass(Widget.class));
-              } else if (StaticWidget.class.isAssignableFrom(clazz)) {
-                System.out.println("Custom Static Widget Loaded: " + clazz.getSimpleName());
-                DisplayElementRegistry.registerStaticWidget(clazz.asSubclass(StaticWidget.class));
-              } else if (NamedDataType.class.isAssignableFrom(clazz)) {
-                try {
-                  Object ret = clazz.asSubclass(NamedDataType.class).getMethod("get").invoke(null);
-                  if (ret == null) {
-                    System.out.println(
-                        "ERROR: custom named data type " + clazz.getSimpleName()
-                        + " failed to load"
-                    );
-                  } else {
-                    System.out.println("Custom Named Data Type Loaded: " + clazz.getSimpleName());
+        try {
+          Enumeration<JarEntry> entries = jarFile.entries();
+          while (entries.hasMoreElements()) {
+            JarEntry entry = entries.nextElement();
+            if (entry.isDirectory()) {
+              continue;
+            }
+            if (entry.getName().endsWith(".class")) {
+              try {
+                String className = entry.getName();
+                className = className.substring(0, className.length() - 6);
+                className = className.replace('/', '.');
+                Class<?> clazz = classLoader.loadClass(className);
+                if (Widget.class.isAssignableFrom(clazz)) {
+                  System.out.println("Custom Widget Loaded: " + clazz.getSimpleName());
+                  DisplayElementRegistry.registerWidget(clazz.asSubclass(Widget.class));
+                } else if (StaticWidget.class.isAssignableFrom(clazz)) {
+                  System.out.println("Custom Static Widget Loaded: " + clazz.getSimpleName());
+                  DisplayElementRegistry.registerStaticWidget(clazz.asSubclass(StaticWidget.class));
+                } else if (NamedDataType.class.isAssignableFrom(clazz)) {
+                  try {
+                    Object ret = clazz.asSubclass(NamedDataType.class).getMethod("get").invoke(null);
+                    if (ret == null) {
+                      System.out.println(
+                          "ERROR: custom named data type " + clazz.getSimpleName()
+                          + " failed to load"
+                      );
+                    } else {
+                      System.out.println("Custom Named Data Type Loaded: " + clazz.getSimpleName());
+                    }
+                  } catch (Exception e) {
+                    e.printStackTrace();
                   }
-                } catch (Exception e) {
-                  e.printStackTrace();
                 }
+              } catch (ClassNotFoundException e) {
+                e.printStackTrace();
               }
-            } catch (ClassNotFoundException e) {
-              e.printStackTrace();
             }
           }
-        }
-      } catch (MalformedURLException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
+        } finally {jarFile.close();}
       }
+      catch (MalformedURLException e) {
+        e.printStackTrace();
+      } 
+      catch (IOException e) {
+        e.printStackTrace();
+      } 
     }
 
     monitor.setProgress(max);

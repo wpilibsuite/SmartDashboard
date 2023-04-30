@@ -1,5 +1,10 @@
 package edu.wpi.first.smartdashboard.livewindow.elements;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.TableEntryListener;
 import edu.wpi.first.smartdashboard.gui.MainPanel;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
@@ -7,8 +12,6 @@ import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.LWSubsystemType;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLReader;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -20,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
+import javax.swing.RowFilter.Entry;
 
 /**
  * The main player in the Live Window. Subsystems hold every component that
@@ -75,7 +79,7 @@ public class LWSubsystem extends AbstractTableWidget {
     addMouseMotionListener(mouse);
   }
 
-  private void addSubsystemElement(String key, ITable value) {
+  private void addSubsystemElement(String key, NetworkTable value) {
     // don't add duplicate widgets
     for (Widget widget : widgets) {
       if (widget != null && widget.getFieldName().equals(key)) {
@@ -86,7 +90,7 @@ public class LWSubsystem extends AbstractTableWidget {
       System.out.println(
           "\nSubsystem \"" + getFieldName() + "\" does not contain widget \"" + key + "\"");
       System.out.println("Table: " + value);
-      System.out.println("Type: " + value.getString(".type", null));
+      System.out.println("Type: " + value.getEntry(".type").getString(null));
       System.out.println(
           "Trying to add a widget of type \"" + DataType.getType(value) + "\" and key " + key);
       Class<? extends Widget> widgetClass = DataType.getType(value).getDefault();
@@ -117,24 +121,39 @@ public class LWSubsystem extends AbstractTableWidget {
    * @param isNew Required by ITableListener. Not used.
    */
   @Override
-  public void tableChanged(ITable source, final String key, final ITable table, boolean isNew) {
+  public void tableCreated(final NetworkTable parent, final String key, 
+                           final NetworkTable newTable) {
     boolean alreadyHasWidget = false;
     if (reader != null) {
       alreadyHasWidget = reader.containsWidgetOfName(this, key);
     }
 
     if (!alreadyHasWidget) {
-      table.addTableListenerEx(".type", new ITableListener() {
-        public void valueChanged(final ITable typeSource, final String typeKey, final Object
-            typeValue, final boolean typeIsNew) {
-          table.removeTableListener(this);
+      abstract class TEListenerWithHandle implements TableEntryListener {
+        int myHandle;
+        public abstract void valueChanged(final NetworkTable typeSource, final String typeKey,
+                                 final NetworkTableEntry typeEntry, 
+                                 final NetworkTableValue typeValue, final int flags);
+        public void setHandle(int handle) { myHandle = handle; }
+      };
+      var listener = new TEListenerWithHandle() {
+        public void valueChanged(final NetworkTable typeSource, final String typeKey, 
+                                 NetworkTableEntry entry, NetworkTableValue typeValue, 
+                                 int flags) {
+          newTable.removeTableListener(myHandle);
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-              addSubsystemElement(key, table);
+              addSubsystemElement(key, newTable);
             }
           });
-        }
-      }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
+        };
+      };
+      listener.setHandle(
+        newTable.addEntryListener(".type", listener, 
+          EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | 
+          EntryListenerFlags.kNew | EntryListenerFlags.kUpdate
+        )
+      );
     }
   }
 

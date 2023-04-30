@@ -1,8 +1,8 @@
 package edu.wpi.livewindowfakerobot;
 
 import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
 import edu.wpi.first.wpiutil.WPIUtilJNI;
 
@@ -16,9 +16,9 @@ import java.util.TimerTask;
  */
 public class LiveWindowFakeRobot {
     
-    private static final NetworkTable liveWindow = NetworkTable.getTable("LiveWindow");
+    private static final NetworkTable liveWindow = NetworkTableInstance.getDefault().getTable("LiveWindow");
     
-    private static final ITable STATUS          = createTable(liveWindow, ".status", "LW Status"),
+    private static final NetworkTable STATUS          = createTable(liveWindow, ".status", "LW Status"),
             
                                 wrist           = createTable(liveWindow, "Wrist", "LW Subsystem"),
                                 wPotentiometer  = createTable(wrist, "Potentiometer", "Analog Input"),
@@ -55,49 +55,49 @@ public class LiveWindowFakeRobot {
         
         System.out.println();
         
-        STATUS.putBoolean("LW Enabled", true);
-        STATUS.putString("Robot", "Testing");
-        wPotentiometer.putNumber("Value", 2.6);
-        ePotentiometer.putNumber("Value", -11.6872);
-        tSwitch.putString("Value", "Off");
+        STATUS.getEntry("LW Enabled").setBoolean(true);
+        STATUS.getEntry("Robot").setString("Testing");
+        wPotentiometer.getEntry("Value").setDouble(2.6);
+        ePotentiometer.getEntry("Value").setDouble(-11.6872);
+        tSwitch.getEntry("Value").setString("Off");
         
-        elevator.putNumber("p", 0.5);
-        elevator.putNumber("i", 0.5);
-        elevator.putNumber("d", 0.5);
-        elevator.putNumber("f", 0.5);
-        elevator.putNumber("setpoint", 0.5);
-        elevator.putBoolean("enabled", false);
+        elevator.getEntry("p").setDouble(0.5);
+        elevator.getEntry("i").setDouble(0.5);
+        elevator.getEntry("d").setDouble(0.5);
+        elevator.getEntry("f").setDouble(0.5);
+        elevator.getEntry("setpoint").setDouble(0.5);
+        elevator.getEntry("enabled").setBoolean(false);
         
-        canJag.putString("Type", "CANJaguar");
-        canTalon.putString("Type", "CANTalon");
+        canJag.getEntry("Type").setString("CANJaguar");
+        canTalon.getEntry("Type").setString("CANTalon");
         
         
         (new Timer()).schedule(
             new TimerTask(){
                 @Override
                 public void run() {
-                    wPotentiometer.putNumber("Value", (Math.random()-.5) * 24);
-                    ePotentiometer.putNumber("Value", (Math.random()-.5) * 24);
-                    tPotentiometer.putNumber("Value", (Math.random()-.5) * 24);
-                    tGyro.putNumber("Value", Math.random() * 360);
-                    tAccel.putNumber("Value", (Math.random()-.5)*8);
-                    tSwitch.putString("Value", Math.random() < 0.5 ? "On" : "Off");
-                    tEncoder1.putNumber("Speed", Math.random() * 20);
-                    tEncoder1.putNumber("Distance", Math.random() * 10);
-                    tEncoder1.putNumber("Distance per Tick", Math.random());
-                    tCompass.putNumber("Value", Math.random());
-                    tUltra.putNumber("Value", (Math.random()-.5) * 200);
-                    tGearTooth.putNumber("Value", (int)(Math.random() * 100));
+                    wPotentiometer.getEntry("Value").setDouble((Math.random()-.5) * 24);
+                    ePotentiometer.getEntry("Value").setDouble((Math.random()-.5) * 24);
+                    tPotentiometer.getEntry("Value").setDouble((Math.random()-.5) * 24);
+                    tGyro.getEntry("Value").setDouble(Math.random() * 360);
+                    tAccel.getEntry("Value").setDouble((Math.random()-.5)*8);
+                    tSwitch.getEntry("Value").setString(Math.random() < 0.5 ? "On" : "Off");
+                    tEncoder1.getEntry("Speed").setDouble(Math.random() * 20);
+                    tEncoder1.getEntry("Distance").setDouble(Math.random() * 10);
+                    tEncoder1.getEntry("Distance per Tick").setDouble(Math.random());
+                    tCompass.getEntry("Value").setDouble(Math.random());
+                    tUltra.getEntry("Value").setDouble((Math.random()-.5) * 200);
+                    tGearTooth.getEntry("Value").setDouble((int)(Math.random() * 100));
                 }}, 
             0, 500);
         
     }
     
-    private static ITable createTable(ITable parent, String name, String type) {
-        ITable table = parent.getSubTable(name);
+    private static NetworkTable createTable(NetworkTable parent, String name, String type) {
+        NetworkTable table = parent.getSubTable(name);
         System.out.println(table);
-        table.putString(".type", type);
-        table.putString("Name", name);
+        table.getEntry(".type").setValue(type);
+        table.getEntry("Name").setValue(name);
         return table;
     }
 }

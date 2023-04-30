@@ -22,7 +22,7 @@ public class CommandButton extends AbstractTableWidget {
     start.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        table.putBoolean("running", true);
+        table.getEntry("running").setBoolean(true);
       }
     });
 

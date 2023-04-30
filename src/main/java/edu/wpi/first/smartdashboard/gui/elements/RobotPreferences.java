@@ -4,9 +4,12 @@ import edu.wpi.first.networktables.PersistentException;
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.robot.Robot;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.networktables.EntryListenerFlags;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -38,9 +41,10 @@ import org.jfree.ui.ExtensionFileFilter;
 /**
  * @author Joe Grinstead
  */
-public class RobotPreferences extends StaticWidget implements ITableListener {
+public class RobotPreferences extends StaticWidget implements TableEntryListener {
 
   public static final String NAME = "Robot Preferences";
+  private int preferencesListener;
   private JTable table;
   private PreferenceTableModel model;
   private Map<String, Object> values;
@@ -128,9 +132,9 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
 
     values = new LinkedHashMap<String, Object>();
 
-    Robot.getPreferences().addTableListenerEx(this,
-        ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_DELETE
-            | ITable.NOTIFY_UPDATE);
+    preferencesListener = Robot.getPreferences().addEntryListener (this,
+        EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
+        | EntryListenerFlags.kDelete | EntryListenerFlags.kUpdate );
 
     model = new PreferenceTableModel();
 
@@ -163,7 +167,7 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
 
   @Override
   public void disconnect() {
-    Robot.getPreferences().removeTableListener(this);
+    Robot.getPreferences().removeEntryListener(preferencesListener);
   }
 
   @Override
@@ -171,21 +175,18 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
   }
 
   @Override
-  public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-  }
-
-  @Override
-  public void valueChangedEx(ITable source, String key, Object value, int flags) {
-    if ((flags & ITable.NOTIFY_DELETE) != 0) {
+  public void valueChanged(NetworkTable source, String key, NetworkTableEntry ntEntry, NetworkTableValue ntValue, int flags) {
+    if ((flags & EntryListenerFlags.kDelete) != 0) {
       values.remove(key);
     } else {
-      values.put(key, value);
+      values.put(key, ntValue);
     }
 
     if (model != null) {
       model.fireTableDataChanged();
     }
-  }
+  };
+
 
   private static final String[] typeNames
       = new String[]{"Boolean", "Number", "String", "Raw", "Boolean[]", "Number[]", "String[]"};
@@ -409,8 +410,9 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
 
     public boolean put(String key, Object value) {
       if (validateKey(key)) {
-        Robot.getPreferences().putValue(key, value);
-        Robot.getPreferences().setPersistent(key);
+        var entry = Robot.getPreferences().getEntry(key);
+        entry.setValue(value);
+        entry.setFlags(NetworkTableEntry.kPersistent);
         return true;
       }
       return false;
@@ -425,8 +427,9 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
       if (valueObj == null) {
         return false;
       }
-      Robot.getPreferences().putValue(key, valueObj);
-      Robot.getPreferences().setPersistent(key);
+      var entry = Robot.getPreferences().getEntry(key);
+      entry.setValue(valueObj);
+      entry.setFlags(NetworkTableEntry.kPersistent);
       return true;
     }
 
@@ -450,10 +453,10 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
           String lower = value.toLowerCase(Locale.ENGLISH);
           if (lower.equals("y") || lower.equals("yes") || lower.equals("t") || lower.equals("true")
               || lower.equals("on") || lower.equals("1")) {
-            return new Boolean(true);
+            return Boolean.TRUE;
           } else if (lower.equals("n") || lower.equals("no") || lower.equals("f")
               || lower.equals("false") || lower.equals("off") || lower.equals("0")) {
-            return new Boolean(false);
+            return Boolean.FALSE;
           } else {
             JOptionPane.showMessageDialog(RobotPreferences.this, "Invalid boolean value; expected"
                 + " one of yes, true, 1, no, false, 0", "Bad Value", JOptionPane.ERROR_MESSAGE);
@@ -705,7 +708,7 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
 
     public void save(String filename) {
       try {
-        NetworkTable.savePersistent(filename);
+        NetworkTableInstance.getDefault().savePersistent(filename);
       } catch (PersistentException e) {
         JOptionPane.showMessageDialog(RobotPreferences.this,
             "Error saving file:" + e.getMessage(), "Save Preferences", JOptionPane.ERROR_MESSAGE);
@@ -715,7 +718,7 @@ public class RobotPreferences extends StaticWidget implements ITableListener {
     public void load(String filename) {
       String[] warnings;
       try {
-        warnings = NetworkTable.loadPersistent(filename);
+        warnings = NetworkTableInstance.getDefault().loadPersistent(filename);
         if (warnings.length > 0) {
           JOptionPane.showMessageDialog(RobotPreferences.this, "Warning loading file:"
               + Arrays.toString(warnings), "Load Preferences", JOptionPane.WARNING_MESSAGE);

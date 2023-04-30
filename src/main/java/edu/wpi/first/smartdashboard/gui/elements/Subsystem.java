@@ -7,14 +7,13 @@ import edu.wpi.first.smartdashboard.properties.ColorProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.SubsystemType;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 
 /**
  * @author Joe Grinstead
  */
-public class Subsystem extends AbstractTableWidget implements ITableListener {
+public class Subsystem extends AbstractTableWidget {
 
   public static final DataType[] TYPES = {SubsystemType.get()};
 

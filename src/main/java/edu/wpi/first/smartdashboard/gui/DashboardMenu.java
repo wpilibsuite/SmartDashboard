@@ -5,8 +5,11 @@ import edu.wpi.first.smartdashboard.livewindow.elements.Controller;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.TableEntryListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -63,7 +66,7 @@ public class DashboardMenu extends JMenuBar {
     newMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
     newMenu.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        mainPanel.getPanel("SmartDashboard").clear();
+        MainPanel.getPanel("SmartDashboard").clear();
       }
     });
     fileMenu.add(newMenu);
@@ -172,11 +175,11 @@ public class DashboardMenu extends JMenuBar {
       }
     });
     resetLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
-    Robot.getLiveWindow().getSubTable(".status").addTableListenerEx("LW Enabled", new
-        ITableListener() {
-      public void valueChanged(ITable itable, String string, Object o, boolean bln) {
+    Robot.getLiveWindow().getSubTable(".status").addEntryListener("LW Enabled", new
+        TableEntryListener() {
+      public void valueChanged(NetworkTable table, String string, NetworkTableEntry e, NetworkTableValue v, int flags) {
         final boolean isInLW
-            = Robot.getLiveWindow().getSubTable(".status").getBoolean("LW Enabled", false);
+            = Robot.getLiveWindow().getSubTable(".status").getEntry("LW Enabled").getBoolean(false);
 
         SwingUtilities.invokeLater(new Runnable() {
           public void run() {
@@ -194,7 +197,8 @@ public class DashboardMenu extends JMenuBar {
           }
         });
       }
-    }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
+    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
+       | EntryListenerFlags.kUpdate);
     viewMenu.add(resetLW);
 
     JMenu addMenu = new JMenu("Add...");
@@ -204,8 +208,9 @@ public class DashboardMenu extends JMenuBar {
       item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           try {
+            @SuppressWarnings("deprecation")
             StaticWidget element = option.newInstance();
-            mainPanel.getPanel("SmartDashboard").addElement(element, null);
+            MainPanel.getPanel("SmartDashboard").addElement(element, null);
           } catch (InstantiationException ex) {
             // TODO
           } catch (IllegalAccessException ex) {
@@ -226,12 +231,12 @@ public class DashboardMenu extends JMenuBar {
         revealMenu.removeAll();
 
         int count = 0;
-        for (final String field : mainPanel.getPanel("SmartDashboard").getHiddenFields()) {
-          if (mainPanel.getPanel("SmartDashboard").getTable().containsKey(field)) {
+        for (final String field : MainPanel.getPanel("SmartDashboard").getHiddenFields()) {
+          if (MainPanel.getPanel("SmartDashboard").getTable().containsKey(field)) {
             count++;
             revealMenu.add(new JMenuItem(new AbstractAction(field) {
               public void actionPerformed(ActionEvent e) {
-                mainPanel.getPanel("SmartDashboard").addField(field);
+                MainPanel.getPanel("SmartDashboard").addField(field);
               }
             }));
           }

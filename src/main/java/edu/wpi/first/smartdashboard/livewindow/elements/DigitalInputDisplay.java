@@ -4,7 +4,6 @@ import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.DigitalInputType;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import javax.swing.BoxLayout;
 
 /**
@@ -12,7 +11,7 @@ import javax.swing.BoxLayout;
  *
  * @author Sam
  */
-public class DigitalInputDisplay extends AbstractTableWidget implements ITableListener {
+public class DigitalInputDisplay extends AbstractTableWidget {
 
   public static final DataType[] TYPES = {DigitalInputType.get()};
 

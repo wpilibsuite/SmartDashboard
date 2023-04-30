@@ -1,11 +1,11 @@
 package edu.wpi.first.smartdashboard.gui;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.BooleanBindable;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.NumberBindable;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.StringBindable;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
-import edu.wpi.first.wpilibj.tables.ITable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -523,27 +523,27 @@ public abstract class Widget extends DisplayElement {
   public static class BindableTableEntry implements BooleanBindable, NumberBindable,
       StringBindable {
 
-    private final ITable table;
+    private final NetworkTable table;
     private final String key;
 
-    public BindableTableEntry(ITable table, String key) {
+    public BindableTableEntry(NetworkTable table, String key) {
       this.table = table;
       this.key = key;
     }
 
     @Override
     public void setBindableValue(String value) {
-      table.putString(key, value);
+      table.getEntry(key).setString(value);
     }
 
     @Override
     public void setBindableValue(double value) {
-      table.putNumber(key, value);
+      table.getEntry(key).setDouble(value);
     }
 
     @Override
     public void setBindableValue(boolean value) {
-      table.putBoolean(key, value);
+      table.getEntry(key).setValue(value);
     }
   }
 
