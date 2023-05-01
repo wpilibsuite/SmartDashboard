@@ -555,7 +555,7 @@ public class DashboardPanel extends JPanel {
         if (!hiddenFields.contains(key)) {
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
-                setField(key, null, value, null);
+                setField(key, null, value.getValue(), null);
               }
             });
         }

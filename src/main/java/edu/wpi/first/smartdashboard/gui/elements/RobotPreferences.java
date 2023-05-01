@@ -179,7 +179,7 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
     if ((flags & EntryListenerFlags.kDelete) != 0) {
       values.remove(key);
     } else {
-      values.put(key, ntValue);
+      values.put(key, ntValue.getValue());
     }
 
     if (model != null) {

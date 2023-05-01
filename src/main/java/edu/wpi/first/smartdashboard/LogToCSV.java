@@ -80,7 +80,7 @@ public class LogToCSV implements TableEntryListener {
     if (m_fw != null) {
       try {
         long timeStamp = System.currentTimeMillis() - m_startTime;
-        m_fw.write(timeStamp + "," + "\"" + key + "\"," + "\"" + value + "\"" + s_lineSeparator);
+        m_fw.write(timeStamp + "," + "\"" + key + "\"," + "\"" + value.getValue() + "\"" + s_lineSeparator);
         m_fw.flush();
       } catch (IOException ex) {
         ex.printStackTrace();
