@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.RowFilter.Entry;
@@ -69,11 +70,15 @@ public class LWSubsystem extends AbstractTableWidget {
    */
   public void init() {
     layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+    var border = BorderFactory.createTitledBorder(getFieldName());
+    var borderWidth = 2*(border.getBorderInsets(this).left + border.getBorderInsets(this).right);
+    borderWidth += this.getFontMetrics(this.getFont()).stringWidth(getFieldName());
     setLayout(layout);
     setObstruction(true);
     setOpaque(true);
     setVisible(true);
-    setBorder(BorderFactory.createTitledBorder(getFieldName()));
+    add(Box.createHorizontalStrut(borderWidth));
+    setBorder(border);
     mouse = new Mouse(this);
     addMouseListener(mouse);
     addMouseMotionListener(mouse);

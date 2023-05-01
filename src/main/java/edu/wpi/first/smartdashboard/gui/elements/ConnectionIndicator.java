@@ -99,12 +99,12 @@ public class ConnectionIndicator extends StaticWidget implements Consumer<Connec
       if (!connected) {
         connected = true;
         SwingUtilities.invokeLater(repainter);
-      } else {
-        System.out.println("ConnectionIndicator DISCONNECTED");
-        if (connected) {
-          connected = false;
-          SwingUtilities.invokeLater(repainter);
-        }
+      } 
+    } else {
+      System.out.println("ConnectionIndicator DISCONNECTED");
+      if (connected) {
+        connected = false;
+        SwingUtilities.invokeLater(repainter);
       }
     }
   }

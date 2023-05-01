@@ -347,7 +347,7 @@ public class DashboardFrame extends JFrame {
           Widget e = (Widget) element;
           Object value = null;
           if (Robot.getTable().containsKey(e.getFieldName())) {
-            value = Robot.getTable().getEntry(e.getFieldName()).getValue();
+            value = Robot.getTable().getEntry(e.getFieldName()).getValue().getValue();
             DataType type = DataType.getType(value);
             if (DisplayElementRegistry.supportsType(e.getClass(), type)) {
               smartDashboardPanel.setField(e.getFieldName(), e, type, value, e.getSavedLocation());
