@@ -590,7 +590,7 @@ public class DashboardPanel extends JPanel {
           public void setHandle(int handle) { myHandle = handle; }
         };
         TEListenerWithHandle teListener = new TEListenerWithHandle();
-        teListener.setHandle(table.addEntryListener(".type", teListener, 
+        teListener.setHandle(newTable.addEntryListener(".type", teListener, 
           EntryListenerFlags.kImmediate            
           | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
           | EntryListenerFlags.kUpdate));
