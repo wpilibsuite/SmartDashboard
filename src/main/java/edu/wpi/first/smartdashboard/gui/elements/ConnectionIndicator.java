@@ -1,6 +1,6 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
-import edu.wpi.first.networktables.ConnectionNotification;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.properties.ColorProperty;
 import edu.wpi.first.smartdashboard.properties.MultiProperty;
@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
 /**
  * @author Joe Grinstead
  */
-public class ConnectionIndicator extends StaticWidget implements Consumer<ConnectionNotification> {
+public class ConnectionIndicator extends StaticWidget implements Consumer<NetworkTableEvent> {
 
   public static final String NAME = "Connection Indicator";
   private static final int DRAW_EMBOSSED = 0;
@@ -93,8 +93,8 @@ public class ConnectionIndicator extends StaticWidget implements Consumer<Connec
   }
 
   @Override
-  public void accept(ConnectionNotification notification) {
-    if (notification.connected) {
+  public void accept(NetworkTableEvent event) {
+    if (event.is(NetworkTableEvent.Kind.kConnected)) {
       System.out.println("ConnectionIndicator CONNECTED");
       if (!connected) {
         connected = true;

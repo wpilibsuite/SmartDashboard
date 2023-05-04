@@ -5,15 +5,17 @@ import edu.wpi.first.smartdashboard.livewindow.elements.Controller;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.TableEntryListener;
+
+import edu.wpi.first.networktables.NetworkTableEvent;
+
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.EnumSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
@@ -175,9 +177,11 @@ public class DashboardMenu extends JMenuBar {
       }
     });
     resetLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
-    Robot.getLiveWindow().getSubTable(".status").addEntryListener("LW Enabled", new
-        TableEntryListener() {
-      public void valueChanged(NetworkTable table, String string, NetworkTableEntry e, NetworkTableValue v, int flags) {
+    Robot.getLiveWindow().getSubTable(".status").addListener("LW Enabled", 
+      EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+      new
+        TableEventListener() {
+      public void accept(NetworkTable table, String string, NetworkTableEvent e) {
         final boolean isInLW
             = Robot.getLiveWindow().getSubTable(".status").getEntry("LW Enabled").getBoolean(false);
 
@@ -197,8 +201,7 @@ public class DashboardMenu extends JMenuBar {
           }
         });
       }
-    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
-       | EntryListenerFlags.kUpdate);
+    });
     viewMenu.add(resetLW);
 
     JMenu addMenu = new JMenu("Add...");

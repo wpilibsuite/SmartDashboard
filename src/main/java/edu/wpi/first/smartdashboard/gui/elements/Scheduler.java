@@ -1,10 +1,8 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
@@ -16,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -47,14 +46,13 @@ public class Scheduler extends Widget {
   private List<Double> toCancel = new ArrayList<>();
 
   private int listenerHandle;
-  private TableEntryListener listener = new TableEntryListener() {
+  private TableEventListener listener = new TableEventListener() {
 
     boolean running = false;
 
     @Override
-    public void valueChanged(NetworkTable source, String key, 
-                             NetworkTableEntry entry,
-                             NetworkTableValue value, int flags) {
+    public void accept(NetworkTable source, String key, 
+                             NetworkTableEvent event) {
       if (running) {
         return;
       }
@@ -118,12 +116,13 @@ public class Scheduler extends Widget {
   @Override
   public void setValue(Object value) {
     if (table != null) {
-      table.removeTableListener(listenerHandle);
+      table.removeListener(listenerHandle);
     }
     table = (NetworkTable) value;
-    listenerHandle = table.addEntryListener(listener,
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal 
-      | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    listenerHandle = table.addListener(
+      EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish,
+                 NetworkTableEvent.Kind.kValueAll),
+                 listener);
 
     revalidate();
     repaint();

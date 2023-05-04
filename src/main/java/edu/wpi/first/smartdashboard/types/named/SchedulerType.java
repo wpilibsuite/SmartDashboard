@@ -1,7 +1,6 @@
 package edu.wpi.first.smartdashboard.types.named;
 
 import edu.wpi.first.smartdashboard.types.NamedDataType;
-import edu.wpi.first.smartdashboard.gui.elements.Scheduler;
 
 /**
  * @author Joe Grinstead

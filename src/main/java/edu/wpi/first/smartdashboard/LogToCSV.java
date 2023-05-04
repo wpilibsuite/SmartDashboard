@@ -1,14 +1,14 @@
 package edu.wpi.first.smartdashboard;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.EnumSet;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
  *
  * @author pmalmsten
  */
-public class LogToCSV implements TableEntryListener {
+public class LogToCSV implements TableEventListener {
 
   private static final String s_lineSeparator = System.getProperty("line.separator");
   private long m_startTime;
@@ -42,9 +42,10 @@ public class LogToCSV implements TableEntryListener {
         m_fw = new FileWriter(path);
         m_fw.write("Time (ms),Name,Value" + s_lineSeparator);
         m_fw.flush();
-        listenerHandle = Robot.getTable().addEntryListener(this,
-            EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal
-          | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+        listenerHandle = Robot.getTable().addListener(
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+                       NetworkTableEvent.Kind.kPublish),
+            this);
       } catch (IOException ex) {
         ex.printStackTrace();
         JOptionPane.showMessageDialog(null,
@@ -70,17 +71,17 @@ public class LogToCSV implements TableEntryListener {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
-    Robot.getTable().removeTableListener(listenerHandle);
+    Robot.getTable().removeListener(listenerHandle);
     m_fw = null;
   }
 
   @Override
-  public void valueChanged(NetworkTable source, String key, 
-                           NetworkTableEntry entry, NetworkTableValue value, int flags) {
+  public void accept(NetworkTable source, String key, 
+                     NetworkTableEvent event) {
     if (m_fw != null) {
       try {
         long timeStamp = System.currentTimeMillis() - m_startTime;
-        m_fw.write(timeStamp + "," + "\"" + key + "\"," + "\"" + value.getValue() + "\"" + s_lineSeparator);
+        m_fw.write(timeStamp + "," + "\"" + key + "\"," + "\"" + event.valueData.value.getValue() + "\"" + s_lineSeparator);
         m_fw.flush();
       } catch (IOException ex) {
         ex.printStackTrace();

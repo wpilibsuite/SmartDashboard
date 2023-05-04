@@ -1,15 +1,11 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
-import edu.wpi.first.networktables.PersistentException;
 import edu.wpi.first.smartdashboard.gui.StaticWidget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.TableEntryListener;
-import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -19,6 +15,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -27,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -36,12 +32,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
-import org.jfree.ui.ExtensionFileFilter;
 
 /**
  * @author Joe Grinstead
  */
-public class RobotPreferences extends StaticWidget implements TableEntryListener {
+public class RobotPreferences extends StaticWidget implements TableEventListener {
 
   public static final String NAME = "Robot Preferences";
   private int preferencesListener;
@@ -84,7 +79,10 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
         }
       }
     });
-
+    
+    
+    /* I think persistence is now handled entirely by the server */
+    /*
     save = new JButton("Save");
     save.addActionListener(new ActionListener() {
 
@@ -129,12 +127,14 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
         }
       }
     });
+    */
 
     values = new LinkedHashMap<String, Object>();
 
-    preferencesListener = Robot.getPreferences().addEntryListener (this,
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
-        | EntryListenerFlags.kDelete | EntryListenerFlags.kUpdate );
+    preferencesListener = Robot.getPreferences().addListener (
+        EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+          NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kUnpublish),
+        this);
 
     model = new PreferenceTableModel();
 
@@ -148,8 +148,6 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
     buttonPanel.setLayout(new GridLayout(0, 4));
     buttonPanel.add(add);
     buttonPanel.add(remove);
-    buttonPanel.add(save);
-    buttonPanel.add(load);
 
     JPanel controlPanel = new JPanel();
     controlPanel.setLayout(new BorderLayout());
@@ -167,7 +165,7 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
 
   @Override
   public void disconnect() {
-    Robot.getPreferences().removeEntryListener(preferencesListener);
+    Robot.getPreferences().removeListener(preferencesListener);
   }
 
   @Override
@@ -175,11 +173,11 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
   }
 
   @Override
-  public void valueChanged(NetworkTable source, String key, NetworkTableEntry ntEntry, NetworkTableValue ntValue, int flags) {
-    if ((flags & EntryListenerFlags.kDelete) != 0) {
+  public void accept(NetworkTable source, String key, NetworkTableEvent event) {
+    if (event.is(NetworkTableEvent.Kind.kUnpublish)) {
       values.remove(key);
     } else {
-      values.put(key, ntValue.getValue());
+      if (event.valueData != null) values.put(key, event.valueData.value.getValue());
     }
 
     if (model != null) {
@@ -412,7 +410,7 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
       if (validateKey(key)) {
         var entry = Robot.getPreferences().getEntry(key);
         entry.setValue(value);
-        entry.setFlags(NetworkTableEntry.kPersistent);
+        entry.setPersistent();
         return true;
       }
       return false;
@@ -429,12 +427,12 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
       }
       var entry = Robot.getPreferences().getEntry(key);
       entry.setValue(valueObj);
-      entry.setFlags(NetworkTableEntry.kPersistent);
+      entry.setPersistent();
       return true;
     }
 
     public void delete(String key) {
-      Robot.getPreferences().delete(key);
+      Robot.getPreferences().getEntry(key).unpublish();
     }
 
     public boolean validateKey(String key) {
@@ -706,6 +704,8 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
       return "ERROR";
     }
 
+    /* Persistence now handled by server? */
+    /*
     public void save(String filename) {
       try {
         NetworkTableInstance.getDefault().savePersistent(filename);
@@ -728,7 +728,9 @@ public class RobotPreferences extends StaticWidget implements TableEntryListener
             "Error loading file:" + e.getMessage(), "Load Preferences", JOptionPane.ERROR_MESSAGE);
       }
     }
+    */
   }
+  
 
   private class NewPreferenceEntryDialog extends JDialog {
 

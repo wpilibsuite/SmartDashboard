@@ -2,8 +2,8 @@ package edu.wpi.first.smartdashboard.robot;
 
 import java.util.function.Consumer;
 
-import edu.wpi.first.networktables.ConnectionNotification;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
@@ -18,11 +18,11 @@ public class Robot {
   public static final String identity = "SmartDashboard";
 
   private static volatile String _host = "";
-  private static volatile int _port = NetworkTableInstance.kDefaultPort;
+  private static volatile int _port = NetworkTableInstance.kDefaultPort3;
   private static final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 
   static {
-    ntInstance.startClient(identity);
+    ntInstance.startClient3(identity);
   }
 
   public static void setTeam(int team) {
@@ -67,15 +67,16 @@ public class Robot {
     return ntInstance.getTable(LIVE_WINDOW_NAME);
   }
 
-  public static int addConnectionListener(Consumer<ConnectionNotification> listener, boolean
+  public static int addConnectionListener(Consumer<NetworkTableEvent> listener, boolean
       immediateNotify) {
     System.out.println("Adding connection listener");
-    return ntInstance.addConnectionListener(listener, immediateNotify);
+    return ntInstance.addConnectionListener(true, listener);
+
   }
 
   public static void removeConnectionListener(int listenerHandle) {
     System.out.println("Removing connection listener");
-    ntInstance.removeConnectionListener(listenerHandle);
+    ntInstance.removeListener(listenerHandle);
   }
 
 }

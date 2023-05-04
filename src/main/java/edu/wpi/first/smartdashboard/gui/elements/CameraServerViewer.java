@@ -3,11 +3,13 @@ package edu.wpi.first.smartdashboard.gui.elements;
 import edu.wpi.first.smartdashboard.properties.MultiProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
+
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.stream.Stream;
 
 public class CameraServerViewer extends MjpgStreamViewer {
@@ -22,8 +24,8 @@ public class CameraServerViewer extends MjpgStreamViewer {
 
   private NetworkTable cameraTable;
   private NetworkTable rootTable = NetworkTableInstance.getDefault().getTable("");
-  private TableEntryListener selectedCameraPathListener
-      = (source, key, entry, value, flags) -> cameraProperty.setValue(value);
+  private TableEventListener selectedCameraPathListener
+      = (source, key, event) -> cameraProperty.setValue(event.valueData.value.getValue());
   private int listenerHandle;
 
   @Override
@@ -36,12 +38,12 @@ public class CameraServerViewer extends MjpgStreamViewer {
             || key.equals(cameraProperty.getSavedValue()))) {
           cameraTable = subtable;
         }
-      }), true
+      })
     );
 
-    listenerHandle = rootTable.addEntryListener(selectedCameraPathProperty.getValue(),
-        selectedCameraPathListener, EntryListenerFlags.kLocal | EntryListenerFlags.kImmediate 
-        | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    listenerHandle = rootTable.addListener(selectedCameraPathProperty.getValue(),
+        EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+        selectedCameraPathListener);
   }  
 
   @Override
@@ -50,11 +52,11 @@ public class CameraServerViewer extends MjpgStreamViewer {
       cameraTable = (NetworkTable) cameraProperty.getValue();
       cameraChanged();
     } else if (property == selectedCameraPathProperty) {
-      rootTable.removeTableListener(listenerHandle);
-      listenerHandle = rootTable.addEntryListener(selectedCameraPathProperty.getValue(),
-          selectedCameraPathListener, 
-          EntryListenerFlags.kLocal | EntryListenerFlags.kImmediate 
-        | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      rootTable.removeListener(listenerHandle);
+      listenerHandle = rootTable.addListener(selectedCameraPathProperty.getValue(),
+          EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+          selectedCameraPathListener
+          );
     }
   }
 

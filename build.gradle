@@ -10,9 +10,9 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.1'
-    id "com.jfrog.artifactory" version "4.16.0"
+    id "com.jfrog.artifactory" version "4.25.2"
     id "com.diffplug.spotless" version "6.0.5"
-    id "com.github.spotbugs" version "5.0.3"
+    id "com.github.spotbugs" version "5.0.4"
     id 'maven-publish'
     id 'idea'
     id 'jacoco'
@@ -20,7 +20,7 @@ plugins {
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'checkstyle'
-    id 'edu.wpi.first.WpilibTools' version '0.9.1'
+    id 'edu.wpi.first.WpilibTools' version '1.0.0'
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')

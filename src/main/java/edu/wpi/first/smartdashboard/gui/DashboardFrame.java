@@ -1,6 +1,7 @@
 package edu.wpi.first.smartdashboard.gui;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.smartdashboard.LogToCSV;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
@@ -102,17 +103,17 @@ public class DashboardFrame extends JFrame {
    */
   public DashboardFrame(boolean competition) {
     setTitle(TITLE + "Disconnected");
-    NetworkTableInstance.getDefault().addConnectionListener((event) -> {
+    NetworkTableInstance.getDefault().addConnectionListener(true, (event) -> {
       String newTitle;
-      if ((event.getInstance().getNetworkMode() & NetworkTableInstance.kNetModeServer) != 0) {
+      if ((event.getInstance().getNetworkMode().contains(NetworkTableInstance.NetworkMode.kServer))) {
         newTitle = TITLE + "Number of Clients: " + event.getInstance().getConnections().length;
-      } else if (event.connected && event.conn != null) {
-        newTitle = TITLE + "Connected: " + event.conn.remote_ip;
+      } else if (event.is(NetworkTableEvent.Kind.kConnected) && event.connInfo != null) {
+        newTitle = TITLE + "Connected: " + event.connInfo.remote_ip;
       } else {
         newTitle = TITLE + "Disconnected";
       }
       SwingUtilities.invokeLater(() -> setTitle(newTitle));
-    }, true);
+    });
 
     setLayout(new BorderLayout());
 

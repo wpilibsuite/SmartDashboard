@@ -4,12 +4,10 @@ import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
 import edu.wpi.first.smartdashboard.types.NamedDataType;
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.TableEntryListener;
-import edu.wpi.first.networktables.TableListener;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.SubTableListener;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -20,6 +18,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -93,10 +92,9 @@ public class DashboardPanel extends JPanel {
 
     setEditable(editable);
 
-    listenerHandle = table.addEntryListener(listener,
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
-       | EntryListenerFlags.kUpdate);
-    table.addSubTableListener(tlistener, true);
+    listenerHandle = table.addListener(EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+                                       NetworkTableEvent.Kind.kPublish), listener);
+    table.addSubTableListener(tlistener);
   }
 
   public NetworkTable getTable() {
@@ -210,11 +208,12 @@ public class DashboardPanel extends JPanel {
     elements.clear();
 
 
-    table.removeTableListener(listenerHandle);
-    listenerHandle = table.addEntryListener(listener,
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
-        | EntryListenerFlags.kUpdate);
-    table.addSubTableListener(tlistener, true);
+    table.removeListener(listenerHandle);
+    listenerHandle = table.addListener(
+      EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+      NetworkTableEvent.Kind.kPublish), listener);  
+
+    table.addSubTableListener(tlistener);
 
     repaint();
   }
@@ -542,20 +541,19 @@ public class DashboardPanel extends JPanel {
     }
   }
 
-  private class RobotListener implements TableEntryListener {
+  private class RobotListener implements TableEventListener {
     @Override
-    public void valueChanged(final NetworkTable source, final String key, 
-                             final NetworkTableEntry entry, final NetworkTableValue value,
-                             final int flags) {
-      if (((flags & EntryListenerFlags.kNew) != 0) 
+    public void accept(final NetworkTable source, final String key, 
+                             final NetworkTableEvent event) {
+      if (event.is(NetworkTableEvent.Kind.kPublish)
           && !frame.getPrefs().autoShowWidgets.getValue() 
           && !fields.containsKey(key)) {
           hiddenFields.add(key);
       } else {
-        if (!hiddenFields.contains(key)) {
+        if (!hiddenFields.contains(key) && event.valueData != null) {
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
-                setField(key, null, value.getValue(), null);
+                setField(key, null, event.valueData.value.getValue(), null);
               }
             });
         }
@@ -571,16 +569,15 @@ public class DashboardPanel extends JPanel {
   // in the parent table with the subtable. This suggests that the ".type" key's value
   // will change *after* the subtable is added to the parent table and that until it does
   // the subtable available in the fields of the Dashboard panel.
-  private class RobotTableListener implements TableListener {    
+  private class RobotTableListener implements SubTableListener {    
     @Override
     public void tableCreated(NetworkTable parent, String key, NetworkTable newTable) {
     if (!hiddenFields.contains(key)) {
-        class TEListenerWithHandle implements TableEntryListener {
+        class TEListenerWithHandle implements TableEventListener {
           int myHandle;
-          public void valueChanged(final NetworkTable typeSource, final String typeKey,
-                                   final NetworkTableEntry typeEntry, 
-                                   final NetworkTableValue typeValue, final int flags) {
-            table.removeTableListener(myHandle);
+          public void accept(final NetworkTable typeSource, final String typeKey,
+                                   final NetworkTableEvent event) {
+            parent.removeListener(myHandle);
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
                 setField(key, null, newTable, null);
@@ -590,10 +587,11 @@ public class DashboardPanel extends JPanel {
           public void setHandle(int handle) { myHandle = handle; }
         };
         TEListenerWithHandle teListener = new TEListenerWithHandle();
-        teListener.setHandle(newTable.addEntryListener(".type", teListener, 
-          EntryListenerFlags.kImmediate            
-          | EntryListenerFlags.kLocal | EntryListenerFlags.kNew
-          | EntryListenerFlags.kUpdate));
+        teListener.setHandle(newTable.addListener(".type", 
+          EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+          NetworkTableEvent.Kind.kPublish),
+          teListener 
+        ));
       } 
     }
   }

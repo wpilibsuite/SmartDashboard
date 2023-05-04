@@ -4,18 +4,19 @@ import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
 import edu.wpi.first.smartdashboard.livewindow.elements.NameTag;
 import edu.wpi.first.smartdashboard.types.DataType;
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.TableEntryListener;
-import edu.wpi.first.networktables.TableListener;
+import edu.wpi.first.networktables.NetworkTable.SubTableListener;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.JComboBox;
 
 /**
@@ -23,7 +24,7 @@ import javax.swing.JComboBox;
  *
  * @author Mitchell
  */
-public abstract class AbstractTableWidget extends Widget implements TableEntryListener, TableListener {
+public abstract class AbstractTableWidget extends Widget implements TableEventListener, SubTableListener {
   protected NetworkTable table;
   protected int entryListenerHandle;
   protected int tableListenerHandle;
@@ -48,20 +49,18 @@ public abstract class AbstractTableWidget extends Widget implements TableEntryLi
     if (value instanceof NetworkTable) {
       NetworkTable table = (NetworkTable) value;
 
-      if (table != null) {
-        // should this be this.table.removeTableListener?
-        table.removeTableListener(tableListenerHandle);
+      if (this.table != null) {
+        this.table.removeListener(tableListenerHandle); 
       }
 
       this.table = table;
       if (table != null) {
-        entryListenerHandle = table.addEntryListener(this,
-            EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal 
-            | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
+        entryListenerHandle = table.addListener(
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll),
+            this);
         if (listenSubtables) {
-          tableListenerHandle = table.addSubTableListener(this, true);
-        }
+          table.addSubTableListener(this);
+        }           
       }
     }
   }
@@ -82,9 +81,19 @@ public abstract class AbstractTableWidget extends Widget implements TableEntryLi
   private Map<String, List<StringBindable>> stringFields = new HashMap<>();
 
   @Override
-  public void valueChanged(NetworkTable source, String key, NetworkTableEntry entry,
-                           NetworkTableValue value, int flags) {
-    boolean isNew = (flags & EntryListenerFlags.kNew) != 0;
+  public void accept(NetworkTable source, String key, NetworkTableEvent event) {
+    boolean isNew = event.is(NetworkTableEvent.Kind.kPublish);
+    // Some worry here that the publish event could be passed separately
+    // from the value event in which case the isNew logic won't work. But
+    // since generally keys don't exist in NTs separately from values it is
+    // probably ok.
+
+    // (Later): above concern was actaully valid: publish events do not include the published value.
+    // However, the xxxChanged methods already track for themselves whether a value is new or not
+    // so apparently nothing needs to be done for a publish event. So just return in that case.
+    if (event.valueData == null) return;
+    // We'll check for kValueAll but it should not be necessary -- he says optimistically.
+    NetworkTableValue value = event.valueData.value;
     if (value.isBoolean()) {
       booleanChanged(source, key, value.getBoolean(), isNew);
     }

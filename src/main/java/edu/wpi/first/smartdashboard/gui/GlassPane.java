@@ -519,7 +519,7 @@ public class GlassPane extends JPanel {
         Widget oldElement = (Widget) menuElement;
 
         if (panel.getTable().containsKey(oldElement.getFieldName())) {
-          Object value = panel.getTable().getEntry(oldElement.getFieldName()).getValue();
+          Object value = panel.getTable().getEntry(oldElement.getFieldName()).getValue().getValue();
           panel.setField(oldElement.getFieldName(), elementClass, value, oldElement.getLocation());
         } else {
           panel.setField(oldElement.getFieldName(), elementClass, oldElement.getType(), null,

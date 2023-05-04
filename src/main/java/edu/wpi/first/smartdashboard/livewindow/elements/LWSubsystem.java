@@ -1,10 +1,8 @@
 package edu.wpi.first.smartdashboard.livewindow.elements;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.TableEntryListener;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.smartdashboard.gui.MainPanel;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
@@ -18,13 +16,13 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
-import javax.swing.RowFilter.Entry;
 
 /**
  * The main player in the Live Window. Subsystems hold every component that
@@ -134,18 +132,16 @@ public class LWSubsystem extends AbstractTableWidget {
     }
 
     if (!alreadyHasWidget) {
-      abstract class TEListenerWithHandle implements TableEntryListener {
+      abstract class TEListenerWithHandle implements TableEventListener {
         int myHandle;
-        public abstract void valueChanged(final NetworkTable typeSource, final String typeKey,
-                                 final NetworkTableEntry typeEntry, 
-                                 final NetworkTableValue typeValue, final int flags);
+        public abstract void accept(final NetworkTable typeSource, final String typeKey,
+                                 final NetworkTableEvent typeEvent);
         public void setHandle(int handle) { myHandle = handle; }
       };
       var listener = new TEListenerWithHandle() {
-        public void valueChanged(final NetworkTable typeSource, final String typeKey, 
-                                 NetworkTableEntry entry, NetworkTableValue typeValue, 
-                                 int flags) {
-          newTable.removeTableListener(myHandle);
+        public void accept(final NetworkTable typeSource, final String typeKey, 
+                                final NetworkTableEvent typeEvent) {
+          newTable.removeListener(myHandle);
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
               addSubsystemElement(key, newTable);
@@ -154,9 +150,11 @@ public class LWSubsystem extends AbstractTableWidget {
         };
       };
       listener.setHandle(
-        newTable.addEntryListener(".type", listener, 
-          EntryListenerFlags.kImmediate | EntryListenerFlags.kLocal | 
-          EntryListenerFlags.kNew | EntryListenerFlags.kUpdate
+        newTable.addListener(".type", 
+          EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+                  NetworkTableEvent.Kind.kPublish),
+
+          listener
         )
       );
     }

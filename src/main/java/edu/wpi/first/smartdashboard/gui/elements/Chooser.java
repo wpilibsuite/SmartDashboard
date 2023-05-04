@@ -1,8 +1,7 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.properties.BooleanProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
@@ -54,8 +53,7 @@ public class Chooser extends AbstractTableWidget {
   }
 
   @Override
-  public void valueChanged(NetworkTable source, String key, NetworkTableEntry entry,
-                           NetworkTableValue value, int flags) {
+  public void accept(NetworkTable source, String key, NetworkTableEvent event) {
     if (key.equals(OPTIONS)) {
       choices = Arrays.asList(table.getEntry(OPTIONS).getStringArray(new String[]{}));
       display.setChoices(choices);

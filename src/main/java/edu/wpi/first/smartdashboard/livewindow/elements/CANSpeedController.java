@@ -6,8 +6,7 @@ import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.CANSpeedControllerType;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.NetworkTableEvent;
 
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
@@ -178,11 +177,10 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
   }
 
   @Override
-  public void valueChanged(NetworkTable source, String key, NetworkTableEntry entry, 
-                           NetworkTableValue value, int flags) {
-    super.valueChanged(source, key, entry, value, flags);
-    pidControlPanel.valueChanged(source, key, entry, value, flags);
-    normalControlPanel.valueChanged(source, key, entry, value, flags);
+  public void accept(NetworkTable source, String key, NetworkTableEvent event) {
+    super.accept(source, key, event);
+    pidControlPanel.accept(source, key, event);
+    normalControlPanel.accept(source, key, event);
   }
 
   @Override
