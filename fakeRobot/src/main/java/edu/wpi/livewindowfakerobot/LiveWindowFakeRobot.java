@@ -1,10 +1,7 @@
 package edu.wpi.livewindowfakerobot;
 
-import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -48,11 +45,7 @@ public class LiveWindowFakeRobot {
                                 canJag          = createTable(canSystem, "CAN Jaguar", "CANSpeedController"),
                                 canTalon        = createTable(canSystem, "CAN Talon", "CANSpeedController");
     
-    public static void main(String[] args) throws IOException {
-        WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
-        NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
-        CombinedRuntimeLoader.loadLibraries(LiveWindowFakeRobot.class, "wpiutiljni", "ntcorejni");
-        
+    public static void fakeRobotMain(String[] args) throws IOException {
         System.out.println();
         
         STATUS.getEntry("LW Enabled").setBoolean(true);

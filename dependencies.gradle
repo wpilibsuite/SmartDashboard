@@ -7,13 +7,15 @@ def nativeTasks = wpilibTools.createExtractionTasks {
 
 nativeTasks.addToSourceSetResources(sourceSets.main)
 
-wpilibTools.deps.wpilibVersion = "2023.4.3-1-g663703d"
+wpilibTools.deps.wpilibVersion = "2023.+"
 
 nativeConfig.dependencies.add wpilibTools.deps.wpilib("ntcore")
+nativeConfig.dependencies.add wpilibTools.deps.wpilib("wpinet")
 nativeConfig.dependencies.add wpilibTools.deps.wpilib("wpiutil")
 
 dependencies {
     implementation wpilibTools.deps.wpilibJava("ntcore")
+    implementation wpilibTools.deps.wpilibJava("wpinet")
     implementation wpilibTools.deps.wpilibJava("wpiutil")
 
     implementation 'jfree:jcommon:1.0.16'

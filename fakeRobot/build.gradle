@@ -12,13 +12,15 @@ def nativeTasks = wpilibTools.createExtractionTasks {
 
 nativeTasks.addToSourceSetResources(sourceSets.main)
 
-wpilibTools.deps.wpilibVersion = "2021.+"
+wpilibTools.deps.wpilibVersion = "2023.+"
 
 nativeConfig.dependencies.add wpilibTools.deps.wpilib("ntcore")
+nativeConfig.dependencies.add wpilibTools.deps.wpilib("wpinet")
 nativeConfig.dependencies.add wpilibTools.deps.wpilib("wpiutil")
 
 dependencies {
     implementation wpilibTools.deps.wpilibJava("ntcore")
+    implementation wpilibTools.deps.wpilibJava("wpinet")
     implementation wpilibTools.deps.wpilibJava("wpiutil")
 
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
@@ -26,4 +28,4 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
 }
 
-mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowFakeRobot"
+mainClassName = "edu.wpi.livewindowfakerobot.LiveWindowMain"
