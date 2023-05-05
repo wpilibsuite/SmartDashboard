@@ -119,9 +119,9 @@ public class LWSubsystem extends AbstractTableWidget {
   }
 
   /**
-   * @param source Required by ITableListener. Not used.
-   * @param key The name of the changed table.
-   * @param isNew Required by ITableListener. Not used.
+   * @param parent The NetworkTable where the change occurred. Not used.
+   * @param key The name of the new table.
+   * @param newTable The newly created NetworkTable. Not used.
    */
   @Override
   public void tableCreated(final NetworkTable parent, final String key, 

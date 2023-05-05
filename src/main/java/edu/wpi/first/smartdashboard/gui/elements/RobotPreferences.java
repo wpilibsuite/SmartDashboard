@@ -145,7 +145,7 @@ public class RobotPreferences extends StaticWidget implements TableEventListener
 
 
     JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new GridLayout(0, 4));
+    buttonPanel.setLayout(new GridLayout(0, 2));
     buttonPanel.add(add);
     buttonPanel.add(remove);
 
@@ -432,7 +432,9 @@ public class RobotPreferences extends StaticWidget implements TableEventListener
     }
 
     public void delete(String key) {
-      Robot.getPreferences().getEntry(key).unpublish();
+      var entry =  Robot.getPreferences().getEntry(key);
+      entry.clearPersistent();
+      entry.unpublish();
     }
 
     public boolean validateKey(String key) {

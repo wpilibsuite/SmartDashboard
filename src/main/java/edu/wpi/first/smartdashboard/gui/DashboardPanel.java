@@ -146,7 +146,7 @@ public class DashboardPanel extends JPanel {
 
   /**
    * Returns the names of all the fields marked as hidden (they are the ones
-   * in the {@link ITable} that have been explicitly declared to be ignored by
+   * in the {@link NetworkTable} that have been explicitly declared to be ignored by
    * the user).
    *
    * @return the hidden fields
