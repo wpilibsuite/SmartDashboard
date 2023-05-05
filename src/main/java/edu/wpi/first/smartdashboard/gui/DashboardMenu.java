@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.gui;
 
+import edu.wpi.first.smartdashboard.SmartDashboard;
 import edu.wpi.first.smartdashboard.gui.elements.LinePlot;
 import edu.wpi.first.smartdashboard.livewindow.elements.Controller;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
@@ -15,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -23,11 +25,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.jfree.ui.ExtensionFileFilter;
+
+import java.net.URL;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * This is the menu bar on top of the window. It can be set to hide
@@ -36,6 +43,7 @@ import org.jfree.ui.ExtensionFileFilter;
  * @author Joe Grinstead
  */
 public class DashboardMenu extends JMenuBar {
+  private final Attributes manifestAttributes = getAttributes();
 
   /**
    * Creates a menu for the given panel.
@@ -43,6 +51,7 @@ public class DashboardMenu extends JMenuBar {
   DashboardMenu(final DashboardFrame frame, final MainPanel mainPanel) {
     JMenu fileMenu = new JMenu("File");
     JMenuItem loadMenu = new JMenuItem("Open...");
+
     loadMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
     loadMenu.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -266,7 +275,43 @@ public class DashboardMenu extends JMenuBar {
 
     viewMenu.add(removeUnusedMenu);
 
+    JMenu helpMenu = new JMenu("Help");
+    JMenuItem aboutMenu = new JMenuItem("About");
+    aboutMenu.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        JOptionPane.showMessageDialog(mainPanel, 
+            "Implementation-Version: " + getVersion() + "\n"
+            + "Built-Date: " + getBuildDate());
+      }
+    });
+    helpMenu.add(aboutMenu);
+
+
+
+
     add(fileMenu);
     add(viewMenu);
+    add(helpMenu);
+  }
+
+  private Attributes getAttributes() {
+    try {
+      var inputStream = SmartDashboard.class.getClassLoader().getResource("META-INF/MANIFEST.MF").openStream();
+      Manifest manifest = new Manifest(inputStream);
+      Attributes attr = manifest.getMainAttributes();
+      return (attr != null) ? attr : new Attributes();
+    } catch (IOException ex) {
+      return new Attributes();
+    }
+  }
+
+  private String getBuildDate() {
+    String buildDate = manifestAttributes.getValue("Built-Date");
+    return (buildDate != null) ? buildDate : "Build date not available";
+  }
+
+  private String getVersion() {
+    String version = manifestAttributes.getValue("Implementation-Version");
+    return (version != null) ? version : "Version not available";
   }
 }
