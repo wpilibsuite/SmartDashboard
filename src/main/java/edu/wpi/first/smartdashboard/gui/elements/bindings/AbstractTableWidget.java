@@ -91,7 +91,7 @@ public abstract class AbstractTableWidget extends Widget implements TableEventLi
     // (Later): above concern was actaully valid: publish events do not include the published value.
     // However, the xxxChanged methods already track for themselves whether a value is new or not
     // so apparently nothing needs to be done for a publish event. So just return in that case.
-    if (event.valueData == null) return;
+    if (event.valueData == null) { return; }
     // We'll check for kValueAll but it should not be necessary -- he says optimistically.
     NetworkTableValue value = event.valueData.value;
     if (value.isBoolean()) {

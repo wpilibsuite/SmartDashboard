@@ -131,7 +131,7 @@ public class RobotPreferences extends StaticWidget implements TableEventListener
 
     values = new LinkedHashMap<String, Object>();
 
-    preferencesListener = Robot.getPreferences().addListener (
+    preferencesListener = Robot.getPreferences().addListener(
         EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
           NetworkTableEvent.Kind.kPublish, NetworkTableEvent.Kind.kUnpublish),
         this);
@@ -177,14 +177,15 @@ public class RobotPreferences extends StaticWidget implements TableEventListener
     if (event.is(NetworkTableEvent.Kind.kUnpublish)) {
       values.remove(key);
     } else {
-      if (event.valueData != null) values.put(key, event.valueData.value.getValue());
+      if (event.valueData != null) { values.put(key, event.valueData.value.getValue()); }
     }
 
     if (model != null) {
       model.fireTableDataChanged();
     }
-  };
+  }
 
+  ;
 
   private static final String[] typeNames
       = new String[]{"Boolean", "Number", "String", "Raw", "Boolean[]", "Number[]", "String[]"};

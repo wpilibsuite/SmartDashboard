@@ -548,14 +548,14 @@ public class DashboardPanel extends JPanel {
       if (event.is(NetworkTableEvent.Kind.kPublish)
           && !frame.getPrefs().autoShowWidgets.getValue() 
           && !fields.containsKey(key)) {
-          hiddenFields.add(key);
+        hiddenFields.add(key);
       } else {
         if (!hiddenFields.contains(key) && event.valueData != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-              public void run() {
-                setField(key, null, event.valueData.value.getValue(), null);
-              }
-            });
+          SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              setField(key, null, event.valueData.value.getValue(), null);
+            }
+          });
         }
       }
     }
@@ -572,25 +572,34 @@ public class DashboardPanel extends JPanel {
   private class RobotTableListener implements SubTableListener {    
     @Override
     public void tableCreated(NetworkTable parent, String key, NetworkTable newTable) {
-    if (!hiddenFields.contains(key)) {
+      if (!hiddenFields.contains(key)) {
         class TEListenerWithHandle implements TableEventListener {
           int myHandle;
+          
           public void accept(final NetworkTable typeSource, final String typeKey,
-                                   final NetworkTableEvent event) {
+                                  final NetworkTableEvent event) {
             parent.removeListener(myHandle);
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
                 setField(key, null, newTable, null);
               }
-            });
+            }
+            );
           }
-          public void setHandle(int handle) { myHandle = handle; }
-        };
+
+          public void setHandle(int handle) { 
+            myHandle = handle; 
+          }
+
+        }
+
+        ;
+        
         TEListenerWithHandle teListener = new TEListenerWithHandle();
         teListener.setHandle(newTable.addListener(".type", 
-          EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
-          NetworkTableEvent.Kind.kPublish),
-          teListener 
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+                      NetworkTableEvent.Kind.kPublish),
+            teListener 
         ));
       } 
     }

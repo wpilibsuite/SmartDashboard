@@ -69,7 +69,7 @@ public class LWSubsystem extends AbstractTableWidget {
   public void init() {
     layout = new BoxLayout(this, BoxLayout.Y_AXIS);
     var border = BorderFactory.createTitledBorder(getFieldName());
-    var borderWidth = 2*(border.getBorderInsets(this).left + border.getBorderInsets(this).right);
+    var borderWidth = 2 * (border.getBorderInsets(this).left + border.getBorderInsets(this).right);
     borderWidth += this.getFontMetrics(this.getFont()).stringWidth(getFieldName());
     setLayout(layout);
     setObstruction(true);
@@ -134,11 +134,18 @@ public class LWSubsystem extends AbstractTableWidget {
     if (!alreadyHasWidget) {
       abstract class TEListenerWithHandle implements TableEventListener {
         int myHandle;
+
         public abstract void accept(final NetworkTable typeSource, final String typeKey,
                                  final NetworkTableEvent typeEvent);
-        public void setHandle(int handle) { myHandle = handle; }
-      };
+
+        public void setHandle(int handle) { 
+          myHandle = handle; 
+        }
+      }
+      
+      ;
       var listener = new TEListenerWithHandle() {
+        
         public void accept(final NetworkTable typeSource, final String typeKey, 
                                 final NetworkTableEvent typeEvent) {
           newTable.removeListener(myHandle);
@@ -147,14 +154,17 @@ public class LWSubsystem extends AbstractTableWidget {
               addSubsystemElement(key, newTable);
             }
           });
-        };
-      };
+        }
+        
+        ;
+      }
+      ;
       listener.setHandle(
-        newTable.addListener(".type", 
-          EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+          newTable.addListener(".type", 
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
                   NetworkTableEvent.Kind.kPublish),
 
-          listener
+            listener
         )
       );
     }

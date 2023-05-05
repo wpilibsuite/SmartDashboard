@@ -31,18 +31,19 @@ public class CameraServerViewer extends MjpgStreamViewer {
   @Override
   public void onInit() {
     rootTable.getSubTable("CameraPublisher").addSubTableListener(
-      ((NetworkTable source, String key, NetworkTable subtable) -> {
-        cameraProperty.add(key, subtable);
-        if (cameraTable == null
-            && (cameraProperty.getSavedValue().isEmpty()
-            || key.equals(cameraProperty.getSavedValue()))) {
-          cameraTable = subtable;
-        }
-      })
+        ((NetworkTable source, String key, NetworkTable subtable) -> {
+          cameraProperty.add(key, subtable);
+          if (cameraTable == null
+              && (cameraProperty.getSavedValue().isEmpty()
+              || key.equals(cameraProperty.getSavedValue()))) {
+            cameraTable = subtable;
+          }
+        })
     );
 
     listenerHandle = rootTable.addListener(selectedCameraPathProperty.getValue(),
-        EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+        EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, 
+                   NetworkTableEvent.Kind.kPublish),
         selectedCameraPathListener);
   }  
 
@@ -54,7 +55,8 @@ public class CameraServerViewer extends MjpgStreamViewer {
     } else if (property == selectedCameraPathProperty) {
       rootTable.removeListener(listenerHandle);
       listenerHandle = rootTable.addListener(selectedCameraPathProperty.getValue(),
-          EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish),
+          EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, 
+                     NetworkTableEvent.Kind.kPublish),
           selectedCameraPathListener
           );
     }

@@ -178,30 +178,30 @@ public class DashboardMenu extends JMenuBar {
     });
     resetLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
     Robot.getLiveWindow().getSubTable(".status").addListener("LW Enabled", 
-      EnumSet.of(NetworkTableEvent.Kind.kValueAll),
-      new
-        TableEventListener() {
-      public void accept(NetworkTable table, String string, NetworkTableEvent e) {
-        final boolean isInLW
-            = Robot.getLiveWindow().getSubTable(".status").getEntry("LW Enabled").getBoolean(false);
+        EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+        new TableEventListener() {
+          public void accept(NetworkTable table, String string, NetworkTableEvent e) {
+            final boolean isInLW
+                = Robot.getLiveWindow().getSubTable(".status").getEntry("LW Enabled").getBoolean(false);
 
-        SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            frame.setDisplayMode(isInLW
-                ? DashboardFrame.DisplayMode.LiveWindow
-                : DashboardFrame.DisplayMode.SmartDashboard);
+            SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                frame.setDisplayMode(isInLW
+                    ? DashboardFrame.DisplayMode.LiveWindow
+                    : DashboardFrame.DisplayMode.SmartDashboard);
 
-            mainPanel.setCurrentPanel(isInLW
-                ? MainPanel.getPanel("LiveWindow")
-                : MainPanel.getPanel("SmartDashboard"));
-            if (!isInLW) {
-              resetLW.doClick();
-            }
+                mainPanel.setCurrentPanel(isInLW
+                    ? MainPanel.getPanel("LiveWindow")
+                    : MainPanel.getPanel("SmartDashboard"));
+                if (!isInLW) {
+                  resetLW.doClick();
+                }
 
-          }
-        });
-      }
-    });
+              }
+            });
+          } 
+        }
+    );
     viewMenu.add(resetLW);
 
     JMenu addMenu = new JMenu("Add...");

@@ -132,7 +132,7 @@ public class FileSniffer {
               }
             }
           }
-        } finally {jarFile.close();}
+        } finally { jarFile.close(); }
       }
       catch (MalformedURLException e) {
         e.printStackTrace();
