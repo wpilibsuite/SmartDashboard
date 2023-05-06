@@ -42,8 +42,8 @@ public class Scheduler extends Widget {
   private CardLayout cardLayout;
 
   private List<String> commands = new ArrayList<>();
-  private List<Double> ids = new ArrayList<>();
-  private List<Double> toCancel = new ArrayList<>();
+  private List<Long> ids = new ArrayList<>();
+  private List<Long> toCancel = new ArrayList<>();
 
   private int listenerHandle;
   private TableEventListener listener = new TableEventListener() {
@@ -62,7 +62,7 @@ public class Scheduler extends Widget {
         public void run() {
           synchronized (table) {
             commands = Arrays.asList(table.getEntry("Names").getStringArray(new String[0]));
-            ids = Arrays.asList(table.getEntry("Ids").getDoubleArray(new Double[0]));
+            ids = Arrays.asList(table.getEntry("Ids").getIntegerArray(new Long[0]));
             assert commands.size() == ids.size();
 
             // Update displayed commands
@@ -79,10 +79,10 @@ public class Scheduler extends Widget {
                 button.addActionListener(new ActionListener() {
                   public void actionPerformed(ActionEvent e) {
                     // Cancel commands
-                    toCancel = new ArrayList<Double>(Arrays.asList(table.getEntry("Cancel")
-                                    .getDoubleArray(new Double[0])));
+                    toCancel = new ArrayList<Long>(Arrays.asList(table.getEntry("Cancel")
+                                    .getIntegerArray(new Long[0])));
                     toCancel.add(ids.get(index));
-                    table.getEntry("Cancel").setValue(toCancel.toArray(new Double[0]));
+                    table.getEntry("Cancel").setValue(toCancel.toArray(new Long[0]));
                   }
                 });
                 buttons.add(button);

@@ -22,7 +22,7 @@ public class Robot {
   private static final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 
   static {
-    ntInstance.startClient3(identity);
+    ntInstance.startClient4(identity);
   }
 
   public static void setTeam(int team) {
