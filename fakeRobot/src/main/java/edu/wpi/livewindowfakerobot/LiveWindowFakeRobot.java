@@ -26,7 +26,7 @@ public class LiveWindowFakeRobot {
         WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
         NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
         CombinedRuntimeLoader.loadLibraries(LiveWindowFakeRobot.class, "wpiutiljni", "ntcorejni");
-
+        NetworkTableInstance.getDefault().startServer();
         liveWindow = NetworkTableInstance.getDefault().getTable("LiveWindow");
 
         STATUS          = createTable(liveWindow, ".status", "LW Status");
