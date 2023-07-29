@@ -13,7 +13,7 @@ import edu.wpi.first.smartdashboard.types.NamedDataType;
  */
 public class SpeedControllerType extends NamedDataType {
 
-  public static final String LABEL = "Motor Controller";
+  public static final String LABEL = "Speed Controller";
 
   private SpeedControllerType() {
     super(LABEL, SpeedController.class);

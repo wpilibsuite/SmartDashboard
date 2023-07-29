@@ -133,7 +133,7 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
     pidControlPanel.setValue(value);
     normalControlPanel.setValue(value);
     this.type = table.getEntry("Type").getString("[unknown]");
-    this.mode = (int) table.getEntry("Mode").getNumber(0);
+    this.mode = table.getEntry("Mode").getNumber(0).intValue();
 
     headerPanel.remove(modeBox);
     switch (type) {
