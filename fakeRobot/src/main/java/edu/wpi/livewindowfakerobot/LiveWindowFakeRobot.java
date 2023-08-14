@@ -34,16 +34,16 @@ public class LiveWindowFakeRobot {
 
         wrist = createTable(liveWindow, "Wrist", "LW Subsystem");
         wPotentiometer = createTable(wrist, "Potentiometer", "Analog Input");
-        wVictor = createTable(wrist, "Victor", "Speed Controller");
+        wVictor = createTable(wrist, "Victor", "Motor Controller");
 
         elevator = createTable(liveWindow, "Elevator", "PIDSubsystem");
         ePotentiometer = createTable(elevator, "Potentiometer", "Analog Input");
-        eVictor = createTable(elevator, "Victor", "Speed Controller");
+        eVictor = createTable(elevator, "Victor", "Motor Controller");
 
         testSys = createTable(liveWindow, "TestSystem", "LW Subsystem");
         tComp = createTable(testSys, "Compressor", "Compressor");
         tGearTooth = createTable(testSys, "Gear Tooth Sensor", "Gear Tooth");
-        tVictor = createTable(testSys, "Victor", "Speed Controller");
+        tVictor = createTable(testSys, "Victor", "Motor Controller");
         tPotentiometer = createTable(testSys, "Potentiometer", "Analog Input");
         tRelay = createTable(testSys, "Spike", "Relay");
         tDigitalOutput = createTable(testSys, "Digital Output", "Digital Output");

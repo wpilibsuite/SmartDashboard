@@ -24,7 +24,7 @@ public class SpeedController extends AbstractTableWidget implements Controller {
 
   private NumberSlider controller;
   /**
-   * Used to turn off the speed controller
+   * Used to turn off the Motor Controller
    */
   private final JButton zeroButton = new JButton("Zero");
 
