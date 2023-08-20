@@ -24,7 +24,7 @@ import javax.swing.SwingUtilities;
 /**
  * The main player in the Live Window. Subsystems hold every component that
  * corresponds to that physical subsystem on the robot (e.g. a drive train would
- * contain speed controllers and encoders).
+ * contain Motor Controllers and encoders).
  *
  * @author Sam Carlberg
  */
