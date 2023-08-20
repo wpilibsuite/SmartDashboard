@@ -21,7 +21,7 @@ public class LiveWindowFakeRobot {
     private static ITable STATUS, wrist, wPotentiometer, wVictor, elevator, ePotentiometer,
         eVictor, testSys, tComp, tGearTooth, tVictor, tPotentiometer, tRelay, tDigitalOutput,
         tGyro, tSolenoid, tServo, tAccel, tEncoder1, tUltra, tCompass, tSwitch, canSystem,
-        canJag, canTalon;
+        canJag, canTalon, ePID;
 
     public static void main(String[] args) throws IOException {
         WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
@@ -39,6 +39,7 @@ public class LiveWindowFakeRobot {
         elevator = createTable(liveWindow, "Elevator", "PIDSubsystem");
         ePotentiometer = createTable(elevator, "Potentiometer", "Analog Input");
         eVictor = createTable(elevator, "Victor", "Speed Controller");
+        ePID = createTable(elevator, "PID Controller", "PIDController");
 
         testSys = createTable(liveWindow, "TestSystem", "LW Subsystem");
         tComp = createTable(testSys, "Compressor", "Compressor");
@@ -68,12 +69,10 @@ public class LiveWindowFakeRobot {
         ePotentiometer.putNumber("Value", -11.6872);
         tSwitch.putString("Value", "Off");
 
-        elevator.putNumber("p", 0.5);
-        elevator.putNumber("i", 0.5);
-        elevator.putNumber("d", 0.5);
-        elevator.putNumber("f", 0.5);
-        elevator.putNumber("setpoint", 0.5);
-        elevator.putBoolean("enabled", false);
+        ePID.putNumber("p", 0.5);
+        ePID.putNumber("i", 0.5);
+        ePID.putNumber("d", 0.5);
+        ePID.putNumber("setpoint", 0.5);
 
         canJag.putString("Type", "CANJaguar");
         canTalon.putString("Type", "CANTalon");
@@ -104,7 +103,7 @@ public class LiveWindowFakeRobot {
         ITable table = parent.getSubTable(name);
         System.out.println(table);
         table.putString(".type", type);
-        table.putString("Name", name);
+        table.putString(".name", name);
         return table;
     }
 }
