@@ -58,7 +58,7 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
   private JPanel headerPanel;
 
   /**
-   * Control panel containing the PID editor / speed controller editor.
+   * Control panel containing the PID editor / Motor Controller editor.
    */
   private JPanel controlPanel;
   private JPanel disabledControlPanel;

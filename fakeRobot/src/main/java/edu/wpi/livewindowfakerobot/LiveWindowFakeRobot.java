@@ -20,44 +20,50 @@ public class LiveWindowFakeRobot {
     private static NetworkTable STATUS, wrist, wPotentiometer, wVictor, elevator, ePotentiometer,
         eVictor, testSys, tComp, tGearTooth, tVictor, tPotentiometer, tRelay, tDigitalOutput,
         tGyro, tSolenoid, tServo, tAccel, tEncoder1, tUltra, tCompass, tSwitch, canSystem,
-        canJag, canTalon;
+        canJag, canTalon, ePID;
 
     public static void main(String[] args) throws IOException {
         WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
         NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
         CombinedRuntimeLoader.loadLibraries(LiveWindowFakeRobot.class, "wpiutiljni", "ntcorejni");
         NetworkTableInstance.getDefault().startServer();
+	
         liveWindow = NetworkTableInstance.getDefault().getTable("LiveWindow");
 
-        STATUS          = createTable(liveWindow, ".status", "LW Status");
+        STATUS = createTable(liveWindow, ".status", "LW Status");
 
         wrist           = createTable(liveWindow, "Wrist", "LW Subsystem");
         wPotentiometer  = createTable(wrist, "Potentiometer", "Analog Input");
         wVictor         = createTable(wrist, "Victor", "Speed Controller"); 
 
-        elevator        = createTable(liveWindow, "Elevator", "PIDSubsystem"); 
-        ePotentiometer  = createTable(elevator, "Potentiometer", "Analog Input");
-        eVictor         = createTable(elevator, "Victor", "Speed Controller");
+        wrist = createTable(liveWindow, "Wrist", "LW Subsystem");
+        wPotentiometer = createTable(wrist, "Potentiometer", "Analog Input");
+        wVictor = createTable(wrist, "Victor", "Motor Controller");
 
-        testSys         = createTable(liveWindow, "TestSystem", "LW Subsystem"); 
-        tComp           = createTable(testSys, "Compressor", "Compressor"); 
-        tGearTooth      = createTable(testSys, "Gear Tooth Sensor", "Gear Tooth");
-        tVictor         = createTable(testSys, "Victor", "Speed Controller");
-        tPotentiometer  = createTable(testSys, "Potentiometer", "Analog Input");
-        tRelay          = createTable(testSys, "Spike", "Relay");
-        tDigitalOutput  = createTable(testSys, "Digital Output", "Digital Output");
-        tGyro           = createTable(testSys, "Gyro", "LWGyro");
-        tSolenoid       = createTable(testSys, "Solenoid", "Solenoid");
-        tServo          = createTable(testSys, "Serov the Servo", "Servo");
-        tAccel          = createTable(testSys, "Accelerometer", "Accelerometer");
-        tEncoder1       = createTable(testSys, "Encoder 1", "Encoder");
-        tUltra          = createTable(testSys, "Ultrasonic", "Ultrasonic");
-        tCompass        = createTable(testSys, "Compass", "Compass");
-        tSwitch         = createTable(testSys, "Limit Switch", "Digital Input");
+        elevator = createTable(liveWindow, "Elevator", "PIDSubsystem");
+        ePotentiometer = createTable(elevator, "Potentiometer", "Analog Input");
+        eVictor = createTable(elevator, "Victor", "Motor Controller");
+        ePID = createTable(elevator, "PID Controller", "PIDController");
 
-        canSystem       = createTable(liveWindow, "CAN Subsystem", "LW Subsystem");
-        canJag          = createTable(canSystem, "CAN Jaguar", "CANSpeedController");
-        canTalon        = createTable(canSystem, "CAN Talon", "CANSpeedController");
+        testSys = createTable(liveWindow, "TestSystem", "LW Subsystem");
+        tComp = createTable(testSys, "Compressor", "Compressor");
+        tGearTooth = createTable(testSys, "Gear Tooth Sensor", "Gear Tooth");
+        tVictor = createTable(testSys, "Victor", "Motor Controller");
+        tPotentiometer = createTable(testSys, "Potentiometer", "Analog Input");
+        tRelay = createTable(testSys, "Spike", "Relay");
+        tDigitalOutput = createTable(testSys, "Digital Output", "Digital Output");
+        tGyro = createTable(testSys, "Gyro", "LWGyro");
+        tSolenoid = createTable(testSys, "Solenoid", "Solenoid");
+        tServo = createTable(testSys, "Serov the Servo", "Servo");
+        tAccel = createTable(testSys, "Accelerometer", "Accelerometer");
+        tEncoder1 = createTable(testSys, "Encoder 1", "Encoder");
+        tUltra = createTable(testSys, "Ultrasonic", "Ultrasonic");
+        tCompass = createTable(testSys, "Compass", "Compass");
+        tSwitch = createTable(testSys, "Limit Switch", "Digital Input");
+
+        canSystem = createTable(liveWindow, "CAN Subsystem", "LW Subsystem");
+        canJag = createTable(canSystem, "CAN Jaguar", "CANSpeedController");
+        canTalon = createTable(canSystem, "CAN Talon", "CANSpeedController");
 
         System.out.println();
         
@@ -73,6 +79,11 @@ public class LiveWindowFakeRobot {
         elevator.getEntry("f").setDouble(0.5);
         elevator.getEntry("setpoint").setDouble(0.5);
         elevator.getEntry("enabled").setBoolean(false);
+
+        ePID.getEntry("p").setDouble(0.5);
+        ePID.getEntry("i").setDouble(0.5);
+        ePID.getEntry("d").setDouble(0.5);
+        ePID.getEntry("setpoint").setDouble(0.5);
 
         canJag.getEntry("Type").setString("CANJaguar");
         canTalon.getEntry("Type").setString("CANTalon");
@@ -103,7 +114,7 @@ public class LiveWindowFakeRobot {
         NetworkTable table = parent.getSubTable(name);
         System.out.println(table);
         table.getEntry(".type").setValue(type);
-        table.getEntry("Name").setValue(name);
+        table.getEntry(".name").setValue(name);
         return table;
     }
 }
