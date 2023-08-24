@@ -34,7 +34,7 @@ public class LiveWindowFakeRobot {
 
         wrist           = createTable(liveWindow, "Wrist", "LW Subsystem");
         wPotentiometer  = createTable(wrist, "Potentiometer", "Analog Input");
-        wVictor         = createTable(wrist, "Victor", "Speed Controller"); 
+        wVictor         = createTable(wrist, "Victor", "Motor Controller"); 
 
         wrist = createTable(liveWindow, "Wrist", "LW Subsystem");
         wPotentiometer = createTable(wrist, "Potentiometer", "Analog Input");
