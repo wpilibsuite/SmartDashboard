@@ -65,7 +65,10 @@ public class Chooser extends AbstractTableWidget implements ITableListener {
     }
 
     if (!source.containsKey(SELECTED)) {
-      source.putString(SELECTED, source.getString(DEFAULT, choices.get(0)));
+      source.putString(SELECTED, 
+                       source.getString(DEFAULT, 
+                                        !choices.isEmpty() ? choices.get(0)
+                                                           : "No Selection"));
     }
   }
 
