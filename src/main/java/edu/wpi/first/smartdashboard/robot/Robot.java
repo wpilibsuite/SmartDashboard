@@ -21,6 +21,7 @@ public class Robot {
   static {
     NetworkTable.setClientMode();
     NetworkTable.setNetworkIdentity(identity);
+    NetworkTable.setDSClientEnabled(false);
     NetworkTable.initialize();
   }
 
