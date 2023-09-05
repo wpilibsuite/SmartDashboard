@@ -88,7 +88,7 @@ public class LWSubsystem extends AbstractTableWidget {
       System.out.println("Table: " + value);
       System.out.println("Type: " + value.getString(".type", null));
       DataType dataType = DataType.getType(value);
-      if (dataType!=null) { 
+      if (dataType != null) { 
         System.out.println(
             "Trying to add a widget of type \"" + dataType + "\" and key " + key);
 
@@ -108,8 +108,7 @@ public class LWSubsystem extends AbstractTableWidget {
         System.out.println("New size [" + preferredSize.width + ", " + preferredSize.height + "]");
         revalidate();
         repaint();
-        }
-      else {
+      } else {
         System.out.println("Skipping: No registered dataType for type " + value.getString(".type", null) );
       }
       System.out.println();

@@ -1,4 +1,5 @@
 package edu.wpi.first.smartdashboard.livewindow.elements;
+
 import edu.wpi.first.smartdashboard.gui.elements.Scheduler;
 import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
 
