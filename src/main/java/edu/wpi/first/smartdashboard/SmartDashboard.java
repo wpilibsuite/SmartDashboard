@@ -119,7 +119,7 @@ public class SmartDashboard {
               frame.load(file.getPath());
             }
 
-            monitor.setProgress(1000);
+            monitor.setProgress(750);
 
           } catch (Exception e) {
             e.printStackTrace();
@@ -133,14 +133,20 @@ public class SmartDashboard {
       System.exit(2);
     }
 
-    NetworkTable.setDSClientEnabled(true);
+    
     if (argParser.hasValue("ip")) {
-      monitor.setProgress(650);
+      monitor.setProgress(1000);
       monitor.setNote("Connecting to robot at: " + argParser.getValue("ip"));
       Robot.setHost(argParser.getValue("ip"));
       System.out.println("IP: " + argParser.getValue("ip"));
     } else {
-      monitor.setProgress(600);
+      NetworkTable.setDSClientEnabled(true);
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        // No harm if the sleep is interrupted
+      }
+      monitor.setProgress(800);
       monitor.setNote("Getting Team Number");
       StringProperty teamProp = frame.getPrefs().team;
       String teamNumber = teamProp.getValue();
@@ -154,10 +160,11 @@ public class SmartDashboard {
           teamNumber = input;
       }
 
-      monitor.setProgress(650);
+      monitor.setProgress(850);
       monitor.setNote("Connecting to robot: " + teamNumber);
       Robot.setHost(teamNumber);
       teamProp.setValue(teamNumber);
+      monitor.setProgress(1000);
     }
   }
 }
