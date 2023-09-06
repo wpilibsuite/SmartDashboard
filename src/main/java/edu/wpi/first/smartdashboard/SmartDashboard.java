@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
@@ -58,8 +59,9 @@ public class SmartDashboard {
     NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
     CombinedRuntimeLoader.loadLibraries(SmartDashboard.class, "wpiutiljni", "ntcorejni");
 
-
-    NetworkTablesJNI.getDefaultInstance();
+    // NetworkTablesJNI.getDefaultInstance();
+    var instance = NetworkTableInstance.getDefault();
+    instance.startDSClient();
 
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
