@@ -1,5 +1,7 @@
 package edu.wpi.first.smartdashboard.robot;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.IRemoteConnectionListener;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -63,20 +65,30 @@ public class Robot {
     NetworkTable.initialize();
   }
 
-  public static ITable getTable(String tableName) {
-    return NetworkTable.getTable(tableName);
+  // NetworkTable.getTable() returns a new table every time it's called.
+  // We need to make sure there is only one table for each table name.
+  private static ConcurrentHashMap<String, ITable> tables = new ConcurrentHashMap<String, ITable>();
+  
+  public static synchronized ITable getTable(String tableName) {
+    if (tables.containsKey(tableName)) {
+      return tables.get(tableName);
+    } else {
+      ITable newTable = NetworkTable.getTable(tableName);
+      tables.put(tableName, newTable);
+      return newTable;
+    }
   }
 
   public static ITable getTable() {
-    return NetworkTable.getTable(TABLE_NAME);
+    return getTable(TABLE_NAME);
   }
 
   public static ITable getPreferences() {
-    return NetworkTable.getTable(PREFERENCES_NAME);
+    return getTable(PREFERENCES_NAME);
   }
 
   public static ITable getLiveWindow() {
-    return NetworkTable.getTable(LIVE_WINDOW_NAME);
+    return getTable(LIVE_WINDOW_NAME);
   }
 
   public static void addConnectionListener(IRemoteConnectionListener listener, boolean
