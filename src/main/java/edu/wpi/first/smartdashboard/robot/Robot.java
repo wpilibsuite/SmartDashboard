@@ -18,11 +18,15 @@ public class Robot {
   public static final String identity = "SmartDashboard";
 
   private static volatile String _host = "";
-  private static volatile int port = NetworkTableInstance.kDefaultPort3;
   private static final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
 
   static {
-    ntInstance.startClient4(identity);
+    ntInstance.stopDSClient();
+    ntInstance.startClient4(identity); 
+  }
+
+  public static void startDSClient() {
+    ntInstance.startDSClient();
   }
 
   public static void setTeam(int team) {
