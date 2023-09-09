@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
@@ -101,32 +102,6 @@ public class SmartDashboard {
       System.exit(2);
     }
 
-    if (argParser.hasValue("ip")) {
-      monitor.setProgress(650);
-      monitor.setNote("Connecting to robot at: " + argParser.getValue("ip"));
-      Robot.setHost(argParser.getValue("ip"));
-      System.out.println("IP: " + argParser.getValue("ip"));
-    } else {
-      monitor.setProgress(600);
-      monitor.setNote("Getting Team Number");
-      StringProperty teamProp = frame.getPrefs().team;
-      String teamNumber = teamProp.getValue();
-
-      teamNumberLoop:
-      while (teamNumber.equals("0")) {
-          String input = JOptionPane.showInputDialog("Input Team Number\\Host");
-          if (input == null) {
-            break teamNumberLoop;
-          }
-          teamNumber = input;
-      }
-
-      monitor.setProgress(650);
-      monitor.setNote("Connecting to robot: " + teamNumber);
-      Robot.setHost(teamNumber);
-      teamProp.setValue(teamNumber);
-    }
-
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -144,7 +119,7 @@ public class SmartDashboard {
               frame.load(file.getPath());
             }
 
-            monitor.setProgress(1000);
+            monitor.setProgress(750);
 
           } catch (Exception e) {
             e.printStackTrace();
@@ -156,6 +131,40 @@ public class SmartDashboard {
     } catch (Exception ex) {
       ex.printStackTrace();
       System.exit(2);
+    }
+
+    
+    if (argParser.hasValue("ip")) {
+      monitor.setProgress(1000);
+      monitor.setNote("Connecting to robot at: " + argParser.getValue("ip"));
+      Robot.setHost(argParser.getValue("ip"));
+      System.out.println("IP: " + argParser.getValue("ip"));
+    } else {
+      NetworkTable.setDSClientEnabled(true);
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        // No harm if the sleep is interrupted
+      }
+      monitor.setProgress(800);
+      monitor.setNote("Getting Team Number");
+      StringProperty teamProp = frame.getPrefs().team;
+      String teamNumber = teamProp.getValue();
+
+      teamNumberLoop:
+      while (teamNumber.equals("0")) {
+          String input = JOptionPane.showInputDialog("Input Team Number\\Host");
+          if (input == null) {
+            break teamNumberLoop;
+          }
+          teamNumber = input;
+      }
+
+      monitor.setProgress(850);
+      monitor.setNote("Connecting to robot: " + teamNumber);
+      Robot.setHost(teamNumber);
+      teamProp.setValue(teamNumber);
+      monitor.setProgress(1000);
     }
   }
 }
