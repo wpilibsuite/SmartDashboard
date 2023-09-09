@@ -1,6 +1,7 @@
 package edu.wpi.first.smartdashboard.robot;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.IRemoteConnectionListener;
@@ -68,7 +69,7 @@ public class Robot {
 
   // NetworkTable.getTable() returns a new table every time it's called.
   // We need to make sure there is only one table for each table name.
-  private static ConcurrentHashMap<String, ITable> tables = new ConcurrentHashMap<String, ITable>();
+  private static final ConcurrentMap<String, ITable> tables = new ConcurrentHashMap<String, ITable>();
   
   public static synchronized ITable getTable(String tableName) {
     if (tables.containsKey(tableName)) {
