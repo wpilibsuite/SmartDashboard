@@ -77,7 +77,7 @@ public class Scheduler extends Widget {
                     // Cancel commands
                     toCancel = new ArrayList<Double>(Arrays.asList(table.getNumberArray("Cancel", new Double[0])));
                     toCancel.add(ids.get(index));
-                    table.putValue("Cancel", toCancel.toArray(new Double[toCancel.size()]);
+                    table.putValue("Cancel", toCancel.toArray(new Double[toCancel.size()]));
                   }
                 });
                 buttons.add(button);
