@@ -67,7 +67,7 @@ public class LiveWindowFakeRobot {
         STATUS.putString("Robot", "Testing");
         wPotentiometer.putNumber("Value", 2.6);
         ePotentiometer.putNumber("Value", -11.6872);
-        tSwitch.putString("Value", "Off");
+        tSwitch.putBoolean("Value", false);
 
         ePID.putNumber("p", 0.5);
         ePID.putNumber("i", 0.5);
@@ -87,7 +87,7 @@ public class LiveWindowFakeRobot {
                     tPotentiometer.putNumber("Value", (Math.random()-.5) * 24);
                     tGyro.putNumber("Value", Math.random() * 360);
                     tAccel.putNumber("Value", (Math.random()-.5)*8);
-                    tSwitch.putString("Value", Math.random() < 0.5 ? "On" : "Off");
+                    tSwitch.putBoolean("Value", Math.random() < 0.5 ? true : false);
                     tEncoder1.putNumber("Speed", Math.random() * 20);
                     tEncoder1.putNumber("Distance", Math.random() * 10);
                     tEncoder1.putNumber("Distance per Tick", Math.random());
