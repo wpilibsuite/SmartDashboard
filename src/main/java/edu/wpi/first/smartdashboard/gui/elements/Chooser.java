@@ -65,7 +65,8 @@ public class Chooser extends AbstractTableWidget {
     }
 
     if (!source.containsKey(SELECTED)) {
-      source.getEntry(SELECTED).setString(source.getEntry(DEFAULT).getString(choices.get(0)));
+      source.getEntry(SELECTED).setString(source.getEntry(DEFAULT)
+          .getString(!choices.isEmpty() ? choices.get(0) : "No Selection"));
     }
   }
 

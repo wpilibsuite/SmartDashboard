@@ -60,6 +60,10 @@ public class SmartDashboard {
     NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
     CombinedRuntimeLoader.loadLibraries(SmartDashboard.class, "wpiutiljni", "ntcorejni");
 
+    // NetworkTablesJNI.getDefaultInstance();
+    var instance = NetworkTableInstance.getDefault();
+    instance.stopDSClient();
+
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
         public void run() {
@@ -99,7 +103,6 @@ public class SmartDashboard {
       System.exit(2);
     }
 
-   
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -108,7 +111,7 @@ public class SmartDashboard {
             frame.pack();
             frame.setVisible(true);
 
-            monitor.setProgress(750);
+            monitor.setProgress(500);
             monitor.setNote("Loading From Save");
 
             // Load
@@ -117,7 +120,7 @@ public class SmartDashboard {
               frame.load(file.getPath());
             }
 
-            monitor.setProgress(650);
+            monitor.setProgress(750);
 
           } catch (Exception e) {
             e.printStackTrace();
@@ -142,7 +145,7 @@ public class SmartDashboard {
       // ignore; no harm if sleep is interrupted
     }
     if (argParser.hasValue("ip")) {
-      monitor.setProgress(650);
+      monitor.setProgress(800);
       monitor.setNote("Connecting to robot at: " + argParser.getValue("ip"));
       Robot.setHost(argParser.getValue("ip"));
       System.out.println("IP: " + argParser.getValue("ip"));
@@ -168,6 +171,5 @@ public class SmartDashboard {
       teamProp.setValue(teamNumber);
       monitor.setProgress(1000);
     }
-
   }
 }
