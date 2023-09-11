@@ -73,12 +73,6 @@ public class LiveWindowFakeRobot {
         ePotentiometer.getEntry("Value").setDouble(-11.6872);
         tSwitch.getEntry("Value").setBoolean(false);
 
-        elevator.getEntry("p").setDouble(0.5);
-        elevator.getEntry("i").setDouble(0.5);
-        elevator.getEntry("d").setDouble(0.5);
-        elevator.getEntry("f").setDouble(0.5);
-        elevator.getEntry("setpoint").setDouble(0.5);
-        elevator.getEntry("enabled").setBoolean(false);
 
         ePID.getEntry("p").setDouble(0.5);
         ePID.getEntry("i").setDouble(0.5);
