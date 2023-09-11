@@ -1,11 +1,14 @@
 package edu.wpi.first.smartdashboard;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.robot.Robot;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.EnumSet;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -13,12 +16,13 @@ import javax.swing.JOptionPane;
  *
  * @author pmalmsten
  */
-public class LogToCSV implements ITableListener {
+public class LogToCSV implements TableEventListener {
 
   private static final String s_lineSeparator = System.getProperty("line.separator");
   private long m_startTime;
   private FileWriter m_fw;
   private final DashboardFrame frame;
+  private int listenerHandle;
 
   public LogToCSV(DashboardFrame frame) {
     this.frame = frame;
@@ -38,9 +42,10 @@ public class LogToCSV implements ITableListener {
         m_fw = new FileWriter(path);
         m_fw.write("Time (ms),Name,Value" + s_lineSeparator);
         m_fw.flush();
-        Robot.getTable().addTableListenerEx(this,
-            ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW
-                | ITable.NOTIFY_UPDATE);
+        listenerHandle = Robot.getTable().addListener(
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+                       NetworkTableEvent.Kind.kPublish),
+            this);
       } catch (IOException ex) {
         ex.printStackTrace();
         JOptionPane.showMessageDialog(null,
@@ -66,16 +71,18 @@ public class LogToCSV implements ITableListener {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
-    Robot.getTable().removeTableListener(this);
+    Robot.getTable().removeListener(listenerHandle);
     m_fw = null;
   }
 
   @Override
-  public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-    if (!(value instanceof ITable) && m_fw != null) {
+  public void accept(NetworkTable source, String key, 
+                     NetworkTableEvent event) {
+    if (m_fw != null) {
       try {
         long timeStamp = System.currentTimeMillis() - m_startTime;
-        m_fw.write(timeStamp + "," + "\"" + key + "\"," + "\"" + value + "\"" + s_lineSeparator);
+        m_fw.write(timeStamp + "," + "\"" + key + "\"," + "\"" + event.valueData
+            .value.getValue() + "\"" + s_lineSeparator);
         m_fw.flush();
       } catch (IOException ex) {
         ex.printStackTrace();

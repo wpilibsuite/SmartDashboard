@@ -1,13 +1,14 @@
 package edu.wpi.first.smartdashboard;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.smartdashboard.extensions.FileSniffer;
 import edu.wpi.first.smartdashboard.gui.DashboardFrame;
-import edu.wpi.first.smartdashboard.properties.IntegerProperty;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
 import edu.wpi.first.smartdashboard.robot.Robot;
-import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.util.CombinedRuntimeLoader;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.smartdashboard.robot.Robot;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,8 +60,9 @@ public class SmartDashboard {
     NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
     CombinedRuntimeLoader.loadLibraries(SmartDashboard.class, "wpiutiljni", "ntcorejni");
 
-
-    NetworkTablesJNI.getDefaultInstance();
+    // NetworkTablesJNI.getDefaultInstance();
+    var instance = NetworkTableInstance.getDefault();
+    instance.stopDSClient();
 
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
@@ -101,13 +103,54 @@ public class SmartDashboard {
       System.exit(2);
     }
 
+    try {
+      SwingUtilities.invokeAndWait(new Runnable() {
+
+        public void run() {
+          try {
+            frame.pack();
+            frame.setVisible(true);
+
+            monitor.setProgress(500);
+            monitor.setNote("Loading From Save");
+
+            // Load
+            File file = new File(frame.getPrefs().saveFile.getValue());
+            if (file.exists()) {
+              frame.load(file.getPath());
+            }
+
+            monitor.setProgress(750);
+
+          } catch (Exception e) {
+            e.printStackTrace();
+
+            System.exit(1);
+          }
+        }
+      });
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      System.exit(2);
+    }
+    // Delay starting DSClient until save.xml is processed.
+    // If NT connection happens before save.xml is processed
+    // some widgets will not be rendered.
+    Robot.startDSClient();
+    try {
+      // Give time for DS client to supply server address
+      // before trying locally configured team number/address
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      // ignore; no harm if sleep is interrupted
+    }
     if (argParser.hasValue("ip")) {
-      monitor.setProgress(650);
+      monitor.setProgress(800);
       monitor.setNote("Connecting to robot at: " + argParser.getValue("ip"));
       Robot.setHost(argParser.getValue("ip"));
       System.out.println("IP: " + argParser.getValue("ip"));
     } else {
-      monitor.setProgress(600);
+      monitor.setProgress(850);
       monitor.setNote("Getting Team Number");
       StringProperty teamProp = frame.getPrefs().team;
       String teamNumber = teamProp.getValue();
@@ -121,41 +164,12 @@ public class SmartDashboard {
           teamNumber = input;
       }
 
-      monitor.setProgress(650);
+      
+      monitor.setProgress(900);
       monitor.setNote("Connecting to robot: " + teamNumber);
       Robot.setHost(teamNumber);
       teamProp.setValue(teamNumber);
-    }
-
-    try {
-      SwingUtilities.invokeAndWait(new Runnable() {
-
-        public void run() {
-          try {
-            frame.pack();
-            frame.setVisible(true);
-
-            monitor.setProgress(750);
-            monitor.setNote("Loading From Save");
-
-            // Load
-            File file = new File(frame.getPrefs().saveFile.getValue());
-            if (file.exists()) {
-              frame.load(file.getPath());
-            }
-
-            monitor.setProgress(1000);
-
-          } catch (Exception e) {
-            e.printStackTrace();
-
-            System.exit(1);
-          }
-        }
-      });
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      System.exit(2);
+      monitor.setProgress(1000);
     }
   }
 }

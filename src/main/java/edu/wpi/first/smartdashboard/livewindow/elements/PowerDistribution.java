@@ -4,7 +4,6 @@ import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.PowerDistributionType;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,7 +13,7 @@ import javax.swing.JLabel;
 /**
  * Displays the current and voltage from the PDP
  */
-public class PowerDistribution extends AbstractTableWidget implements ITableListener {
+public class PowerDistribution extends AbstractTableWidget {
 
   public static final DataType[] TYPES = {PowerDistributionType.get()};
   

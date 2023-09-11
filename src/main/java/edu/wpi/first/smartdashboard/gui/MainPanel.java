@@ -17,7 +17,7 @@ import javax.swing.JPanel;
  */
 public final class MainPanel extends JPanel {
 
-  public static final HashMap<String, DashboardPanel> panels = new HashMap();
+  public static final HashMap<String, DashboardPanel> panels = new HashMap<String, DashboardPanel>();
   private static DashboardPanel currentPanel;
 
   public MainPanel(LayoutManager layout, DashboardPanel defaultPanel, DashboardPanel... panels) {

@@ -12,7 +12,8 @@ public class NamedDataType extends DataType {
   private static final Map<String, NamedDataType> map = new HashMap<String, NamedDataType>();
 
   public static NamedDataType get(String name) {
-    return map.get(name);
+    var type = map.get(name);
+    return type;
   }
 
   protected NamedDataType(String name, DataType... parents) {

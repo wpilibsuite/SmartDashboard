@@ -5,7 +5,9 @@ import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.CANSpeedControllerType;
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
+
 import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -74,9 +76,9 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
     }
     normalControlPanel.reset();
     mode = m;
-    table.putBoolean("Enabled",
+    table.getEntry("Enabled").setBoolean(
         mode == 0 || mode == 4); // enable on %VBus and voltage, disable on all others
-    table.putNumber("Mode", mode);
+    table.getEntry("Mode").setNumber(mode);
   };
 
   @Override
@@ -130,8 +132,8 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
     super.setValue(value);
     pidControlPanel.setValue(value);
     normalControlPanel.setValue(value);
-    this.type = table.getString("Type", "[unknown]");
-    this.mode = (int) table.getNumber("Mode", 0);
+    this.type = table.getEntry("Type").getString("[unknown]");
+    this.mode = table.getEntry("Mode").getNumber(0).intValue();
 
     headerPanel.remove(modeBox);
     switch (type) {
@@ -148,13 +150,13 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
   }
 
   @Override
-  public void booleanChanged(ITable source, String key, boolean value, boolean isNew) {
+  public void booleanChanged(NetworkTable source, String key, boolean value, boolean isNew) {
     pidControlPanel.booleanChanged(source, key, value, isNew);
     normalControlPanel.booleanChanged(source, key, value, isNew);
   }
 
   @Override
-  public void doubleChanged(ITable source, String key, double value, boolean isNew) {
+  public void doubleChanged(NetworkTable source, String key, double value, boolean isNew) {
     if ("Mode".equals(key)) {
       this.mode = (int) value;
       modeBox.setSelectedIndex(mode == TALON_DISABLED_MODE ? 6 : mode);
@@ -166,7 +168,7 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
   }
 
   @Override
-  public void stringChanged(ITable source, String key, String value, boolean isNew) {
+  public void stringChanged(NetworkTable source, String key, String value, boolean isNew) {
     if ("Type".equals(key)) {
       this.type = value;
     }
@@ -175,10 +177,10 @@ public class CANSpeedController extends AbstractTableWidget implements Controlle
   }
 
   @Override
-  public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-    super.valueChanged(source, key, value, isNew);
-    pidControlPanel.valueChanged(source, key, value, isNew);
-    normalControlPanel.valueChanged(source, key, value, isNew);
+  public void accept(NetworkTable source, String key, NetworkTableEvent event) {
+    super.accept(source, key, event);
+    pidControlPanel.accept(source, key, event);
+    normalControlPanel.accept(source, key, event);
   }
 
   @Override

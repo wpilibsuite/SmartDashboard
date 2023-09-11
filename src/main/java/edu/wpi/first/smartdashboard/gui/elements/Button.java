@@ -23,12 +23,12 @@ public class Button extends AbstractTableWidget {
     start.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(MouseEvent e) {
-        table.putBoolean("pressed", true);
+        table.getEntry("pressed").setBoolean(true);
       }
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        table.putBoolean("pressed", false);
+        table.getEntry("pressed").setBoolean(false);
       }
     });
 

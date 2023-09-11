@@ -1,5 +1,8 @@
 package edu.wpi.first.smartdashboard.livewindow.elements;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.smartdashboard.gui.MainPanel;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
@@ -7,17 +10,17 @@ import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.LWSubsystemType;
 import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLReader;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 
@@ -65,17 +68,21 @@ public class LWSubsystem extends AbstractTableWidget {
    */
   public void init() {
     layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+    var border = BorderFactory.createTitledBorder(getFieldName());
+    var borderWidth = 2 * (border.getBorderInsets(this).left + border.getBorderInsets(this).right);
+    borderWidth += this.getFontMetrics(this.getFont()).stringWidth(getFieldName());
     setLayout(layout);
     setObstruction(true);
     setOpaque(true);
     setVisible(true);
-    setBorder(BorderFactory.createTitledBorder(getFieldName()));
+    add(Box.createHorizontalStrut(borderWidth));
+    setBorder(border);
     mouse = new Mouse(this);
     addMouseListener(mouse);
     addMouseMotionListener(mouse);
   }
 
-  private void addSubsystemElement(String key, ITable value) {
+  private void addSubsystemElement(String key, NetworkTable value) {
     // don't add duplicate widgets
     for (Widget widget : widgets) {
       if (widget != null && widget.getFieldName().equals(key)) {
@@ -86,25 +93,31 @@ public class LWSubsystem extends AbstractTableWidget {
       System.out.println(
           "\nSubsystem \"" + getFieldName() + "\" does not contain widget \"" + key + "\"");
       System.out.println("Table: " + value);
-      System.out.println("Type: " + value.getString(".type", null));
-      System.out.println(
-          "Trying to add a widget of type \"" + DataType.getType(value) + "\" and key " + key);
-      Class<? extends Widget> widgetClass = DataType.getType(value).getDefault();
-      Widget widget = widgetClass.newInstance();
-      widget.setFieldName(key);
-      widget.setType(DataType.getType(value));
-      widget.init();
-      widget.setValue(value);
-      widgets.add(widget);
-      add(widget);
-      preferredSize = layout.preferredLayoutSize(this);
-      setPreferredSize(preferredSize);
-      setMinimumSize(preferredSize);
-      setSavedSize(preferredSize);
-      setSize(preferredSize);
-      System.out.println("New size [" + preferredSize.width + ", " + preferredSize.height + "]");
-      revalidate();
-      repaint();
+      System.out.println("Type: " + value.getEntry(".type").getString(null));
+      DataType dataType = DataType.getType(value);
+      if (dataType != null) { 
+        System.out.println(
+            "Trying to add a widget of type \"" + dataType + "\" and key " + key);
+
+        Class<? extends Widget> widgetClass = DataType.getType(value).getDefault();
+        Widget widget = widgetClass.newInstance();
+        widget.setFieldName(key);
+        widget.setType(DataType.getType(value));
+        widget.init();
+        widget.setValue(value);
+        widgets.add(widget);
+        add(widget);
+        preferredSize = layout.preferredLayoutSize(this);
+        setPreferredSize(preferredSize);
+        setMinimumSize(preferredSize);
+        setSavedSize(preferredSize);
+        setSize(preferredSize);
+        System.out.println("New size [" + preferredSize.width + ", " + preferredSize.height + "]");
+        revalidate();
+        repaint();
+      } else {
+        System.out.println("Skipping: No registered dataType for type " + value.getEntry(".type").getString(null));
+      }
       System.out.println();
     } catch (InstantiationException | IllegalAccessException ex) {
       Logger.getLogger(LWSubsystem.class.getName()).log(Level.SEVERE, null, ex);
@@ -112,29 +125,54 @@ public class LWSubsystem extends AbstractTableWidget {
   }
 
   /**
-   * @param source Required by ITableListener. Not used.
-   * @param key The name of the changed table.
-   * @param isNew Required by ITableListener. Not used.
+   * @param parent The NetworkTable where the change occurred. Not used.
+   * @param key The name of the new table.
+   * @param newTable The newly created NetworkTable. Not used.
    */
   @Override
-  public void tableChanged(ITable source, final String key, final ITable table, boolean isNew) {
+  public void tableCreated(final NetworkTable parent, final String key, 
+                           final NetworkTable newTable) {
     boolean alreadyHasWidget = false;
     if (reader != null) {
       alreadyHasWidget = reader.containsWidgetOfName(this, key);
     }
 
     if (!alreadyHasWidget) {
-      table.addTableListenerEx(".type", new ITableListener() {
-        public void valueChanged(final ITable typeSource, final String typeKey, final Object
-            typeValue, final boolean typeIsNew) {
-          table.removeTableListener(this);
+      abstract class TEListenerWithHandle implements TableEventListener {
+        int myHandle;
+
+        public abstract void accept(final NetworkTable typeSource, final String typeKey,
+                                 final NetworkTableEvent typeEvent);
+
+        public void setHandle(int handle) { 
+          myHandle = handle; 
+        }
+      }
+      
+      ;
+      var listener = new TEListenerWithHandle() {
+        
+        public void accept(final NetworkTable typeSource, final String typeKey, 
+                                final NetworkTableEvent typeEvent) {
+          newTable.removeListener(myHandle);
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-              addSubsystemElement(key, table);
+              addSubsystemElement(key, newTable);
             }
           });
         }
-      }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
+        
+        ;
+      }
+      ;
+      listener.setHandle(
+          newTable.addListener(".type", 
+            EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kValueAll,
+                  NetworkTableEvent.Kind.kPublish),
+
+            listener
+        )
+      );
     }
   }
 

@@ -1,10 +1,10 @@
 package edu.wpi.livewindowfakerobot;
 
 import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpiutil.CombinedRuntimeLoader;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.CombinedRuntimeLoader;
+import edu.wpi.first.util.WPIUtilJNI;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -15,10 +15,9 @@ import java.util.TimerTask;
  * @author Sam
  */
 public class LiveWindowFakeRobot {
-
     private static NetworkTable liveWindow;
 
-    private static ITable STATUS, wrist, wPotentiometer, wVictor, elevator, ePotentiometer,
+    private static NetworkTable STATUS, wrist, wPotentiometer, wVictor, elevator, ePotentiometer,
         eVictor, testSys, tComp, tGearTooth, tVictor, tPotentiometer, tRelay, tDigitalOutput,
         tGyro, tSolenoid, tServo, tAccel, tEncoder1, tUltra, tCompass, tSwitch, canSystem,
         canJag, canTalon, ePID;
@@ -27,10 +26,15 @@ public class LiveWindowFakeRobot {
         WPIUtilJNI.Helper.setExtractOnStaticLoad(false);
         NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
         CombinedRuntimeLoader.loadLibraries(LiveWindowFakeRobot.class, "wpiutiljni", "ntcorejni");
-
-        liveWindow = NetworkTable.getTable("LiveWindow");
+        NetworkTableInstance.getDefault().startServer();
+	
+        liveWindow = NetworkTableInstance.getDefault().getTable("LiveWindow");
 
         STATUS = createTable(liveWindow, ".status", "LW Status");
+
+        wrist           = createTable(liveWindow, "Wrist", "LW Subsystem");
+        wPotentiometer  = createTable(wrist, "Potentiometer", "Analog Input");
+        wVictor         = createTable(wrist, "Victor", "Motor Controller"); 
 
         wrist = createTable(liveWindow, "Wrist", "LW Subsystem");
         wPotentiometer = createTable(wrist, "Potentiometer", "Analog Input");
@@ -62,48 +66,49 @@ public class LiveWindowFakeRobot {
         canTalon = createTable(canSystem, "CAN Talon", "CANSpeedController");
 
         System.out.println();
+        
+        STATUS.getEntry("LW Enabled").setBoolean(true);
+        STATUS.getEntry("Robot").setString("Testing");
+        wPotentiometer.getEntry("Value").setDouble(2.6);
+        ePotentiometer.getEntry("Value").setDouble(-11.6872);
+        tSwitch.getEntry("Value").setBoolean(false);
 
-        STATUS.putBoolean("LW Enabled", true);
-        STATUS.putString("Robot", "Testing");
-        wPotentiometer.putNumber("Value", 2.6);
-        ePotentiometer.putNumber("Value", -11.6872);
-        tSwitch.putBoolean("Value", false);
 
-        ePID.putNumber("p", 0.5);
-        ePID.putNumber("i", 0.5);
-        ePID.putNumber("d", 0.5);
-        ePID.putNumber("setpoint", 0.5);
+        ePID.getEntry("p").setDouble(0.5);
+        ePID.getEntry("i").setDouble(0.5);
+        ePID.getEntry("d").setDouble(0.5);
+        ePID.getEntry("setpoint").setDouble(0.5);
 
-        canJag.putString("Type", "CANJaguar");
-        canTalon.putString("Type", "CANTalon");
+        canJag.getEntry("Type").setString("CANJaguar");
+        canTalon.getEntry("Type").setString("CANTalon");
 
 
         (new Timer()).schedule(
             new TimerTask(){
                 @Override
                 public void run() {
-                    wPotentiometer.putNumber("Value", (Math.random()-.5) * 24);
-                    ePotentiometer.putNumber("Value", (Math.random()-.5) * 24);
-                    tPotentiometer.putNumber("Value", (Math.random()-.5) * 24);
-                    tGyro.putNumber("Value", Math.random() * 360);
-                    tAccel.putNumber("Value", (Math.random()-.5)*8);
-                    tSwitch.putBoolean("Value", Math.random() < 0.5 ? true : false);
-                    tEncoder1.putNumber("Speed", Math.random() * 20);
-                    tEncoder1.putNumber("Distance", Math.random() * 10);
-                    tEncoder1.putNumber("Distance per Tick", Math.random());
-                    tCompass.putNumber("Value", Math.random());
-                    tUltra.putNumber("Value", (Math.random()-.5) * 200);
-                    tGearTooth.putNumber("Value", (int)(Math.random() * 100));
+                    wPotentiometer.getEntry("Value").setDouble((Math.random()-.5) * 24);
+                    ePotentiometer.getEntry("Value").setDouble((Math.random()-.5) * 24);
+                    tPotentiometer.getEntry("Value").setDouble((Math.random()-.5) * 24);
+                    tGyro.getEntry("Value").setDouble(Math.random() * 360);
+                    tAccel.getEntry("Value").setDouble((Math.random()-.5)*8);
+                    tSwitch.getEntry("Value").setBoolean(Math.random() < 0.5 ? true : false);
+                    tEncoder1.getEntry("Speed").setDouble(Math.random() * 20);
+                    tEncoder1.getEntry("Distance").setDouble(Math.random() * 10);
+                    tEncoder1.getEntry("Distance per Tick").setDouble(Math.random());
+                    tCompass.getEntry("Value").setDouble(Math.random());
+                    tUltra.getEntry("Value").setDouble((Math.random()-.5) * 200);
+                    tGearTooth.getEntry("Value").setDouble((int)(Math.random() * 100));
                 }},
             0, 500);
 
     }
 
-    private static ITable createTable(ITable parent, String name, String type) {
-        ITable table = parent.getSubTable(name);
+    private static NetworkTable createTable(NetworkTable parent, String name, String type) {
+        NetworkTable table = parent.getSubTable(name);
         System.out.println(table);
-        table.putString(".type", type);
-        table.putString(".name", name);
+        table.getEntry(".type").setValue(type);
+        table.getEntry(".name").setValue(name);
         return table;
     }
 }

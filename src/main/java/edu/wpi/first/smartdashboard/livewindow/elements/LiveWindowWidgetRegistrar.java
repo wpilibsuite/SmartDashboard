@@ -1,5 +1,6 @@
 package edu.wpi.first.smartdashboard.livewindow.elements;
 
+import edu.wpi.first.smartdashboard.gui.elements.Scheduler;
 import edu.wpi.first.smartdashboard.types.DisplayElementRegistry;
 
 /**
@@ -24,6 +25,7 @@ public class LiveWindowWidgetRegistrar {
     DisplayElementRegistry.registerWidget(PowerDistribution.class);
     DisplayElementRegistry.registerWidget(ThreeAxisAccelerometer.class);
     DisplayElementRegistry.registerWidget(CANSpeedController.class);
+    DisplayElementRegistry.registerWidget(Scheduler.class);
   }
 
 }

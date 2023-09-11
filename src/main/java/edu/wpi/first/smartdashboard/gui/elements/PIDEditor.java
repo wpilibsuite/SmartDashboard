@@ -20,7 +20,6 @@ public class PIDEditor extends AbstractTableWidget implements Controller {
 
   private final boolean editType;
 
-  private NumberTableComboBox tBox;
   private NumberTableField pField;
   private NumberTableField iField;
   private NumberTableField dField;
@@ -35,7 +34,7 @@ public class PIDEditor extends AbstractTableWidget implements Controller {
     this(true);
   }
 
-  public PIDEditor(boolean editType) { //TODO alert user when the robot is about reset modified
+  public PIDEditor(boolean editType) { //TODO alert user when the robot is about reset modified ???
     // PID values
     this.editType = editType;
   }

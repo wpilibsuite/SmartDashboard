@@ -1,11 +1,12 @@
 package edu.wpi.first.smartdashboard.gui.elements;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.smartdashboard.gui.Widget;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.types.DataType;
 import edu.wpi.first.smartdashboard.types.named.SchedulerType;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.GridLayout;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -34,21 +36,23 @@ public class Scheduler extends Widget {
   private JPanel commandPanel;
   private List<JLabel> labels;
   private List<JButton> buttons;
-  private ITable table;
+  private NetworkTable table;
   private GridLayout commandLayout;
   private GridLayout cancelLayout;
   private CardLayout cardLayout;
 
   private List<String> commands = new ArrayList<>();
-  private List<Double> ids = new ArrayList<>();
-  private List<Double> toCancel = new ArrayList<>();
+  private List<Long> ids = new ArrayList<>();
+  private List<Long> toCancel = new ArrayList<>();
 
-  private ITableListener listener = new ITableListener() {
+  private int listenerHandle;
+  private TableEventListener listener = new TableEventListener() {
 
     boolean running = false;
 
     @Override
-    public void valueChanged(ITable source, String key, Object value, boolean isNew) {
+    public void accept(NetworkTable source, String key, 
+                             NetworkTableEvent event) {
       if (running) {
         return;
       }
@@ -57,8 +61,8 @@ public class Scheduler extends Widget {
 
         public void run() {
           synchronized (table) {
-            commands = Arrays.asList(table.getStringArray("Names", new String[0]));
-            ids = Arrays.asList(table.getNumberArray("Ids", new Double[0]));
+            commands = Arrays.asList(table.getEntry("Names").getStringArray(new String[0]));
+            ids = Arrays.asList(table.getEntry("Ids").getIntegerArray(new Long[0]));
             assert commands.size() == ids.size();
 
             // Update displayed commands
@@ -75,9 +79,10 @@ public class Scheduler extends Widget {
                 button.addActionListener(new ActionListener() {
                   public void actionPerformed(ActionEvent e) {
                     // Cancel commands
-                    toCancel = Arrays.asList(table.getNumberArray("Cancel", new Double[0]));
+                    toCancel = new ArrayList<Long>(Arrays.asList(table.getEntry("Cancel")
+                                    .getIntegerArray(new Long[0])));
                     toCancel.add(ids.get(index));
-                    table.putValue("Cancel", toCancel);
+                    table.getEntry("Cancel").setValue(toCancel.toArray(new Long[0]));
                   }
                 });
                 buttons.add(button);
@@ -112,11 +117,13 @@ public class Scheduler extends Widget {
   @Override
   public void setValue(Object value) {
     if (table != null) {
-      table.removeTableListener(listener);
+      table.removeListener(listenerHandle);
     }
-    table = (ITable) value;
-    table.addTableListenerEx(listener,
-        ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_LOCAL | ITable.NOTIFY_NEW | ITable.NOTIFY_UPDATE);
+    table = (NetworkTable) value;
+    listenerHandle = table.addListener(
+      EnumSet.of(NetworkTableEvent.Kind.kImmediate, NetworkTableEvent.Kind.kPublish,
+                 NetworkTableEvent.Kind.kValueAll),
+                 listener);
 
     revalidate();
     repaint();

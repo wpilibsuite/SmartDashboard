@@ -1,6 +1,7 @@
 package edu.wpi.first.smartdashboard.gui;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.smartdashboard.LogToCSV;
 import edu.wpi.first.smartdashboard.gui.elements.bindings.AbstractTableWidget;
 import edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem;
@@ -84,7 +85,8 @@ public class DashboardFrame extends JFrame {
   private boolean shouldHideMenu = prefs.hideMenu.getValue();
 
   private static final String LW_SAVE = "_"
-      + Robot.getLiveWindow().getSubTable(".status").getString("Robot", "LiveWindow") + ".xml";
+      + Robot.getLiveWindow().getSubTable(".status")
+      .getEntry("Robot").getString("LiveWindow") + ".xml";
 
   private final LogToCSV logger = new LogToCSV(this);
 
@@ -101,17 +103,17 @@ public class DashboardFrame extends JFrame {
    */
   public DashboardFrame(boolean competition) {
     setTitle(TITLE + "Disconnected");
-    NetworkTableInstance.getDefault().addConnectionListener((event) -> {
+    NetworkTableInstance.getDefault().addConnectionListener(true, (event) -> {
       String newTitle;
-      if ((event.getInstance().getNetworkMode() & NetworkTableInstance.kNetModeServer) != 0) {
+      if ((event.getInstance().getNetworkMode().contains(NetworkTableInstance.NetworkMode.kServer))) {
         newTitle = TITLE + "Number of Clients: " + event.getInstance().getConnections().length;
-      } else if (event.connected && event.conn != null) {
-        newTitle = TITLE + "Connected: " + event.conn.remote_ip;
+      } else if (event.is(NetworkTableEvent.Kind.kConnected) && event.connInfo != null) {
+        newTitle = TITLE + "Connected: " + event.connInfo.remote_ip;
       } else {
         newTitle = TITLE + "Disconnected";
       }
       SwingUtilities.invokeLater(() -> setTitle(newTitle));
-    }, true);
+    });
 
     setLayout(new BorderLayout());
 
@@ -346,7 +348,7 @@ public class DashboardFrame extends JFrame {
           Widget e = (Widget) element;
           Object value = null;
           if (Robot.getTable().containsKey(e.getFieldName())) {
-            value = Robot.getTable().getValue(e.getFieldName(), null);
+            value = Robot.getTable().getEntry(e.getFieldName()).getValue().getValue();
             DataType type = DataType.getType(value);
             if (DisplayElementRegistry.supportsType(e.getClass(), type)) {
               smartDashboardPanel.setField(e.getFieldName(), e, type, value, e.getSavedLocation());
@@ -370,7 +372,7 @@ public class DashboardFrame extends JFrame {
         mostRecentParent = subsystem;
         Object value1 = null;
         if (Robot.getLiveWindow().containsKey(subsystem.getFieldName())) {
-          value1 = Robot.getTable().getValue(subsystem.getFieldName(), null);
+          value1 = Robot.getTable().getEntry(subsystem.getFieldName()).getValue();
           DataType type = DataType.getType(value1);
           if (DisplayElementRegistry.supportsType(subsystem.getClass(), type)) {
             liveWindowPanel.setField(subsystem.getFieldName(), subsystem, type, value1, subsystem
@@ -389,6 +391,7 @@ public class DashboardFrame extends JFrame {
               .getFieldName());
           DataType type = DataType.getType(value2);
           mostRecentParent.addWidget(w);
+          mostRecentParent.add(w);
           w.setField(w.getFieldName(), w, type, value2, mostRecentParent, w.getSavedLocation());
           mostRecentParent.setSize(mostRecentParent.getPreferredSize());
         }

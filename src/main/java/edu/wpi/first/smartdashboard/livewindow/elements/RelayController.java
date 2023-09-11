@@ -27,7 +27,7 @@ public class RelayController extends AbstractTableWidget implements Controller {
   public static final DataType[] TYPES = {RelayType.get(), DoubleSolenoidType.get()};
 
   private final String[] options = {"Forward", "Off", "Reverse"};
-  private final JComboBox controller = new JComboBox(options);
+  private final JComboBox<String> controller = new JComboBox<String>(options);
 
   @Override
   public void init() {
@@ -39,7 +39,7 @@ public class RelayController extends AbstractTableWidget implements Controller {
     controller.setSelectedIndex(1);
     controller.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        table.putString("Value", controller.getSelectedItem().toString());
+        table.getEntry("Value").setString(controller.getSelectedItem().toString());
       }
     });
     add(controller);
@@ -54,7 +54,7 @@ public class RelayController extends AbstractTableWidget implements Controller {
   }
 
   public void reset() {
-    table.putString("Value", "Off");
+    table.getEntry("Value").setString("Off");
     controller.setSelectedIndex(1);
   }
 

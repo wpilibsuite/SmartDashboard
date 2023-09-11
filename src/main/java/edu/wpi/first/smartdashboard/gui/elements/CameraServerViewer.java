@@ -3,10 +3,13 @@ package edu.wpi.first.smartdashboard.gui.elements;
 import edu.wpi.first.smartdashboard.properties.MultiProperty;
 import edu.wpi.first.smartdashboard.properties.Property;
 import edu.wpi.first.smartdashboard.properties.StringProperty;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTable.TableEventListener;
+
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.stream.Stream;
 
 public class CameraServerViewer extends MjpgStreamViewer {
@@ -19,35 +22,43 @@ public class CameraServerViewer extends MjpgStreamViewer {
   public final StringProperty selectedCameraPathProperty
       = new StringProperty(this, "Selected Camera Path", "");
 
-  private ITable cameraTable;
-  private ITable rootTable = NetworkTable.getTable("");
-  private ITableListener selectedCameraPathListener
-      = (source, key, value, isNew) -> cameraProperty.setValue(value);
+  private NetworkTable cameraTable;
+  private NetworkTable rootTable = NetworkTableInstance.getDefault().getTable("");
+  private TableEventListener selectedCameraPathListener
+      = (source, key, event) -> cameraProperty.setValue(event.valueData.value.getValue());
+  private int listenerHandle;
 
   @Override
   public void onInit() {
-    NetworkTable.getTable("CameraPublisher").addSubTableListener(((source, key, value, isNew) -> {
-      cameraProperty.add(key, value);
-      if (cameraTable == null
-          && (cameraProperty.getSavedValue().isEmpty()
-          || key.equals(cameraProperty.getSavedValue()))) {
-        cameraTable = (ITable) value;
-      }
-    }));
+    rootTable.getSubTable("CameraPublisher").addSubTableListener(
+        ((NetworkTable source, String key, NetworkTable subtable) -> {
+          cameraProperty.add(key, subtable);
+          if (cameraTable == null
+              && (cameraProperty.getSavedValue().isEmpty()
+              || key.equals(cameraProperty.getSavedValue()))) {
+            cameraTable = subtable;
+          }
+        })
+    );
 
-    rootTable.addTableListener(selectedCameraPathProperty.getValue(),
-        selectedCameraPathListener, true);
-  }
+    listenerHandle = rootTable.addListener(selectedCameraPathProperty.getValue(),
+        EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, 
+                   NetworkTableEvent.Kind.kPublish),
+        selectedCameraPathListener);
+  }  
 
   @Override
   public void onPropertyChanged(Property property) {
     if (property == cameraProperty) {
-      cameraTable = (ITable) cameraProperty.getValue();
+      cameraTable = (NetworkTable) cameraProperty.getValue();
       cameraChanged();
     } else if (property == selectedCameraPathProperty) {
-      rootTable.removeTableListener(selectedCameraPathListener);
-      rootTable.addTableListener(selectedCameraPathProperty.getValue(),
-          selectedCameraPathListener, true);
+      rootTable.removeListener(listenerHandle);
+      listenerHandle = rootTable.addListener(selectedCameraPathProperty.getValue(),
+          EnumSet.of(NetworkTableEvent.Kind.kValueAll, NetworkTableEvent.Kind.kImmediate, 
+                     NetworkTableEvent.Kind.kPublish),
+          selectedCameraPathListener
+          );
     }
   }
 
@@ -57,9 +68,10 @@ public class CameraServerViewer extends MjpgStreamViewer {
       return Stream.empty();
     }
 
-    return Arrays.stream(cameraTable.getStringArray(STREAMS_KEY, new String[0])).map(s -> {
-      if (NetworkTable.connections().length > 0) {
-        return s.replaceFirst("roboRIO-\\d+-FRC.*(?=:)", NetworkTable.connections()[0].remote_ip);
+    return Arrays.stream(cameraTable.getEntry(STREAMS_KEY).getStringArray(new String[0])).map(s -> {
+      if (NetworkTableInstance.getDefault().getConnections().length > 0) {
+        return s.replaceFirst("roboRIO-\\d+-FRC.*(?=:)", 
+                              NetworkTableInstance.getDefault().getConnections()[0].remote_ip);
       }
       return s;
     });
