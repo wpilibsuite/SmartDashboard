@@ -389,6 +389,7 @@ public class DashboardFrame extends JFrame {
               .getFieldName());
           DataType type = DataType.getType(value2);
           mostRecentParent.addWidget(w);
+          mostRecentParent.add(w);
           w.setField(w.getFieldName(), w, type, value2, mostRecentParent, w.getSavedLocation());
           mostRecentParent.setSize(mostRecentParent.getPreferredSize());
         }

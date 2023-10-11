@@ -87,24 +87,30 @@ public class LWSubsystem extends AbstractTableWidget {
           "\nSubsystem \"" + getFieldName() + "\" does not contain widget \"" + key + "\"");
       System.out.println("Table: " + value);
       System.out.println("Type: " + value.getString(".type", null));
-      System.out.println(
-          "Trying to add a widget of type \"" + DataType.getType(value) + "\" and key " + key);
-      Class<? extends Widget> widgetClass = DataType.getType(value).getDefault();
-      Widget widget = widgetClass.newInstance();
-      widget.setFieldName(key);
-      widget.setType(DataType.getType(value));
-      widget.init();
-      widget.setValue(value);
-      widgets.add(widget);
-      add(widget);
-      preferredSize = layout.preferredLayoutSize(this);
-      setPreferredSize(preferredSize);
-      setMinimumSize(preferredSize);
-      setSavedSize(preferredSize);
-      setSize(preferredSize);
-      System.out.println("New size [" + preferredSize.width + ", " + preferredSize.height + "]");
-      revalidate();
-      repaint();
+      DataType dataType = DataType.getType(value);
+      if (dataType != null) { 
+        System.out.println(
+            "Trying to add a widget of type \"" + dataType + "\" and key " + key);
+
+        Class<? extends Widget> widgetClass = DataType.getType(value).getDefault();
+        Widget widget = widgetClass.newInstance();
+        widget.setFieldName(key);
+        widget.setType(DataType.getType(value));
+        widget.init();
+        widget.setValue(value);
+        widgets.add(widget);
+        add(widget);
+        preferredSize = layout.preferredLayoutSize(this);
+        setPreferredSize(preferredSize);
+        setMinimumSize(preferredSize);
+        setSavedSize(preferredSize);
+        setSize(preferredSize);
+        System.out.println("New size [" + preferredSize.width + ", " + preferredSize.height + "]");
+        revalidate();
+        repaint();
+      } else {
+        System.out.println("Skipping: No registered dataType for type " + value.getString(".type", null) );
+      }
       System.out.println();
     } catch (InstantiationException | IllegalAccessException ex) {
       Logger.getLogger(LWSubsystem.class.getName()).log(Level.SEVERE, null, ex);
