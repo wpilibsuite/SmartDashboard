@@ -13,7 +13,7 @@ jobs:
         echo "Version update for ${{ github.event.client_payload.package_name }} -> ${{ github.event.client_payload.package_version }} requested"
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        token: ${{ secrets.TOOL_REPO_ACCESS_TOKEN }}
         fetch-depth: 0
 
     - name: Tag and push
