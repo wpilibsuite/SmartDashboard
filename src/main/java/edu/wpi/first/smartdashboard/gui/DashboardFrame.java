@@ -13,6 +13,7 @@ import edu.wpi.first.smartdashboard.xml.SmartDashboardXMLWriter;
 import edu.wpi.first.smartdashboard.xml.XMLWidget;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -27,8 +28,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
@@ -69,6 +72,7 @@ public class DashboardFrame extends JFrame {
   private final DashboardPanel smartDashboardPanel;
   private final DashboardPanel liveWindowPanel;
   private final MainPanel mainPanel;
+  private final JPanel footerPanel;
   private DisplayMode displayMode = DisplayMode.SmartDashboard;
   /**
    * The menu bar
@@ -128,11 +132,17 @@ public class DashboardFrame extends JFrame {
     setDisplayMode(DisplayMode.SmartDashboard);
     menuBar = new DashboardMenu(this, mainPanel);
     propEditor = new PropertyEditor(this);
+    
+    JLabel deprecatedLabel = new JLabel("SmartDashboard is deprecated and will not work with the 2027 control system");
+    deprecatedLabel.setForeground(Color.RED);
+    footerPanel = new JPanel();
+    footerPanel.add(deprecatedLabel);
 
     if (!shouldHideMenu) {
       add(menuBar, BorderLayout.NORTH);
     }
     add(mainPanel, BorderLayout.CENTER);
+    add(footerPanel, BorderLayout.SOUTH);
 
     // Look for when the menu bar should be displayed
     MouseAdapter hideListener = new MouseAdapter() {
