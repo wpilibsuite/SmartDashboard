@@ -4,6 +4,8 @@
 
 Welcome to the WPILib project. This repository contains the SmartDashboard project.
 
+SmartDashboard is deprecated and will be removed for 2027 due to its usage of Network Tables v3. Users can find [additional modern dashboard options here](https://docs.wpilib.org/en/stable/docs/software/dashboards/dashboard-intro.html)
+
 - [WPILib Mission](#wpilib-mission)
 - [Getting SmartDashboard](#getting-smartdashboard)
 - [Building SmartDashboard](#building-smartdashboard)
